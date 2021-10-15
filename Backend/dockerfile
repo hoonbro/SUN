@@ -1,0 +1,10 @@
+# openjdk:8-jre-alpine 이미지를 기본으로 사용
+FROM openjdk:8-jre-alpine
+
+# jar 파일을 복사한다.
+COPY . .
+
+# 어플리케이션 포트쓰~
+EXPOSE 8080
+
+CMD ["java", "-jar", "application.jar"]
