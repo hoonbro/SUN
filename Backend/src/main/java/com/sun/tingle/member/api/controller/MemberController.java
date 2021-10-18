@@ -28,7 +28,15 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<MemberEntity> registMember(@RequestBody MemberDto member){
         HttpStatus httpStatus = HttpStatus.CREATED;
-        MemberEntity memberEntity = memberService.registMember(member);
+        MemberEntity memberEntity;
+        try {
+            memberEntity = memberService.registMember(member);
+            log.info("회원가입 성공");
+        }catch(Exception e){
+            httpStatus = HttpStatus.CONFLICT;
+            log.error("회원가입 실패");
+            return new ResponseEntity<>(httpStatus);
+        }
         return new ResponseEntity<MemberEntity>(memberEntity, httpStatus);
     }
 
@@ -37,8 +45,10 @@ public class MemberController {
         HttpStatus httpStatus = HttpStatus.OK;
         try{
             memberService.duplicateId(id);
+            log.info("아이디 미중복");
         }catch (Exception e){
             httpStatus = HttpStatus.CONFLICT;
+            log.error("아이디 중복");
             return new ResponseEntity<>(httpStatus);
         }
 
@@ -50,8 +60,10 @@ public class MemberController {
         HttpStatus httpStatus = HttpStatus.OK;
         try{
             memberService.duplicateEmail(email);
+            log.info("이메일 미중복");
         }catch (Exception e){
             httpStatus = HttpStatus.CONFLICT;
+            log.error("이메일 중복");
             return new ResponseEntity<>(httpStatus);
         }
 
@@ -61,20 +73,22 @@ public class MemberController {
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(@RequestBody MemberDto loginMember){
         Map<String, Object> map = new HashMap<String, Object>();
-        HttpStatus httpStatus = HttpStatus.CREATED;
+        HttpStatus httpStatus = HttpStatus.OK;
 
         try{
             Optional<MemberEntity> memberEntity = memberService.getMemberById(loginMember.getMemberId());
             //아이디가 없는 경우
-            if(memberEntity == null) {
+            if(memberEntity.isEmpty()) {
                 httpStatus = HttpStatus.UNAUTHORIZED;
                 map.put("error", "Invalid ID");
+                log.error("존재하지 않는 아이디");
                 return new ResponseEntity<Map<String, Object>>(map, httpStatus);
             }
             //비밀번호가 틀린경우
-            if(!passwordEncoder.matches(memberEntity.get().getPassword(), loginMember.getPassword())){
+            if(!passwordEncoder.matches(loginMember.getPassword(), memberEntity.get().getPassword())){
                 httpStatus = HttpStatus.UNAUTHORIZED;
                 map.put("error", "Wrong password");
+                log.error("비밀번호 오류");
                 return new ResponseEntity<Map<String, Object>>(map, httpStatus);
             }
 
