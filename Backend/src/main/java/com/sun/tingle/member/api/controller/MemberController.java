@@ -3,13 +3,17 @@ package com.sun.tingle.member.api.controller;
 import com.sun.tingle.member.api.dto.MemberDto;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.db.entity.MemberEntity;
+import com.sun.tingle.member.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +28,9 @@ public class MemberController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    JwtUtil jwtUtil;
 
     @PostMapping
     public ResponseEntity<MemberEntity> registMember(@RequestBody MemberDto member){
@@ -92,6 +99,9 @@ public class MemberController {
                 return new ResponseEntity<Map<String, Object>>(map, httpStatus);
             }
 
+            String jwt = jwtUtil.createToken(loginMember.getMemberId());
+            log.debug("로그인 토큰 정보 : {}", jwt);
+            map.put("accessToken", jwt);
 
         }catch(Exception e){
             httpStatus = HttpStatus.BAD_REQUEST;
@@ -106,5 +116,13 @@ public class MemberController {
         HttpStatus httpStatus = HttpStatus.OK;
         Optional<MemberEntity> memberEntity = memberService.getMemberById(id);
         return new ResponseEntity<Optional<MemberEntity>>(memberEntity, httpStatus);
+    }
+
+    @GetMapping("/invalid")
+    public ResponseEntity<Boolean> tokenTest(HttpServletRequest request){
+        HttpStatus httpStatus = HttpStatus.OK;
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        boolean auth = jwtUtil.validateToken(token.substring("Bearer ".length()));
+        return new ResponseEntity<Boolean>(auth, httpStatus);
     }
 }
