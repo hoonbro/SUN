@@ -1,4 +1,8 @@
 package com.sun.tingle.member.config;
+import com.sun.tingle.member.api.service.MemberService;
+import com.sun.tingle.member.auth.JwtAuthenticationFilter;
+import com.sun.tingle.member.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -16,6 +20,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //해당 어노테이션에 대한 설정을 활성화시키는 어노테이션.
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    MemberService memberService;
+
+    @Autowired
+    JwtUtil jwtUtil;
+
     // Password 인코딩 방식에 BCrypt 암호화 방식 사용
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -29,9 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 토큰 기반 인증이므로 세션 사용 하지않음
                 .and()
-//                .addFilter(new JwtAuthenticationFilter(authenticationManager(), userService)) //HTTP 요청에 JWT 토큰 인증 필터를 거치도록 필터를 추가
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtUtil, memberService)) //HTTP 요청에 JWT 토큰 인증 필터를 거치도록 필터를 추가
                 .authorizeRequests() //시큐리티 처리에 HttpServletRequest를 이용한다는 것을 의미
                 //antMatchers()는 특정한 경로를 지정합니다.
+                .antMatchers("/members/invalid").hasRole("USER")
                 .anyRequest().permitAll()
                 .and().cors();
     }
