@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class CalendarController {
     }
 
     @GetMapping("{calendarCode}")
-    public ResponseEntity<CalendarEntity> selectCalendarChild(@PathVariable("calendarCode") String calendarCode) {
+    public ResponseEntity<CalendarEntity> selectCalendar(@PathVariable("calendarCode") String calendarCode) {
         CalendarEntity calendarEntity = calendarService.selectCalendar(calendarCode);
         if(calendarEntity == null) {
             System.out.println("null입니다.");
@@ -83,19 +84,49 @@ public class CalendarController {
         String memberId = "audwns11111"; /// 임시 !! 나중에 토큰에서 아이디 뽑을 거임
         try {
             calendarService.deleteShareCalendar(calendarCode,memberId);
-            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제할 캘린더가 없을 때
+            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 떄
         }
         catch (Exception e) {
             return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR); //삭제할 캘린더가 없을 때
         }
     }
 
+    @GetMapping("/every/calendars")
+    public ResponseEntity<Map<String,List<CalendarEntity>>> selectEveryCalendarList() {
+        String memberId = "audwns102";
+        Map<String,List<CalendarEntity>> map = new HashMap<>();
+        List<CalendarEntity> list = calendarService.getMyCalendarList(memberId);
+        List<CalendarEntity> list2 = calendarService.getShareCalendarList(memberId);
+
+        System.out.println(list.size());
+        System.out.println(list2.size());
+
+        map.put("myCalendar",list);
+        map.put("shareCalendar",list2);
+
+        return new ResponseEntity<Map<String,List<CalendarEntity>>>(map,HttpStatus.OK);
+    }
 
 
-//    @GetMapping("/share")
-//    public ResponseEntity<List<CalendarEntity>> selectShareCalendarList() {
-//
-//    }
+    @GetMapping("/my/calendars")
+    public ResponseEntity<List<CalendarEntity>> selectMyCalendarList() {
+        String memberId = "audwns102";
+        List<CalendarEntity> list = calendarService.getMyCalendarList(memberId);
+        if(list == null) {
+            return new ResponseEntity<List<CalendarEntity>>(list,HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<CalendarEntity>>(list,HttpStatus.OK);
+    }
+
+    @GetMapping("/share/calendars")
+    public ResponseEntity<List<CalendarEntity>> selectShareCalendarList() {
+        String memberId = "audwns102";
+        List<CalendarEntity> list = calendarService.getShareCalendarList(memberId);
+        if(list == null) {
+            return new ResponseEntity<List<CalendarEntity>>(list,HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<List<CalendarEntity>>(list,HttpStatus.OK);
+    }
 
 
 

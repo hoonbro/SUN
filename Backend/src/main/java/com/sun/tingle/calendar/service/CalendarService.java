@@ -17,5 +17,7 @@ public interface CalendarService {
 //    ShareCalendarEntity selectShareCalendar(String calendarCode, String memberId);
     void deleteShareCalendar(String calendarCode,String memberId);
 
+    List<CalendarEntity> getMyCalendarList(String memberId);
     List<CalendarEntity> getShareCalendarList(String memberId);
+
 }

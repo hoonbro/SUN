@@ -8,10 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -87,7 +84,22 @@ public class CalendarServiceImpl implements CalendarService{
     }
 
     @Override
+    public List<CalendarEntity> getMyCalendarList(String memberId) {
+        List<CalendarEntity> list = calendarRepository.findByMemberId(memberId);
+        return list;
+    }
+
+
+    @Override
     public List<CalendarEntity> getShareCalendarList(String memberId) {
-        return null;
+        List<ShareCalendarEntity> list1 = shareCalendarRepository.findCalendarCodeByMemberId(memberId);
+        int size = list1.size();
+        List<CalendarEntity> list2 = new ArrayList<>();
+        for(int i=0; i<size; i++) {
+            CalendarEntity c = calendarRepository.findByCalendarCode(list1.get(i).getCalendarCode()).get();
+//            c.setShareCalendar(null);
+            list2.add(c);
+        }
+        return list2;
     }
 }
