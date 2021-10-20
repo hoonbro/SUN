@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -52,8 +54,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Optional<MemberEntity> getMemberById(String id) {
-        Optional<MemberEntity> memberEntity = memberRepository.findByMemberId(id);
-        return memberEntity;
+    public Optional<MemberEntity> getMemberById(String memberId) {
+        return memberRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    public MemberEntity getMemberByEmail(String email){
+        return memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
     }
 }

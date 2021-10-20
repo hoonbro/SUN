@@ -6,11 +6,13 @@ import com.sun.tingle.member.db.entity.MemberEntity;
 import java.util.Optional;
 
 public interface MemberService {
-    public MemberEntity registMember(MemberDto member);
+     MemberEntity registMember(MemberDto member);
 
-    public void duplicateId(String id);
+    void duplicateId(String id);
 
-    public void duplicateEmail(String email);
+    void duplicateEmail(String email);
 
-    public Optional<MemberEntity> getMemberById(String id);
+    Optional<MemberEntity> getMemberById(String id);
+
+    MemberEntity getMemberByEmail(String email);
 }

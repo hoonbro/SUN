@@ -1,6 +1,7 @@
 package com.sun.tingle.member.api.controller;
 
 import com.sun.tingle.member.api.dto.MemberDto;
+import com.sun.tingle.member.api.service.EmailService;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.util.JwtUtil;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
@@ -25,6 +27,9 @@ import java.util.Optional;
 public class MemberController {
     @Autowired
     MemberService memberService;
+
+    @Autowired
+    EmailService emailService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -86,7 +91,7 @@ public class MemberController {
             Optional<MemberEntity> memberEntity = memberService.getMemberById(loginMember.getMemberId());
             //아이디가 없는 경우
             if(memberEntity.isEmpty()) {
-                httpStatus = HttpStatus.UNAUTHORIZED;
+                httpStatus = HttpStatus.NOT_FOUND;
                 map.put("error", "Invalid ID");
                 log.error("존재하지 않는 아이디");
                 return new ResponseEntity<Map<String, Object>>(map, httpStatus);
@@ -111,18 +116,28 @@ public class MemberController {
         return new ResponseEntity<Map<String, Object>>(map, httpStatus);
     }
 
-    @GetMapping("/test/{id}")
-    public ResponseEntity<Optional<MemberEntity>> test(@PathVariable String id){
-        HttpStatus httpStatus = HttpStatus.OK;
-        Optional<MemberEntity> memberEntity = memberService.getMemberById(id);
-        return new ResponseEntity<Optional<MemberEntity>>(memberEntity, httpStatus);
-    }
-
     @GetMapping("/invalid")
     public ResponseEntity<Boolean> tokenTest(HttpServletRequest request){
         HttpStatus httpStatus = HttpStatus.OK;
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         boolean auth = jwtUtil.validateToken(token.substring("Bearer ".length()));
         return new ResponseEntity<Boolean>(auth, httpStatus);
+    }
+
+    @PostMapping("/find-id")
+    public ResponseEntity<Void> findId(@RequestBody MemberDto member){
+        HttpStatus httpStatus = HttpStatus.OK;
+        MemberEntity memberEntity;
+        try {
+            memberEntity = memberService.getMemberByEmail(member.getEmail());
+            emailService.sendId(memberEntity.getEmail(), memberEntity.getMemberId());
+        }catch (NoSuchElementException e){
+            httpStatus = HttpStatus.NOT_FOUND;
+            log.error("존재하지 않는 이메일 : {}", e);
+            return new ResponseEntity<>(httpStatus);
+        }
+
+        return new ResponseEntity<>(httpStatus);
+
     }
 }
