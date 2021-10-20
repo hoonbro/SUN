@@ -20,7 +20,7 @@ public class UserAuthDetail implements UserDetails {
     public UserAuthDetail(MemberEntity memberEntity) {
         this.memberEntity = memberEntity;
         roles.add(new SimpleGrantedAuthority(memberEntity.getAuth()));
-    }
+    } 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

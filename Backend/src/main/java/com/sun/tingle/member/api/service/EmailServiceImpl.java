@@ -19,7 +19,7 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     MemberService memberService;
-
+ 
     @Override
     public void sendId(String email, String memberId) {
         MimeMessage message = javaMailSender.createMimeMessage();

@@ -18,7 +18,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
-
+ 
     @Override
     public MemberEntity registMember(MemberDto member) {
         MemberEntity memberEntity = MemberEntity.builder()

@@ -23,7 +23,7 @@ public class JwtUtil{
     private static String SECRET_KEY;
     private static Integer EXPIRE_TIME;
     private final MemberService memberService;
-
+ 
     @Autowired
     public JwtUtil(@Value("${jwt.secret}") String SECRET_KEY, @Value("${jwt.expiration}") Integer EXPIRE_TIME, MemberService memberService) {
         this.SECRET_KEY = SECRET_KEY;

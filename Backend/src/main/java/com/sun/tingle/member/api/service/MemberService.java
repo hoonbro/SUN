@@ -18,3 +18,4 @@ public interface MemberService {
 
     void changePassword(MemberEntity memberEntity, String password);
 }
+ 

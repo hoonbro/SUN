@@ -6,3 +6,4 @@ public interface EmailService {
 
     public String SendPasswordCode(String email, String name);
 }
+ 
