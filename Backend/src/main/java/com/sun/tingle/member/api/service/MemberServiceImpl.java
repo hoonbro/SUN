@@ -27,6 +27,7 @@ public class MemberServiceImpl implements MemberService {
                 .name(member.getName())
                 .phone(member.getPhone())
                 .email(member.getEmail())
+                .auth("ROLE_USER")
                 .build();
 
         return memberRepository.save(memberEntity);
@@ -61,5 +62,11 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberEntity getMemberByEmail(String email){
         return memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Override
+    public void changePassword(MemberEntity memberEntity, String password) {
+        memberEntity.setPassword(passwordEncoder.encode(password));
+        memberRepository.save(memberEntity);
     }
 }

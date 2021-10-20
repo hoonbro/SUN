@@ -15,4 +15,6 @@ public interface MemberService {
     Optional<MemberEntity> getMemberById(String id);
 
     MemberEntity getMemberByEmail(String email);
+
+    void changePassword(MemberEntity memberEntity, String password);
 }
