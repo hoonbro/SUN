@@ -104,7 +104,7 @@ public class MemberController {
                 return new ResponseEntity<Map<String, Object>>(map, httpStatus);
             }
 
-            String jwt = jwtUtil.createToken(loginMember.getMemberId());
+            String jwt = jwtUtil.createToken(loginMember);
             log.debug("로그인 토큰 정보 : {}", jwt);
             map.put("access-token", jwt);
 
@@ -140,20 +140,18 @@ public class MemberController {
         return new ResponseEntity<>(httpStatus);
     }
     @PostMapping("/send-password-code")
-    public ResponseEntity<Map<String, String>> SendPasswordCode(@RequestBody MemberDto member){
+    public ResponseEntity<Void> SendPasswordCode(@RequestBody MemberDto member){
         HttpStatus httpStatus = HttpStatus.OK;
-        Map<String, String> map = new HashMap<>();
         MemberEntity memberEntity;
         try {
             memberEntity = memberService.getMemberByEmail(member.getEmail());
-            String code = emailService.SendPasswordCode(memberEntity.getEmail(), memberEntity.getName());
-            map.put("code", code);
+            emailService.SendPasswordCode(memberEntity.getEmail(), memberEntity.getName());
         }catch (NoSuchElementException e){
             httpStatus = HttpStatus.NOT_FOUND;
             log.error("존재하지 않는 이메일 : {}", e);
-            return new ResponseEntity<Map<String, String>>(map, httpStatus);
+            return new ResponseEntity<Void>(httpStatus);
         }
-        return new ResponseEntity<Map<String, String>>(map, httpStatus);
+        return new ResponseEntity<Void>(httpStatus);
     }
 
     @PutMapping("/reset-password")
