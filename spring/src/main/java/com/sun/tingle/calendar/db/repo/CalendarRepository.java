@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface CalendarRepository extends JpaRepository<CalendarEntity,String> {
 
     public CalendarEntity findByCalendarCode(String calendarCode);
-    public List<CalendarEntity> findByMemberId(String memberId);
+    public List<CalendarEntity> findById(long id);
 
 
 }

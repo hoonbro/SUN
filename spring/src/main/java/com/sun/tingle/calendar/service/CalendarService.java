@@ -9,14 +9,14 @@ import java.util.Map;
 
 public interface CalendarService {
 
-    CalendarRpDto insertCalendar(String calendarCode, String calendarName, String memberId);
+    CalendarRpDto insertCalendar(String calendarCode, String calendarName, long id);
     CalendarRpDto selectCalendar(String calendarCode);
     CalendarRpDto updateCalendar(String calendarCode,String calendarName);
     void deleteCalendar(String calendarCode);
-    Map<String,Object> insertShareCalendar(String calendarCode,String memberId);
-    void deleteShareCalendar(String calendarCode,String memberId);
+    Map<String,Object> insertShareCalendar(String calendarCode,long id);
+    void deleteShareCalendar(String calendarCode,long id);
 
-    List<CalendarRpDto> getMyCalendarList(String memberId);
-    List<CalendarRpDto> getShareCalendarList(String memberId);
+    List<CalendarRpDto> getMyCalendarList(long id);
+    List<CalendarRpDto> getShareCalendarList(long id);
 
 }

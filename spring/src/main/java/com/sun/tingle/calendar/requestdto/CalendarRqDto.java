@@ -12,5 +12,5 @@ import lombok.Setter;
 public class CalendarRqDto {
     String calendarCode;
     String calendarName;
-    String teacherId;
+    long id;
 }

@@ -21,11 +21,11 @@ public class CalendarServiceImpl implements CalendarService{
     @Autowired
     ShareCalendarRepository shareCalendarRepository;
     @Override
-    public CalendarRpDto insertCalendar(String calendarCode,String calendarName,String memberId) {
+    public CalendarRpDto insertCalendar(String calendarCode,String calendarName,long id) {
         CalendarEntity calendarEntity = new CalendarEntity();
         calendarEntity.setCalendarCode(calendarCode);
         calendarEntity.setCalendarName(calendarName);
-        calendarEntity.setMemberId(memberId);
+        calendarEntity.setId(id);
         calendarEntity =  calendarRepository.save(calendarEntity);
         CalendarRpDto calendarRpDto = buildCalendar(calendarEntity);
         return calendarRpDto;
@@ -58,7 +58,7 @@ public class CalendarServiceImpl implements CalendarService{
 
 
     @Override
-    public Map<String,Object> insertShareCalendar(String calendarCode,String memberId) {
+    public Map<String,Object> insertShareCalendar(String calendarCode,long id) {
         Map<String,Object> map = new HashMap<>();
         CalendarRpDto calendarRpDto = selectCalendar(calendarCode);
         if(calendarRpDto == null) {
@@ -67,9 +67,9 @@ public class CalendarServiceImpl implements CalendarService{
         }
         ShareCalendarEntity shareCalendarEntity2 = new ShareCalendarEntity();
         shareCalendarEntity2.setCalendarCode(calendarCode);
-        shareCalendarEntity2.setMemberId(memberId);
+        shareCalendarEntity2.setId(id);
 
-        ShareCalendarEntity shareCalendarEntity = shareCalendarRepository.findByCalendarCodeAndMemberId(calendarCode,memberId);
+        ShareCalendarEntity shareCalendarEntity = shareCalendarRepository.findByCalendarCodeAndId(calendarCode,id);
         if(shareCalendarEntity != null) {
             map.put("flag",-2);
             return map;
@@ -86,22 +86,22 @@ public class CalendarServiceImpl implements CalendarService{
 
 
     @Override
-    public void deleteShareCalendar(String calendarCode,String memberId) {
-        ShareCalendarEntity shareCalendarEntity = shareCalendarRepository.findByCalendarCodeAndMemberId(calendarCode,memberId);
+    public void deleteShareCalendar(String calendarCode,long id) {
+        ShareCalendarEntity shareCalendarEntity = shareCalendarRepository.findByCalendarCodeAndId(calendarCode,id);
         shareCalendarRepository.delete(shareCalendarEntity);
     }
 
     @Override
-    public List<CalendarRpDto> getMyCalendarList(String memberId) {
-        List<CalendarEntity> list = calendarRepository.findByMemberId(memberId);
+    public List<CalendarRpDto> getMyCalendarList(long id) {
+        List<CalendarEntity> list = calendarRepository.findById(id);
         List<CalendarRpDto> list2 = builderCalendarList(list);
         return list2;
     }
 
 
     @Override
-    public List<CalendarRpDto> getShareCalendarList(String memberId) {
-        List<ShareCalendarEntity> list1 = shareCalendarRepository.findCalendarCodeByMemberId(memberId);
+    public List<CalendarRpDto> getShareCalendarList(long id) {
+        List<ShareCalendarEntity> list1 = shareCalendarRepository.findCalendarCodeById(id);
         int size = list1.size();
         List<CalendarEntity> list2 = new ArrayList<>();
         for(int i=0; i<size; i++) {
@@ -120,7 +120,7 @@ public class CalendarServiceImpl implements CalendarService{
         calendarRpDto = calendarRpDto.builder().
                 calendarCode(calendarEntity.getCalendarCode()).
                 calendarName(calendarEntity.getCalendarName()).
-                memberId(calendarEntity.getMemberId()).
+                id(calendarEntity.getId()).
                 build();
 
 

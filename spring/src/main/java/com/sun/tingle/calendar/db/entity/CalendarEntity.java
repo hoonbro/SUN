@@ -22,8 +22,8 @@ public class CalendarEntity {
     @Column(name="calendar_name")
     String calendarName;
 
-    @Column(name="member_id")
-    String memberId;
+    @Column(name="id")
+    long id;
 
     @OneToMany(mappedBy = "calendarCode", cascade = CascadeType.ALL)
     private List<ShareCalendarEntity> ShareCalendar = new ArrayList<>();
