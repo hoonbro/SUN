@@ -1,0 +1,3 @@
+*.pem
+.pem
+docker-compose.yaml
