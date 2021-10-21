@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS `tingle` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ;
+USE `tingle` ;
 CREATE TABLE IF NOT EXISTS `tingle`.`member` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
