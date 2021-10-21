@@ -33,7 +33,6 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         // request에 Header(jwtToken)를 획득한다.
         // Read the Authorization header, where the JWT Token should be
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         // If header is null delegate to Spring impl and exit
         if (token == null || !token.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);

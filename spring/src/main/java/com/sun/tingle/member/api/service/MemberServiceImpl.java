@@ -1,6 +1,7 @@
 package com.sun.tingle.member.api.service;
 
-import com.sun.tingle.member.api.dto.request.MemberResDto;
+import com.sun.tingle.member.api.dto.request.MemberReqDto;
+import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ public class MemberServiceImpl implements MemberService {
     PasswordEncoder passwordEncoder;
  
     @Override
-    public MemberEntity registMember(MemberResDto member) {
+    public MemberResDto registMember(MemberReqDto member) {
         MemberEntity memberEntity = MemberEntity.builder()
                 .memberId(member.getMemberId())
                 .password(passwordEncoder.encode(member.getPassword()))
@@ -29,7 +30,18 @@ public class MemberServiceImpl implements MemberService {
                 .auth("ROLE_USER")
                 .build();
 
-        return memberRepository.save(memberEntity);
+        memberEntity = memberRepository.save(memberEntity);
+
+        MemberResDto memberResDto = MemberResDto.builder()
+                .id(memberEntity.getId())
+                .memberId(memberEntity.getMemberId())
+                .name(memberEntity.getName())
+                .phone(memberEntity.getPhone())
+                .email(memberEntity.getEmail())
+                .auth(memberEntity.getAuth())
+                .build();
+
+        return memberResDto;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.sun.tingle.member.api.controller;
 
-import com.sun.tingle.member.api.dto.request.MemberResDto;
+import com.sun.tingle.member.api.dto.request.MemberReqDto;
+import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.api.service.EmailService;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.db.entity.MemberEntity;
@@ -37,18 +38,18 @@ public class MemberController {
     JwtUtil jwtUtil;
 
     @PostMapping
-    public ResponseEntity<MemberEntity> registMember(@RequestBody MemberResDto member){
+    public ResponseEntity<MemberResDto> registMember(@RequestBody MemberReqDto member){
         HttpStatus httpStatus = HttpStatus.CREATED;
-        MemberEntity memberEntity;
+        MemberResDto memberResDto;
         try {
-            memberEntity = memberService.registMember(member);
+            memberResDto = memberService.registMember(member);
             log.info("회원가입 성공");
         }catch(Exception e){
             httpStatus = HttpStatus.CONFLICT;
             log.error("회원가입 실패");
             return new ResponseEntity<>(httpStatus);
         }
-        return new ResponseEntity<MemberEntity>(memberEntity, httpStatus);
+        return new ResponseEntity<MemberResDto>(memberResDto, httpStatus);
     }
 
     @GetMapping("/duplicate-id/{id}")
@@ -82,7 +83,7 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody MemberResDto loginMember){
+    public ResponseEntity<Map<String, Object>> login(@RequestBody MemberReqDto loginMember){
         Map<String, Object> map = new HashMap<String, Object>();
         HttpStatus httpStatus = HttpStatus.OK;
 
@@ -102,10 +103,18 @@ public class MemberController {
                 log.error("비밀번호 오류");
                 return new ResponseEntity<Map<String, Object>>(map, httpStatus);
             }
-
-            String jwt = jwtUtil.createToken(loginMember);
+            String jwt = jwtUtil.createToken(memberEntity.get());
+            MemberResDto memberResDto = MemberResDto.builder()
+                    .id(memberEntity.get().getId())
+                    .memberId(memberEntity.get().getMemberId())
+                    .name(memberEntity.get().getName())
+                    .phone(memberEntity.get().getPhone())
+                    .email(memberEntity.get().getEmail())
+                    .auth(memberEntity.get().getAuth())
+                    .build();
             log.debug("로그인 토큰 정보 : {}", jwt);
             map.put("access-token", jwt);
+            map.put("member", memberResDto);
 
         }catch(Exception e){
             httpStatus = HttpStatus.BAD_REQUEST;
@@ -124,7 +133,7 @@ public class MemberController {
     }
 
     @PostMapping("/find-id")
-    public ResponseEntity<Void> findId(@RequestBody MemberResDto member){
+    public ResponseEntity<Void> findId(@RequestBody MemberReqDto member){
         HttpStatus httpStatus = HttpStatus.OK;
         MemberEntity memberEntity;
         try {
@@ -139,7 +148,7 @@ public class MemberController {
         return new ResponseEntity<>(httpStatus);
     }
     @PostMapping("/send-password-code")
-    public ResponseEntity<Void> SendPasswordCode(@RequestBody MemberResDto member){
+    public ResponseEntity<Void> SendPasswordCode(@RequestBody MemberReqDto member){
         HttpStatus httpStatus = HttpStatus.OK;
         MemberEntity memberEntity;
         try {
@@ -154,7 +163,7 @@ public class MemberController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody MemberResDto member){
+    public ResponseEntity<Void> resetPassword(@RequestBody MemberReqDto member){
         HttpStatus httpStatus = HttpStatus.CREATED;
 
         MemberEntity memberEntity;
