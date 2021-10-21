@@ -1,6 +1,6 @@
 package com.sun.tingle.member.util;
 
-import com.sun.tingle.member.api.dto.MemberDto;
+import com.sun.tingle.member.api.dto.request.MemberResDto;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.auth.UserAuthDetail;
 import com.sun.tingle.member.db.entity.MemberEntity;
@@ -31,7 +31,7 @@ public class JwtUtil{
         this.memberService = memberService;
     }
 
-    public <T> String createToken(MemberDto memberDto) {
+    public <T> String createToken(MemberResDto memberDto) {
         Date now = new Date();
         //HS256 방식으로 암호화 방식 설정
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -50,8 +50,8 @@ public class JwtUtil{
     }
 
     //Jwt Token을 복호화해 Id를 return
-    public String getIdFromJwt(String jwt){
-        return getClaims(jwt).getBody().get("memberId", String.class);
+    public Long getIdFromJwt(String jwt){
+        return getClaims(jwt).getBody().get("id", Long.class);
     }
 
     public static boolean validateToken(String jwt){
@@ -60,11 +60,11 @@ public class JwtUtil{
 
     // 인증 성공시 SecurityContextHolder에 저장할 Authentication 객체 생성
     public Authentication getAuthentication(String token) {
-        String memberId = this.getIdFromJwt(token);
-        MemberEntity memberEntity = memberService.getMemberById(memberId).get();
+        Long id = this.getIdFromJwt(token);
+        MemberEntity memberEntity = memberService.getMemberById(id).get();
         if(memberEntity != null) {
             UserAuthDetail userAuthDetail = new UserAuthDetail(memberEntity);
-            UsernamePasswordAuthenticationToken jwtAuthentication = new UsernamePasswordAuthenticationToken(memberId,
+            UsernamePasswordAuthenticationToken jwtAuthentication = new UsernamePasswordAuthenticationToken(id,
                     memberEntity.getPassword(), userAuthDetail.getAuthorities());
             jwtAuthentication.setDetails(userAuthDetail);
             return jwtAuthentication;

@@ -1,6 +1,6 @@
 package com.sun.tingle.member.api.controller;
 
-import com.sun.tingle.member.api.dto.MemberDto;
+import com.sun.tingle.member.api.dto.request.MemberResDto;
 import com.sun.tingle.member.api.service.EmailService;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.db.entity.MemberEntity;
@@ -37,7 +37,7 @@ public class MemberController {
     JwtUtil jwtUtil;
 
     @PostMapping
-    public ResponseEntity<MemberEntity> registMember(@RequestBody MemberDto member){
+    public ResponseEntity<MemberEntity> registMember(@RequestBody MemberResDto member){
         HttpStatus httpStatus = HttpStatus.CREATED;
         MemberEntity memberEntity;
         try {
@@ -82,12 +82,12 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody MemberDto loginMember){
+    public ResponseEntity<Map<String, Object>> login(@RequestBody MemberResDto loginMember){
         Map<String, Object> map = new HashMap<String, Object>();
         HttpStatus httpStatus = HttpStatus.OK;
 
         try{
-            Optional<MemberEntity> memberEntity = memberService.getMemberById(loginMember.getMemberId());
+            Optional<MemberEntity> memberEntity = memberService.getMemberByMemberId(loginMember.getMemberId());
             //아이디가 없는 경우
             if(memberEntity.isEmpty()) {
                 httpStatus = HttpStatus.NOT_FOUND;
@@ -124,7 +124,7 @@ public class MemberController {
     }
 
     @PostMapping("/find-id")
-    public ResponseEntity<Void> findId(@RequestBody MemberDto member){
+    public ResponseEntity<Void> findId(@RequestBody MemberResDto member){
         HttpStatus httpStatus = HttpStatus.OK;
         MemberEntity memberEntity;
         try {
@@ -139,7 +139,7 @@ public class MemberController {
         return new ResponseEntity<>(httpStatus);
     }
     @PostMapping("/send-password-code")
-    public ResponseEntity<Void> SendPasswordCode(@RequestBody MemberDto member){
+    public ResponseEntity<Void> SendPasswordCode(@RequestBody MemberResDto member){
         HttpStatus httpStatus = HttpStatus.OK;
         MemberEntity memberEntity;
         try {
@@ -154,7 +154,7 @@ public class MemberController {
     }
 
     @PutMapping("/reset-password")
-    public ResponseEntity<Void> resetPassword(@RequestBody MemberDto member){
+    public ResponseEntity<Void> resetPassword(@RequestBody MemberResDto member){
         HttpStatus httpStatus = HttpStatus.CREATED;
 
         MemberEntity memberEntity;
