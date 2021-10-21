@@ -1,4 +1,4 @@
-package com.sun.tingle.member.api.dto;
+package com.sun.tingle.member.api.dto.request;
 
 import lombok.*;
 
@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberDto {
+public class MemberResDto {
     private Long id;
     private String memberId;
     private String password;

@@ -1,18 +1,20 @@
 package com.sun.tingle.member.api.service;
 
-import com.sun.tingle.member.api.dto.MemberDto;
+import com.sun.tingle.member.api.dto.request.MemberResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
 
 import java.util.Optional;
 
 public interface MemberService {
-     MemberEntity registMember(MemberDto member);
+     MemberEntity registMember(MemberResDto member);
 
     void duplicateId(String id);
 
     void duplicateEmail(String email);
 
-    Optional<MemberEntity> getMemberById(String id);
+    Optional<MemberEntity> getMemberByMemberId(String id);
+
+    Optional<MemberEntity> getMemberById(Long id);
 
     MemberEntity getMemberByEmail(String email);
 

@@ -1,6 +1,6 @@
 package com.sun.tingle.member.api.service;
 
-import com.sun.tingle.member.api.dto.MemberDto;
+import com.sun.tingle.member.api.dto.request.MemberResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class MemberServiceImpl implements MemberService {
     PasswordEncoder passwordEncoder;
  
     @Override
-    public MemberEntity registMember(MemberDto member) {
+    public MemberEntity registMember(MemberResDto member) {
         MemberEntity memberEntity = MemberEntity.builder()
                 .memberId(member.getMemberId())
                 .password(passwordEncoder.encode(member.getPassword()))
@@ -54,8 +54,13 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Optional<MemberEntity> getMemberById(String memberId) {
+    public Optional<MemberEntity> getMemberByMemberId(String memberId) {
         return memberRepository.findByMemberId(memberId);
+    }
+
+    @Override
+    public Optional<MemberEntity> getMemberById(Long id) {
+        return memberRepository.findById(id);
     }
 
     @Override
