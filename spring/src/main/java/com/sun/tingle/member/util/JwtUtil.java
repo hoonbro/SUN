@@ -1,6 +1,6 @@
 package com.sun.tingle.member.util;
 
-import com.sun.tingle.member.api.dto.request.MemberResDto;
+import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.auth.UserAuthDetail;
 import com.sun.tingle.member.db.entity.MemberEntity;
@@ -31,18 +31,17 @@ public class JwtUtil{
         this.memberService = memberService;
     }
 
-    public <T> String createToken(MemberResDto memberDto) {
+    public <T> String createToken(MemberEntity memberEntity) {
         Date now = new Date();
         //HS256 방식으로 암호화 방식 설정
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
         byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(SECRET_KEY);
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
-
         JwtBuilder builder = Jwts.builder()
                 .setIssuer("tingle") // 발급자
-                .claim("id", memberDto.getId())
-                .claim("email", memberDto.getEmail())
-                .claim("name", memberDto.getName())
+                .claim("id", memberEntity.getId())
+                .claim("email", memberEntity.getEmail())
+                .claim("name", memberEntity.getName())
                 .setExpiration(new Date(now.getTime() + EXPIRE_TIME))
                 .signWith(SignatureAlgorithm.HS256, signingKey); //암호화 알고리즘
 
