@@ -111,6 +111,7 @@ public class MemberController {
                     .phone(memberEntity.get().getPhone())
                     .email(memberEntity.get().getEmail())
                     .auth(memberEntity.get().getAuth())
+                    .profileImage(memberEntity.get().getProfileImage())
                     .build();
             log.debug("로그인 토큰 정보 : {}", jwt);
             map.put("access-token", jwt);

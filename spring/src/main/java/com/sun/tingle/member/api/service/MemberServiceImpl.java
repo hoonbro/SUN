@@ -28,6 +28,7 @@ public class MemberServiceImpl implements MemberService {
                 .phone(member.getPhone())
                 .email(member.getEmail())
                 .auth("ROLE_USER")
+                .profileImage(member.getProfileImage())
                 .build();
 
         memberEntity = memberRepository.save(memberEntity);
@@ -39,6 +40,7 @@ public class MemberServiceImpl implements MemberService {
                 .phone(memberEntity.getPhone())
                 .email(memberEntity.getEmail())
                 .auth(memberEntity.getAuth())
+                .profileImage(memberEntity.getProfileImage())
                 .build();
 
         return memberResDto;
