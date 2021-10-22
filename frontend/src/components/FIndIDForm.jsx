@@ -25,6 +25,7 @@ const FindIDForm = () => {
         label="이메일"
         value={email.value}
         name="email"
+        placeholder="ex) admin@sun.com"
         onChange={handleChange}
       />
       <Button disabled={!canSubmit}>아이디 찾기</Button>
