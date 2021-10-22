@@ -52,6 +52,54 @@ public class MemberController {
         return new ResponseEntity<MemberResDto>(memberResDto, httpStatus);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<MemberResDto> getMemberInfo(@PathVariable Long id){
+        HttpStatus httpStatus = HttpStatus.OK;
+        MemberResDto memberResDto;
+        try {
+            memberResDto = memberService.getMemberInfo(id);
+            log.info("회원정보 조회 성공");
+        }catch(Exception e){
+            httpStatus = HttpStatus.NOT_FOUND;
+            log.error("회원정보 조회 실패");
+            return new ResponseEntity<>(httpStatus);
+        }
+        return new ResponseEntity<MemberResDto>(memberResDto, httpStatus);
+    }
+
+    @PutMapping
+    public ResponseEntity<MemberResDto> updateMemberInfo(@RequestBody MemberReqDto memberReqDto){
+        HttpStatus httpStatus = HttpStatus.CREATED;
+        MemberResDto memberResDto;
+
+        try{
+            memberResDto = memberService.updateMemberInfo(memberReqDto);
+            log.info("회원정보 수정 성공");
+        }catch(Exception e){
+            httpStatus = HttpStatus.NOT_FOUND;
+            log.error("존재하지 않는 회원");
+            return new ResponseEntity<>(httpStatus);
+        }
+
+        return new ResponseEntity<MemberResDto>(memberResDto, httpStatus);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMemberInfo(@PathVariable Long id){
+        HttpStatus httpStatus = HttpStatus.NO_CONTENT;
+
+        try{
+            memberService.deleteMemberInfo(id);
+            log.info("회원정보 삭제 성공");
+        }catch(Exception e){
+            httpStatus = HttpStatus.NOT_FOUND;
+            log.error("존재하지 않는 회원 : {}", e);
+            return new ResponseEntity<>(httpStatus);
+        }
+
+        return new ResponseEntity<>( httpStatus);
+    }
+
     @GetMapping("/duplicate-id/{id}")
     public ResponseEntity<Void> duplicateId(@PathVariable("id") String id){
         HttpStatus httpStatus = HttpStatus.OK;
@@ -104,15 +152,7 @@ public class MemberController {
                 return new ResponseEntity<Map<String, Object>>(map, httpStatus);
             }
             String jwt = jwtUtil.createToken(memberEntity.get());
-            MemberResDto memberResDto = MemberResDto.builder()
-                    .id(memberEntity.get().getId())
-                    .memberId(memberEntity.get().getMemberId())
-                    .name(memberEntity.get().getName())
-                    .phone(memberEntity.get().getPhone())
-                    .email(memberEntity.get().getEmail())
-                    .auth(memberEntity.get().getAuth())
-                    .profileImage(memberEntity.get().getProfileImage())
-                    .build();
+            MemberResDto memberResDto = memberService.entity2Dto(memberEntity.get());
             log.debug("로그인 토큰 정보 : {}", jwt);
             map.put("access-token", jwt);
             map.put("member", memberResDto);
@@ -124,6 +164,7 @@ public class MemberController {
 
         return new ResponseEntity<Map<String, Object>>(map, httpStatus);
     }
+
 
     @GetMapping("/invalid")
     public ResponseEntity<Boolean> tokenTest(HttpServletRequest request){
@@ -166,7 +207,6 @@ public class MemberController {
     @PutMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(@RequestBody MemberReqDto member){
         HttpStatus httpStatus = HttpStatus.CREATED;
-
         MemberEntity memberEntity;
         try {
             memberEntity = memberService.getMemberByEmail(member.getEmail());

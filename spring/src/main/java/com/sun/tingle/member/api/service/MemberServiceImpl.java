@@ -7,6 +7,7 @@ import com.sun.tingle.member.db.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -27,40 +28,49 @@ public class MemberServiceImpl implements MemberService {
                 .name(member.getName())
                 .phone(member.getPhone())
                 .email(member.getEmail())
-                .auth("ROLE_USER")
+                .auth(member.getAuth())
                 .profileImage(member.getProfileImage())
                 .build();
 
         memberEntity = memberRepository.save(memberEntity);
 
-        MemberResDto memberResDto = MemberResDto.builder()
-                .id(memberEntity.getId())
-                .memberId(memberEntity.getMemberId())
-                .name(memberEntity.getName())
-                .phone(memberEntity.getPhone())
-                .email(memberEntity.getEmail())
-                .auth(memberEntity.getAuth())
-                .profileImage(memberEntity.getProfileImage())
-                .build();
-
-        return memberResDto;
+        return entity2Dto(memberEntity);
     }
 
     @Override
-    public void duplicateId(String id) {
-        memberRepository.findByMemberId(id)
+    public MemberResDto getMemberInfo(Long id) {
+        MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return entity2Dto(memberEntity);
+    }
+
+    @Override
+    @Transactional
+    public MemberResDto updateMemberInfo(MemberReqDto memberReqDto) {
+        MemberEntity memberEntity = getMemberById(memberReqDto.getId()).orElseThrow(NoSuchElementException::new);
+        memberEntity.setName(memberReqDto.getName());
+        memberEntity.setEmail(memberReqDto.getEmail());
+        memberEntity.setPhone(memberReqDto.getPhone());
+        memberEntity = memberRepository.save(memberEntity);
+        return entity2Dto(memberEntity);
+    }
+
+    @Override
+    public void deleteMemberInfo(Long id) {
+        memberRepository.delete(
+                memberRepository.findById(id).orElseThrow(() -> new NoSuchElementException())
+        );
+    }
+
+    @Override
+    public void duplicateId(String memberId) {
+        memberRepository.findByMemberId(memberId)
                 .ifPresent(m -> {
                     throw new IllegalStateException("중복되는 아이디 입니다");
                 });
-
-
     }
 
     @Override
     public void duplicateEmail(String email) {
-//        Optional<MemberEntity> memberOptional = memberRepository.findByEmail(email);
-
-//        MemberEntity memberEntity = memberRepository.findByEmail(email);
         memberRepository.findByEmail(email)
                 .ifPresent(m -> {
                     throw new IllegalStateException("중복되는 이메일 입니다");
@@ -86,5 +96,19 @@ public class MemberServiceImpl implements MemberService {
     public void changePassword(MemberEntity memberEntity, String password) {
         memberEntity.setPassword(passwordEncoder.encode(password));
         memberRepository.save(memberEntity);
+    }
+
+    @Override
+    public MemberResDto entity2Dto(MemberEntity memberEntity) {
+        MemberResDto memberResDto = MemberResDto.builder()
+                .id(memberEntity.getId())
+                .memberId(memberEntity.getMemberId())
+                .name(memberEntity.getName())
+                .phone(memberEntity.getPhone())
+                .email(memberEntity.getEmail())
+                .auth(memberEntity.getAuth())
+                .profileImage(memberEntity.getProfileImage())
+                .build();
+        return memberResDto;
     }
 }

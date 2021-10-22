@@ -9,6 +9,12 @@ import java.util.Optional;
 public interface MemberService {
     MemberResDto registMember(MemberReqDto member);
 
+    MemberResDto getMemberInfo(Long id);
+
+    MemberResDto updateMemberInfo(MemberReqDto memberReqDto);
+
+    void deleteMemberInfo(Long id);
+
     void duplicateId(String id);
 
     void duplicateEmail(String email);
@@ -20,5 +26,7 @@ public interface MemberService {
     MemberEntity getMemberByEmail(String email);
 
     void changePassword(MemberEntity memberEntity, String password);
+
+    MemberResDto entity2Dto(MemberEntity memberEntity);
 }
  

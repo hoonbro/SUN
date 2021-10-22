@@ -42,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtUtil, memberService)) //HTTP 요청에 JWT 토큰 인증 필터를 거치도록 필터를 추가
                 .authorizeRequests() //시큐리티 처리에 HttpServletRequest를 이용한다는 것을 의미
                 //antMatchers()는 특정한 경로를 지정합니다.
-                .antMatchers("/members/invalid").hasRole("USER")
+                .antMatchers("/members/invalid").hasRole("TEACHER")
                 .anyRequest().permitAll()
                 .and().cors();
     }
