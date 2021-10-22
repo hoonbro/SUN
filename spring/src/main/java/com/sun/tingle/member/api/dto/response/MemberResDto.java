@@ -13,6 +13,7 @@ public class MemberResDto {
     private String email;
     private String name;
     private String phone;
+    private String profileImage;
     private String auth;
 
 
