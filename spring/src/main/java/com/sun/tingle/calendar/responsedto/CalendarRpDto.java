@@ -10,6 +10,6 @@ import lombok.*;
 public class CalendarRpDto {
     String calendarCode;
     String calendarName;
-    String memberId;
+    long id;
 
 }

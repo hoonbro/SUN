@@ -18,9 +18,7 @@ public class MissionRpDto {
     private Long missionId;
     private String missionName;
     private String startDate;
-    private  String startTime;
     private  String endDate;
-    private  String endTime;
     private  List<String> tag;
     private  String calendarCode;
 }

@@ -12,7 +12,8 @@ import java.util.Optional;
 public interface CalendarRepository extends JpaRepository<CalendarEntity,String> {
 
     public CalendarEntity findByCalendarCode(String calendarCode);
-    public List<CalendarEntity> findByMemberId(String memberId);
+    public CalendarEntity findByCalendarName(String calendarName);
+    public List<CalendarEntity> findById(long id);
 
 
 }
