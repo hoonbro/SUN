@@ -1,12 +1,12 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
 
 const Login = () => {
-  const [username, setUsername] = useState({
-    key: "username",
+  const [memberId, setMemberId] = useState({
+    key: "memberId",
     label: "아이디",
     type: "text",
     placeholder: "ex) admin",
@@ -22,23 +22,25 @@ const Login = () => {
     disabled: false,
   })
 
-  const isDisabled = username.value && password.value ? false : true
+  const isAllFill = memberId.value && password.value ? true : false
+  const canSubmit = useMemo(() => {
+    return isAllFill
+  }, [isAllFill])
 
   const handleButtonClick = () => {
-    alert("handleButtonClick() 실행")
-    console.log({ username: username.value, password: password.value })
+    console.log({ memberId: memberId.value, password: password.value })
   }
 
   return (
     <div className="py-10 px-6 grid gap-10">
       <Welcome />
       <div className="grid gap-6">
-        <InputFormField field={username} setField={setUsername} />
+        <InputFormField field={memberId} setField={setMemberId} />
         <InputFormField field={password} setField={setPassword} />
       </div>
       <div className="grid gap-4">
         <SubmitButton
-          disabled={isDisabled}
+          disabled={!canSubmit}
           handleButtonClick={handleButtonClick}
         >
           로그인

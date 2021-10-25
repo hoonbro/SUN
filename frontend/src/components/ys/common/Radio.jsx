@@ -1,4 +1,5 @@
 import React from "react"
+import { IoMdRadioButtonOn, IoMdRadioButtonOff } from "react-icons/io"
 
 const Radio = ({ name, inputId, label, isChecked, setValue }) => {
   const handleChange = (e) => {
@@ -7,9 +8,9 @@ const Radio = ({ name, inputId, label, isChecked, setValue }) => {
 
   let radioButton
   if (isChecked) {
-    radioButton = <span className="material-icons">radio_button_checked</span>
+    radioButton = <IoMdRadioButtonOn />
   } else {
-    radioButton = <span className="material-icons">radio_button_unchecked</span>
+    radioButton = <IoMdRadioButtonOff />
   }
 
   return (

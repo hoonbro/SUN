@@ -5,7 +5,7 @@ export class InputFormFieldMaker {
     this.disabled = disabled
 
     switch (key) {
-      case "username": {
+      case "memberId": {
         this.label = "아이디"
         this.type = "text"
         this.placeholder = "ex) admin"
@@ -29,7 +29,7 @@ export class InputFormFieldMaker {
         this.placeholder = "한글 (1-8자) 또는 영어(2-8자)"
         break
       }
-      case "phoneNum": {
+      case "phone": {
         this.label = "핸드폰 번호"
         this.type = "text"
         this.placeholder = "(-)을 제외하고 숫자만 입력하세요"
