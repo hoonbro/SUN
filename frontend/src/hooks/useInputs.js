@@ -13,6 +13,13 @@ function reducer(state, action) {
       }
     }
     case "CHANGE_ERRORS": {
+      console.log({
+        ...state,
+        [action.name]: {
+          ...state[action.name],
+          errors: action.errors,
+        },
+      })
       return {
         ...state,
         [action.name]: {
