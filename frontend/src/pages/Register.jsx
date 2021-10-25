@@ -4,8 +4,11 @@ import SubmitButton from "../components/ys/common/SubmitButton"
 import RadioFormField from "../components/ys/common/RadioFormField"
 import InputFormField from "../components/ys/common/InputFormField"
 import Header from "../components/Header"
+import client from "../api/client.js"
+import { useHistory } from "react-router"
 
 const Register = () => {
+  const history = useHistory()
   // 아이디 ~ 이메일
   const [memberId, setMemberId] = useState(new InputFormFieldMaker("memberId"))
   const [password, setPassword] = useState(new InputFormFieldMaker("password"))
@@ -80,7 +83,9 @@ const Register = () => {
       isNameValid &&
       isPhoneValid &&
       isEmailValid &&
-      isMemberIdValid
+      isMemberIdValid &&
+      memberId.validMsg &&
+      email.validMsg
     )
   }, [
     isAllFill,
@@ -90,9 +95,11 @@ const Register = () => {
     isPhoneValid,
     isEmailValid,
     isMemberIdValid,
+    memberId.validMsg,
+    email.validMsg,
   ])
 
-  const handleBlur = (e) => {
+  const handleBlur = async (e) => {
     const targetId = e.target.id
     let state, setState, isStateValid, error
     if (targetId === "memberId")
@@ -138,14 +145,51 @@ const Register = () => {
         "잘못된 이메일 형식입니다",
       ]
 
-    if (!state.value) setState({ ...state, error: "필수 입력값입니다" })
-    else if (!isStateValid) setState({ ...state, error })
-    else setState({ ...state, error: "" })
+    if (!state.value)
+      setState({ ...state, error: "필수 입력값입니다", validMsg: "" })
+    else if (!isStateValid) setState({ ...state, error, validMsg: "" })
+    else if (targetId === "memberId" || targetId === "email") {
+      const path = targetId === "memberId" ? "id" : "email"
+      try {
+        const res = await client.get(
+          `/members/duplicate-${path}/${state.value}`
+        )
+        console.log(res)
+        setState({
+          ...state,
+          error: "",
+          validMsg: `사용 가능한 ${state.label}입니다`,
+        })
+      } catch (error) {
+        console.log(error.response)
+        if (error.response.status === 409)
+          setState({
+            ...state,
+            error: `이미 가입한 ${state.label}입니다`,
+            validMsg: "",
+          })
+      }
+    } else setState({ ...state, error: "" })
   }
 
   // 제출 버튼 핸들링
-  const handleButtonClick = () => {
-    console.log(fieldsValue)
+  const handleButtonClick = async () => {
+    const reqForm = {
+      memberId: memberId.value,
+      password: password.value,
+      name: name.value,
+      phone: phone.value,
+      email: email.value,
+      auth: teacherOrStudent,
+    }
+    console.log(reqForm)
+    try {
+      const res = await client.post(`/members`, reqForm)
+      console.log(res)
+      history.push({ pathname: "/login" })
+    } catch (error) {
+      console.log(error.response)
+    }
   }
 
   return (
@@ -175,13 +219,13 @@ const Register = () => {
               handleBlur={handleBlur}
             />
             <InputFormField
-              field={phone}
-              setField={setPhone}
+              field={email}
+              setField={setEmail}
               handleBlur={handleBlur}
             />
             <InputFormField
-              field={email}
-              setField={setEmail}
+              field={phone}
+              setField={setPhone}
               handleBlur={handleBlur}
             />
 

@@ -33,7 +33,12 @@ const InputFormField = ({ field, setField, handleBlur }) => {
             </div>
           )}
         </div>
-        <p className="text-xs text-red-500 pl-2">{field.error}</p>
+        <div className="flex">
+          <span className="text-xs text-red-500 pl-2">{field.error}</span>
+          {(field.key === "memberId" || field.key === "email") && (
+            <span className="text-xs text-green-500">{field.validMsg}</span>
+          )}
+        </div>
       </div>
     </div>
   )

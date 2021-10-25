@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
+import client from "../api/client"
 
 const Login = () => {
   const [memberId, setMemberId] = useState({
@@ -27,8 +28,19 @@ const Login = () => {
     return isAllFill
   }, [isAllFill])
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     console.log({ memberId: memberId.value, password: password.value })
+    const reqForm = {
+      memberId: memberId.value,
+      password: password.value,
+    }
+    try {
+      const res = await client.post("/members/login", reqForm)
+      localStorage.setItem("accessToken", res.data["access-token"])
+      console.log(res)
+    } catch (error) {
+      console.log(error.response)
+    }
   }
 
   return (
