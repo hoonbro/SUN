@@ -3,7 +3,7 @@ import { IoIosArrowBack } from "react-icons/io"
 
 function Header({ pageTitle = "페이지 이름", to, backPageTitle = "뒤로가기" }) {
   return (
-    <header className="py-4 grid gap-2 relative">
+    <header className="py-4 mb-10 grid gap-2 relative">
       {to && (
         <div className="px-2">
           <Link to={to} className="flex gap-1 items-center">

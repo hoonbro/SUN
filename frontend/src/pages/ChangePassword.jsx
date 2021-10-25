@@ -1,58 +1,70 @@
-import { useLocation } from "react-router"
+import { useMemo } from "react"
+import Button from "../components/Button"
 import Header from "../components/Header"
 import LabelInput from "../components/LabelInput"
 import useInputs from "../hooks/useInputs"
 import { passwordValidator } from "../lib/validators"
-import Button from "../components/Button"
-import { useMemo } from "react"
-
-function useQuery() {
-  return new URLSearchParams(useLocation().search)
-}
 
 const ChangePassword = () => {
-  const query = useQuery()
-
   const [state, handleChange] = useInputs({
     password: {
       value: "",
       errors: {},
+      validators: [],
+    },
+    newPassword: {
+      value: "",
+      errors: {},
       validators: [passwordValidator],
     },
-    confirmPassword: {
+    newConfirmPassword: {
       value: "",
       errors: {},
       validators: [],
     },
   })
-  const { password, confirmPassword } = state
+  const { password, newPassword, newConfirmPassword } = state
 
   const canSubmit = useMemo(() => {
     return (
       password.value &&
-      !Object.keys(password.errors).length &&
-      password.value === confirmPassword.value
+      newPassword.value &&
+      !Object.keys(newPassword.errors).length &&
+      newPassword.value === newConfirmPassword.value
     )
-  }, [password, confirmPassword])
+  }, [password, newPassword, newConfirmPassword])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+  }
 
   return (
     <>
-      <Header pageTitle="비밀번호 변경" to="/auth/find-auth" />
-      <p>email: {query.get("email")}</p>
+      <Header pageTitle="비밀번호 수정" to="/profile/edit" />
       <div className="container px-4">
-        <form className="grid gap-10">
+        <form className="grid gap-10" onSubmit={handleSubmit}>
           <div className="fields grid gap-4">
+            <LabelInput
+              label="현재 비밀번호"
+              onChange={handleChange}
+              name="password"
+              type="password"
+              errors={password.errors}
+              placeholder="현재 비밀번호를 입력하세요"
+            />
             <LabelInput
               label="새 비밀번호"
               onChange={handleChange}
-              name="password"
-              errors={password.errors}
+              name="newPassword"
+              type="password"
+              errors={newPassword.errors}
               placeholder="문자, 숫자, 특수문자를 포함하여 8자 이상"
             />
             <LabelInput
               label="새 비밀번호 확인"
               onChange={handleChange}
-              name="confirmPassword"
+              name="newConfirmPassword"
+              type="password"
               placeholder="동일한 비밀번호를 입력하세요"
             />
           </div>
