@@ -52,7 +52,7 @@ const Login = () => {
           </Link>
           <Link
             className="font-bold text-sm text-gray-700 text-center"
-            to="/find-auth"
+            to="/auth/find-auth"
           >
             아이디 / 비밀번호 찾기
           </Link>

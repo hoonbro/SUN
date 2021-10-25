@@ -18,13 +18,20 @@
 }
 
 @layer components {
+  #root {
+    @apply min-h-screen;
+  }
+
   .label_input {
     @apply grid gap-2;
   }
   .label_input label {
-    @apply text-sm font-medium text-gray-700;
+    @apply text-sm font-medium text-gray-700 place-self-start;
+  }
+  .label_input .input-wrapper {
+    @apply relative border border-gray-300 rounded;
   }
   .label_input input {
-    @apply py-2 px-4 border border-gray-300 rounded outline-none focus:ring;
+    @apply w-full py-2 px-4 rounded outline-none focus:ring;
   }
 }
