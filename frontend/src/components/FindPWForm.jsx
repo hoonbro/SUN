@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+import { useHistory } from "react-router"
 import useInputs from "../hooks/useInputs"
 import { emailValidator } from "../lib/validators"
 import Button from "./Button"
@@ -17,6 +18,7 @@ const FindPWForm = () => {
       validators: [],
     },
   })
+  const history = useHistory()
 
   const { email, authcode } = formFields
 
@@ -39,10 +41,12 @@ const FindPWForm = () => {
     switch (step) {
       case "sendEmail": {
         alert(`이메일 전송: ${email.value}`)
+        setStep("confirmAuthcode")
         break
       }
       case "confirmAuthcode": {
         alert(`인증코드 확인: ${authcode.value}`)
+        history.push(`/auth/reset-password?email=${email.value}`)
       }
     }
   }
@@ -53,6 +57,7 @@ const FindPWForm = () => {
         label="이메일"
         value={email.value}
         name="email"
+        placeholder="ex) admin@sun.com"
         onChange={handleChange}
       />
       {step !== "sendEmail" && (

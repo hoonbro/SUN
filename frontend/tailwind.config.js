@@ -27,6 +27,9 @@ module.exports = {
       pink: colors.pink,
       rose: colors.rose,
     },
+    container: {
+      center: true,
+    },
     fontFamily: {
       sans: [
         "Noto Sans KR",
