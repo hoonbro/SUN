@@ -26,37 +26,6 @@ const Register = () => {
   const [teacherOrStudent, setTeacherOrStudent] = useState("")
 
   // 유효성 검사
-  const isMemberIdValid = useMemo(() => {
-    const regex = /^[a-zA-Z0-9]{4,12}$/
-    return regex.test(memberId.value)
-  }, [memberId])
-
-  const isPasswordValid = useMemo(() => {
-    const regex =
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,255}$/
-    return regex.test(password.value)
-  }, [password])
-
-  const isPasswordConfirmValid = useMemo(() => {
-    return password.value === passwordConfirm.value
-  }, [password, passwordConfirm])
-
-  const isNameValid = useMemo(() => {
-    const regex1 = /^[가-힣]{1,8}$/
-    const regex2 = /^[a-zA-Z]{2,8}$/
-    return regex1.test(name.value) || regex2.test(name.value)
-  }, [name])
-
-  const isPhoneValid = useMemo(() => {
-    const regex = /^01[016789][0-9]{6,8}$/
-    return regex.test(phone.value)
-  }, [phone])
-
-  const isEmailValid = useMemo(() => {
-    const regex = /^[\w\d-]+@[\w]+\.[\w]{1,3}(\.[\w]{1,3})*/
-    return regex.test(email.value)
-  }, [email])
-
   const fieldsValue = [
     memberId.value,
     password.value,
@@ -69,6 +38,31 @@ const Register = () => {
   const isAllFill = useMemo(() => {
     return fieldsValue.every((item) => item !== "")
   }, [fieldsValue])
+  const isMemberIdValid = useMemo(() => {
+    const regex = /^[a-zA-Z0-9]{4,12}$/
+    return regex.test(memberId.value)
+  }, [memberId])
+  const isPasswordValid = useMemo(() => {
+    const regex =
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,255}$/
+    return regex.test(password.value)
+  }, [password])
+  const isPasswordConfirmValid = useMemo(() => {
+    return password.value === passwordConfirm.value
+  }, [password, passwordConfirm])
+  const isNameValid = useMemo(() => {
+    const regex1 = /^[가-힣]{1,8}$/
+    const regex2 = /^[a-zA-Z]{2,8}$/
+    return regex1.test(name.value) || regex2.test(name.value)
+  }, [name])
+  const isPhoneValid = useMemo(() => {
+    const regex = /^01[016789][0-9]{6,8}$/
+    return regex.test(phone.value)
+  }, [phone])
+  const isEmailValid = useMemo(() => {
+    const regex = /^[\w\d-]+@[\w]+\.[\w]{1,3}(\.[\w]{1,3})*/
+    return regex.test(email.value)
+  }, [email])
 
   const canSubmit = useMemo(() => {
     // console.log("isAllFill:", isAllFill)
@@ -98,6 +92,35 @@ const Register = () => {
     isMemberIdValid,
   ])
 
+  const handleBlur = (e) => {
+    console.log("blur")
+    console.log(e.target.id)
+    const targetId = e.target.id
+    let state
+    let setState
+    if (targetId === "memberId") {
+      state = memberId
+      setState = setMemberId
+    } else if (targetId === "password") {
+      state = password
+      setState = setPassword
+    } else if (targetId === "passwordConfirm") {
+      state = passwordConfirm
+      setState = setPasswordConfirm
+    } else if (targetId === "name") {
+      state = name
+      setState = setName
+    } else if (targetId === "phone") {
+      state = phone
+      setState = setPhone
+    } else if (targetId === "email") {
+      state = email
+      setState = setEmail
+    }
+
+    console.log(memberId)
+  }
+
   // 제출 버튼 핸들링
   const handleButtonClick = () => {
     console.log(fieldsValue)
@@ -109,15 +132,36 @@ const Register = () => {
       <div className="grid gap-10 py-10">
         <div className="px-6 grid gap-10">
           <div className=" grid gap-4">
-            <InputFormField field={memberId} setField={setMemberId} />
-            <InputFormField field={password} setField={setPassword} />
+            <InputFormField
+              field={memberId}
+              setField={setMemberId}
+              handleBlur={handleBlur}
+            />
+            <InputFormField
+              field={password}
+              setField={setPassword}
+              handleBlur={handleBlur}
+            />
             <InputFormField
               field={passwordConfirm}
               setField={setPasswordConfirm}
+              handleBlur={handleBlur}
             />
-            <InputFormField field={name} setField={setName} />
-            <InputFormField field={phone} setField={setPhone} />
-            <InputFormField field={email} setField={setEmail} />
+            <InputFormField
+              field={name}
+              setField={setName}
+              handleBlur={handleBlur}
+            />
+            <InputFormField
+              field={phone}
+              setField={setPhone}
+              handleBlur={handleBlur}
+            />
+            <InputFormField
+              field={email}
+              setField={setEmail}
+              handleBlur={handleBlur}
+            />
 
             <RadioFormField
               radioDiv={radioDiv}

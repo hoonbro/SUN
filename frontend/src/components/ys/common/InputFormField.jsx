@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useRef } from "react"
 
-const InputFormField = ({ field, setField }) => {
+const InputFormField = ({ field, setField, handleBlur }) => {
   const handleChange = (e) => {
     setField({ ...field, value: e.target.value })
   }
@@ -19,7 +19,9 @@ const InputFormField = ({ field, setField }) => {
           value={field.value}
           disabled={field.disabled}
           onChange={handleChange}
+          onBlur={handleBlur}
         />
+        <p>{field.error}</p>
       </div>
     </div>
   )

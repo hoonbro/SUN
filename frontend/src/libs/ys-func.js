@@ -3,6 +3,7 @@ export class InputFormFieldMaker {
     this.key = key
     this.value = value
     this.disabled = disabled
+    this.error = ""
 
     switch (key) {
       case "memberId": {
