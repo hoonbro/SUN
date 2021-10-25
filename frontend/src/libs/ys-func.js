@@ -27,7 +27,7 @@ export class InputFormFieldMaker {
       case "name": {
         this.label = "이름"
         this.type = "text"
-        this.placeholder = "한글 (1-8자) 또는 영어(2-8자)"
+        this.placeholder = "한글(1-8자) 또는 영어(2-8자)"
         break
       }
       case "phone": {

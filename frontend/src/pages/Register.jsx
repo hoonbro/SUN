@@ -93,32 +93,54 @@ const Register = () => {
   ])
 
   const handleBlur = (e) => {
-    console.log("blur")
-    console.log(e.target.id)
     const targetId = e.target.id
-    let state
-    let setState
-    if (targetId === "memberId") {
-      state = memberId
-      setState = setMemberId
-    } else if (targetId === "password") {
-      state = password
-      setState = setPassword
-    } else if (targetId === "passwordConfirm") {
-      state = passwordConfirm
-      setState = setPasswordConfirm
-    } else if (targetId === "name") {
-      state = name
-      setState = setName
-    } else if (targetId === "phone") {
-      state = phone
-      setState = setPhone
-    } else if (targetId === "email") {
-      state = email
-      setState = setEmail
-    }
+    let state, setState, isStateValid, error
+    if (targetId === "memberId")
+      [state, setState, isStateValid, error] = [
+        memberId,
+        setMemberId,
+        isMemberIdValid,
+        "영어 대소문자, 숫자(4-8자)를 입력해주세요",
+      ]
+    else if (targetId === "password")
+      [state, setState, isStateValid, error] = [
+        password,
+        setPassword,
+        isPasswordValid,
+        "문자, 숫자, 특수문자를 포함하여 7자 이상",
+      ]
+    else if (targetId === "passwordConfirm")
+      [state, setState, isStateValid, error] = [
+        passwordConfirm,
+        setPasswordConfirm,
+        isPasswordConfirmValid,
+        "동일한 비밀번호를 입력하세요",
+      ]
+    else if (targetId === "name")
+      [state, setState, isStateValid, error] = [
+        name,
+        setName,
+        isNameValid,
+        "한글(1-8자) 또는 영어(2-8자)",
+      ]
+    else if (targetId === "phone")
+      [state, setState, isStateValid, error] = [
+        phone,
+        setPhone,
+        isPhoneValid,
+        "잘못된 핸드폰 번호입니다",
+      ]
+    else if (targetId === "email")
+      [state, setState, isStateValid, error] = [
+        email,
+        setEmail,
+        isEmailValid,
+        "잘못된 이메일 형식입니다",
+      ]
 
-    console.log(memberId)
+    if (!state.value) setState({ ...state, error: "필수 입력값입니다" })
+    else if (!isStateValid) setState({ ...state, error })
+    else setState({ ...state, error: "" })
   }
 
   // 제출 버튼 핸들링
