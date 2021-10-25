@@ -18,8 +18,11 @@ const LabelInput = ({
         {type === "password" && (
           <div
             className="absolute top-2 right-2 cursor-pointer"
-            onMouseEnter={() => setInputType("string")}
-            onMouseLeave={() => setInputType(type)}
+            onClick={() =>
+              setInputType((prev) =>
+                prev === "string" ? "password" : "string"
+              )
+            }
           >
             <VscSymbolString size="24px" />
           </div>
