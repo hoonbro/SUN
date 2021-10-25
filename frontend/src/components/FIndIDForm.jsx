@@ -18,9 +18,14 @@ const FindIDForm = () => {
   const canSubmit = useMemo(() => {
     return email.value.length && Object.keys(email.errors).length === 0
   }, [email])
-  const handleSubmit = () => {}
+
+  const handleSubmit = (e, email) => {
+    e.preventDefault()
+    console.log(email)
+  }
+
   return (
-    <form className="grid gap-6" onSubmit={(e) => handleSubmit(e, "id")}>
+    <form className="grid gap-6" onSubmit={(e) => handleSubmit(e, email.value)}>
       <LabelInput
         label="이메일"
         value={email.value}

@@ -1,8 +1,8 @@
-function LabelInput({ label = "", onChange, errors = {}, ...rest }) {
+function LabelInput({ label = "", onChange = (f) => f, errors = {}, ...rest }) {
   return (
     <div className="label_input">
-      <label>{label}</label>
-      <input onChange={onChange} {...rest} />
+      <label htmlFor={label}>{label}</label>
+      <input id={label} onChange={onChange} {...rest} />
       {Object.keys(errors).map((key) => (
         <div key={key}>{errors[key]}</div>
       ))}
