@@ -40,10 +40,10 @@ const Login = () => {
     try {
       const res = await client.post("/members/login", reqForm)
       localStorage.setItem("accessToken", res.data["access-token"])
-      history.push({
-        pathname: "/profile",
-        state: { memberId: memberId.value },
-      })
+      // history.push({
+      //   pathname: "/profile",
+      //   state: { memberId: memberId.value },
+      // })
       console.log(res)
     } catch (error) {
       const { status } = error.response
