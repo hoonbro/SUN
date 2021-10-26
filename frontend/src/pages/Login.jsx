@@ -44,6 +44,7 @@ const Login = () => {
       //   pathname: "/profile",
       //   state: { memberId: memberId.value },
       // })
+      alert("임시: 로그인 성공")
       console.log(res)
     } catch (error) {
       const { status } = error.response
