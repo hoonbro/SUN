@@ -4,8 +4,11 @@ import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
 import client from "../api/client"
+import { useHistory } from "react-router"
 
 const Login = () => {
+  const history = useHistory()
+
   const [memberId, setMemberId] = useState({
     key: "memberId",
     label: "아이디",
@@ -37,9 +40,22 @@ const Login = () => {
     try {
       const res = await client.post("/members/login", reqForm)
       localStorage.setItem("accessToken", res.data["access-token"])
+      // history.push({
+      //   pathname: "/profile",
+      //   state: { memberId: memberId.value },
+      // })
       console.log(res)
     } catch (error) {
-      console.log(error.response)
+      const { status } = error.response
+      switch (status) {
+        case 404: {
+          alert("가입되지 않은 아이디입니다.")
+          break
+        }
+        case 401: {
+          alert("비밀번호가 일치하지 않습니다.")
+        }
+      }
     }
   }
 

@@ -83,9 +83,7 @@ const Register = () => {
       isNameValid &&
       isPhoneValid &&
       isEmailValid &&
-      isMemberIdValid &&
-      memberId.validMsg &&
-      email.validMsg
+      isMemberIdValid
     )
   }, [
     isAllFill,
@@ -95,8 +93,6 @@ const Register = () => {
     isPhoneValid,
     isEmailValid,
     isMemberIdValid,
-    memberId.validMsg,
-    email.validMsg,
   ])
 
   const handleBlur = async (e) => {
@@ -189,6 +185,12 @@ const Register = () => {
       history.push({ pathname: "/login" })
     } catch (error) {
       console.log(error.response)
+      const { status } = error.response
+      switch (status) {
+        case 409: {
+          alert("회원가입에 실패했습니다.")
+        }
+      }
     }
   }
 
@@ -219,13 +221,13 @@ const Register = () => {
               handleBlur={handleBlur}
             />
             <InputFormField
-              field={email}
-              setField={setEmail}
+              field={phone}
+              setField={setPhone}
               handleBlur={handleBlur}
             />
             <InputFormField
-              field={phone}
-              setField={setPhone}
+              field={email}
+              setField={setEmail}
               handleBlur={handleBlur}
             />
 
