@@ -6,7 +6,6 @@ const CalendarLayout = () => {
   const { path } = useRouteMatch()
   return (
     <>
-      <h1>CalendarLayout</h1>
       <Switch>
         <Route path={`${path}/:calendarId`} exact>
           <Calendar />
