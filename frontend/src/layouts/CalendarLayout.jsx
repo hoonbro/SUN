@@ -1,6 +1,6 @@
 import { Switch, Route, useRouteMatch } from "react-router-dom"
 import Calendar from "../pages/Calendar"
-import EventDetail from "../pages/EvnetDetail"
+import EventDetail from "../pages/EventDetail"
 
 const CalendarLayout = () => {
   const { path } = useRouteMatch()
