@@ -16,9 +16,9 @@ import java.util.List;
 public class MissionRpDto {
 
     private Long missionId;
-    private String missionName;
-    private String startDate;
-    private  String endDate;
+    private String name;
+    private String start;
+    private  String end;
     private  List<String> tag;
     private  String calendarCode;
 }
