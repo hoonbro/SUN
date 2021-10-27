@@ -18,5 +18,5 @@ public class MissionRqDto {
     String end;
     List<String> tag;
     String calendarCode;
-
+    Long id;
 }

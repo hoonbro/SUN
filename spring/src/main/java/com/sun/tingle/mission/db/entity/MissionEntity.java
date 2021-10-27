@@ -31,6 +31,9 @@ public class MissionEntity {
     @Column(name="calendar_code")
     String calendarCode;
 
+    @Column(name="id")
+    Long id;
+
 
 
 }
