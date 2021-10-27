@@ -11,18 +11,18 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Builder
-@Table(name = "member")
-public class MemberEntity {
+@Table(name = "token")
+public class TokenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) //기본키 생성을 db에 위임하는 방법(auto increment)
     private Long id;
 
-    private String memberId;
-    private String email;
-    private String password;
-    private String name;
-    private String phone;
-    private String profileImage;
-    private String auth;
+    @Column(name = "refresh_token",  unique=true)
+    private String refreshToken;
+
+    @Column(name = "mid")
+    private Long mid;
+
+    @Column(name = "expire_time")
+    private Long expireTime;
 }
- 

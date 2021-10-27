@@ -1,6 +1,6 @@
 package com.sun.tingle.member.util;
 
-import com.sun.tingle.member.api.dto.request.MemberReqDto;
+import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.auth.UserAuthDetail;
 import com.sun.tingle.member.db.entity.MemberEntity;
@@ -21,17 +21,28 @@ import java.util.Date;
 @Component
 public class JwtUtil{
     private static String SECRET_KEY;
-    private static Integer EXPIRE_TIME;
-    private final MemberService memberService;
- 
+    public static long EXPIRE_TIME;
+    public static long REFRESH_TIME;
+    MemberService memberService;
+
     @Autowired
-    public JwtUtil(@Value("${jwt.secret}") String SECRET_KEY, @Value("${jwt.expiration}") Integer EXPIRE_TIME, MemberService memberService) {
+    public JwtUtil(@Value("${jwt.secret}") String SECRET_KEY, @Value("${jwt.expiration}") long EXPIRE_TIME, @Value("${jwt.refresh}") long REFRESH_TIME, MemberService memberService) {
         this.SECRET_KEY = SECRET_KEY;
         this.EXPIRE_TIME = EXPIRE_TIME;
+        this.REFRESH_TIME = REFRESH_TIME;
         this.memberService = memberService;
+
     }
 
-    public <T> String createToken(MemberEntity memberEntity) {
+    public String createToken(Long id, String email, String name){
+        return doCreateToken(id, email, name, EXPIRE_TIME);
+    }
+
+    public String createRefreshToken(Long id, String email, String name){
+        return doCreateToken(id, email, name, REFRESH_TIME);
+    }
+
+    public <T> String doCreateToken(Long id, String email, String name, long time) {
         Date now = new Date();
         //HS256 방식으로 암호화 방식 설정
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -39,10 +50,10 @@ public class JwtUtil{
         Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
         JwtBuilder builder = Jwts.builder()
                 .setIssuer("tingle") // 발급자
-                .claim("id", memberEntity.getId())
-                .claim("email", memberEntity.getEmail())
-                .claim("name", memberEntity.getName())
-                .setExpiration(new Date(now.getTime() + EXPIRE_TIME))
+                .claim("id", id)
+                .claim("email", email)
+                .claim("name", name)
+                .setExpiration(new Date(now.getTime() + time))
                 .signWith(SignatureAlgorithm.HS256, signingKey); //암호화 알고리즘
 
         return builder.compact();
@@ -53,12 +64,28 @@ public class JwtUtil{
         return getClaims(jwt).getBody().get("id", Long.class);
     }
 
+    public TokenInfo getClaimsFromJwt(String jwt){
+        long id = getClaims(jwt).getBody().get("id", Long.class);
+        String email = getClaims(jwt).getBody().get("email", String.class);
+        String name = getClaims(jwt).getBody().get("name", String.class);
+        return new TokenInfo(id, email, name);
+    }
+
+//    public String getEmailFromJwt(String jwt){
+//        return getClaims(jwt).getBody().get("email", String.class);
+//
+//    }
+//
+//    public String getNameFromJwt(String jwt){
+//        return getClaims(jwt).getBody().get("name", String.class);
+//    }
+
     public static boolean validateToken(String jwt){
         return getClaims(jwt) != null;
     }
 
     // 인증 성공시 SecurityContextHolder에 저장할 Authentication 객체 생성
-    public Authentication getAuthentication(String token) {
+    public Authentication getAuthentication(String token){
         Long id = this.getIdFromJwt(token);
         MemberEntity memberEntity = memberService.getMemberById(id).get();
         if(memberEntity != null) {
@@ -70,12 +97,6 @@ public class JwtUtil{
         }
         return null;
     }
-
-//    public static JWTVerifier getVerifier() {
-//        return JWT
-//                .require(Algorithm.HMAC512(SECRET_KEY.getBytes()))
-//                .build();
-//    }
 
     //claims : 속성 정보(?), 권한 집합
     //JWT는 속성 정보 (Claim)를 JSON 데이터 구조로 표현한 토큰
@@ -101,17 +122,4 @@ public class JwtUtil{
         }
     }
 
-//    //	전달 받은 토큰이 제대로 생성된것인지 확인 하고 문제가 있다면 UnauthorizedException을 발생.
-//    @Override
-//    public boolean isUsable(String jwt) {
-//        try {
-//            Claims claims = Jwts.parser()
-//                    .setSigningKey(DatatypeConverter.parseBase64Binary(SECRET_KEY))
-//                    .parseClaimsJws(jwt).getBody();
-//            return true;
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//            return false;
-//        }
-//    }
 }
