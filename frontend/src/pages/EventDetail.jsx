@@ -1,7 +1,7 @@
 import Header from "../components/Header"
 import ChatController from "../components/ys/event/ChatController"
 import ChatListContainer from "../components/ys/event/ChatListContainer"
-import EventMaterial from "../components/ys/event/EventMaterial"
+// import EventMaterial from "../components/ys/event/EventMaterial"
 
 const EventDetail = () => {
   return (
