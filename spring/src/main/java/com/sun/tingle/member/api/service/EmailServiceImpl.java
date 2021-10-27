@@ -1,5 +1,7 @@
 package com.sun.tingle.member.api.service;
 
+import com.sun.tingle.member.api.dto.request.PasswordCodeDto;
+import com.sun.tingle.member.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,6 +21,11 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     MemberService memberService;
+
+    @Autowired
+    RedisUtil redisUtil;
+
+    private final long CODE_EXPIRE = 86400000;
  
     @Override
     public void sendId(String email, String memberId) {
@@ -57,10 +64,22 @@ public class EmailServiceImpl implements EmailService {
                     "</div></body></html>", true);
 
             javaMailSender.send(message);
+            savePasswordCode(code, email);
         }catch(MessagingException e){
             log.error("가입 메일 발송 실패 :{}", e);
         }
         return code;
+    }
+
+    @Override
+    public boolean validatePasswordCode(PasswordCodeDto passwordCodeDto) {
+        if(passwordCodeDto.getEmail().equals(redisUtil.getData(passwordCodeDto.getCode())))
+            return true;
+        return false;
+    }
+
+    public void savePasswordCode(String code, String email){
+        redisUtil.setDataExpire(code, email, CODE_EXPIRE);
     }
 
     public String getRamdomPassword() {
