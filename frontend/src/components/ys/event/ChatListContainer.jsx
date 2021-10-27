@@ -18,7 +18,7 @@ const ChatListContainer = () => {
   }
   return (
     <div className="overflow-y-scroll h-full flex-1">
-      <section className="pt-6 flex flex-col gap-6">
+      <section className="pt-6 px-6 flex flex-col gap-6">
         <ChatItem chatItem={chatItem} />
         <ChatItem chatItem={chatItem2} />
         <ChatItem chatItem={chatItem2} />
