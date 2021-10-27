@@ -20,12 +20,12 @@ public class MissionEntity {
     @Column(name = "mission_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long missionId;
-    @Column(name="mission_name")
-    String missionName;
-    @Column(name="start_date")
-    String startDate;
-    @Column(name="end_date")
-    String endDate;
+    @Column(name="title")
+    String title;
+    @Column(name="start")
+    String start;
+    @Column(name="end")
+    String end;
     @Column(name="tag")
     String tag;
     @Column(name="calendar_code")
