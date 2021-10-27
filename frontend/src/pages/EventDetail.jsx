@@ -1,4 +1,5 @@
 import Header from "../components/Header"
+import ChatController from "../components/ys/event/ChatController"
 import ChatListContainer from "../components/ys/event/ChatListContainer"
 import EventMaterial from "../components/ys/event/EventMaterial"
 
@@ -16,7 +17,10 @@ const EventDetail = () => {
         <hr />
         <ChatListContainer />
       </article>
-      <article className="p-2">채팅form</article>
+      <hr />
+      <article className="p-2">
+        <ChatController />
+      </article>
     </div>
   )
 }
