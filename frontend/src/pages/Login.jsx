@@ -4,10 +4,10 @@ import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
 import client from "../api/client"
-import { useHistory } from "react-router"
+// import { useHistory } from "react-router"
 
 const Login = () => {
-  const history = useHistory()
+  // const history = useHistory()
 
   const [memberId, setMemberId] = useState({
     key: "memberId",

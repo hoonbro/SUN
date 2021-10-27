@@ -36,7 +36,7 @@ const EditProfile = () => {
     handleChange({ target: { name: "name", value: dummyData.name } })
     handleChange({ target: { name: "phone", value: dummyData.phone } })
     handleChange({ target: { name: "email", value: dummyData.email } })
-  }, [])
+  })
 
   return (
     <>

@@ -123,17 +123,10 @@ button.rbc-input::-moz-focus-inner {
 }
 
 .rbc-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 10px;
-  font-size: 16px;
+  @apply flex flex-wrap items-center justify-center mb-4 px-4;
 }
 .rbc-toolbar .rbc-toolbar-label {
-  flex-grow: 1;
-  padding: 0 10px;
-  text-align: center;
+  @apply flex-1 text-center text-lg font-bold;
 }
 .rbc-toolbar button {
   @apply text-gray-700 text-sm py-1 px-2 border border-gray-200 rounded whitespace-nowrap;
@@ -321,6 +314,7 @@ button.rbc-input::-moz-focus-inner {
 .rbc-date-cell > a:visited {
   color: inherit;
   text-decoration: none;
+  @apply cursor-default;
 }
 
 .rbc-row-bg {
@@ -331,7 +325,8 @@ button.rbc-input::-moz-focus-inner {
 }
 
 .rbc-day-bg {
-  flex: 1 0 0%;
+  /* flex: 1 0 0%; */
+  @apply flex-grow flex-shrink-0 cursor-pointer;
 }
 .rbc-day-bg + .rbc-day-bg {
   border-left: 1px solid #ddd;
@@ -339,6 +334,9 @@ button.rbc-input::-moz-focus-inner {
 .rbc-rtl .rbc-day-bg + .rbc-day-bg {
   border-left-width: 0;
   border-right: 1px solid #ddd;
+}
+.rbc-day-bg:hover {
+  @apply bg-orange-50;
 }
 
 .rbc-overlay {

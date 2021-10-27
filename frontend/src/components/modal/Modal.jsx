@@ -20,7 +20,7 @@ const Modal = ({ onClose = (f) => f, maskClosable = true, children }) => {
   return (
     <Portal elementId="modal-root">
       <div
-        className="fixed inset-0 w-full px-6 bg-black bg-opacity-40 z-10 flex items-center justify-center"
+        className="fixed inset-0 w-full px-4 bg-black bg-opacity-50 z-10 flex items-center justify-center"
         tabIndex="-1"
         onClick={maskClosable ? onMaskClick : null}
       >
