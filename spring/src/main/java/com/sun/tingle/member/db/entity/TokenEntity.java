@@ -17,7 +17,7 @@ public class TokenEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY) //기본키 생성을 db에 위임하는 방법(auto increment)
     private Long id;
 
-    @Column(name = "refresh_token")
+    @Column(name = "refresh_token",  unique=true)
     private String refreshToken;
 
     @Column(name = "mid")
