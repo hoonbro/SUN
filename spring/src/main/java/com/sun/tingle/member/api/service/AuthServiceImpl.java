@@ -66,6 +66,7 @@ public class AuthServiceImpl implements AuthService{
         redisUtil.setDataExpire(refreshToken, String.valueOf(memberEntity.getId()), jwtUtil.REFRESH_TIME);
         TokenEntity tokenEntity = TokenEntity.builder()
                 .mid(memberEntity.getId())
+                .refreshToken(refreshToken)
                 .expireTime(jwtUtil.REFRESH_TIME)
                 .build();
         tokenRepository.save(tokenEntity);
