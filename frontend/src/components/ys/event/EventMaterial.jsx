@@ -3,7 +3,7 @@ import { MdAttachFile, MdSaveAlt } from "react-icons/md"
 
 const EventMaterial = () => {
   return (
-    <section className="py-4 grid gap-2">
+    <section className="py-4 px-4 grid gap-2">
       <div className="flex justify-between items-center">
         <p className="flex items-center gap-1">
           <MdAttachFile className="text-blue-300 text-2xl" />

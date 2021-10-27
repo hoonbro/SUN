@@ -1,6 +1,7 @@
 import Header from "../components/Header"
+import ChatController from "../components/ys/event/ChatController"
 import ChatListContainer from "../components/ys/event/ChatListContainer"
-import EventMaterial from "../components/ys/event/EventMaterial"
+// import EventMaterial from "../components/ys/event/EventMaterial"
 
 const EventDetail = () => {
   return (
@@ -10,10 +11,11 @@ const EventDetail = () => {
         to={`1`}
         backPageTitle="이전"
       />
-      <EventMaterial />
+      {/* <EventMaterial /> */}
       <hr />
       <ChatListContainer />
-      <article className="p-2">채팅form</article>
+      <hr />
+      <ChatController />
     </div>
   )
 }
