@@ -29,15 +29,18 @@ const Register = () => {
   const [teacherOrStudent, setTeacherOrStudent] = useState("")
 
   // 유효성 검사
-  const fieldsValue = [
-    memberId.value,
-    password.value,
-    passwordConfirm.value,
-    name.value,
-    phone.value,
-    email.value,
-    teacherOrStudent,
-  ]
+  const fieldsValue = useMemo(
+    () => [
+      memberId.value,
+      password.value,
+      passwordConfirm.value,
+      name.value,
+      phone.value,
+      email.value,
+      teacherOrStudent,
+    ],
+    [memberId, password, passwordConfirm, name, phone, email, teacherOrStudent]
+  )
   const isAllFill = useMemo(() => {
     return fieldsValue.every((item) => item !== "")
   }, [fieldsValue])

@@ -1,4 +1,4 @@
-import { Route, Switch } from "react-router"
+import { Redirect, Route, Switch } from "react-router"
 import "./App.css"
 import ResetPassword from "./pages/ResetPassword"
 import FindAuth from "./pages/FindAuth"
@@ -10,9 +10,10 @@ import ChangePassword from "./pages/ChangePassword"
 import CalendarLayout from "./layouts/CalendarLayout"
 
 function App() {
+  const loggedIn = false
   return (
-    <Switch>
-      <main className="flex-1 flex flex-col">
+    <main className="h-full max-h-full pb-16">
+      <Switch>
         <Route path="/login">
           <Login />
         </Route>
@@ -37,8 +38,11 @@ function App() {
         <Route path="/profile/:email">
           <Profile />
         </Route>
-      </main>
-    </Switch>
+        <Route path="*">
+          {loggedIn ? <Redirect to="/calendars" /> : <Redirect to="/login" />}
+        </Route>
+      </Switch>
+    </main>
   )
 }
 

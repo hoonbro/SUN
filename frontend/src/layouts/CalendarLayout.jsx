@@ -5,17 +5,14 @@ import EventDetail from "../pages/EventDetail"
 const CalendarLayout = () => {
   const { path } = useRouteMatch()
   return (
-    <div className="flex-1 flex flex-col">
-      <h1>CalendarLayout</h1>
-      <Switch>
-        <Route path={`${path}/:calendarId`} exact>
-          <Calendar />
-        </Route>
-        <Route path={`${path}/:calendarId/events/:eventId`}>
-          <EventDetail />
-        </Route>
-      </Switch>
-    </div>
+    <Switch>
+      <Route path={`${path}/:calendarId`} exact>
+        <Calendar />
+      </Route>
+      <Route path={`${path}/:calendarId/events/:eventId`}>
+        <EventDetail />
+      </Route>
+    </Switch>
   )
 }
 

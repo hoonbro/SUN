@@ -12,7 +12,7 @@ const InputFormField = ({ field, setField, handleBlur }) => {
     <div className="label_input">
       <label htmlFor={field.key}>{field.label}</label>
       <div className="grid gap-1">
-        <div className="input-wrapper">
+        <div className={`input-wrapper ${field.error && "error"}`}>
           <input
             type={inputType}
             id={field.key}
@@ -33,12 +33,14 @@ const InputFormField = ({ field, setField, handleBlur }) => {
             </div>
           )}
         </div>
-        <div className="flex">
-          <span className="text-xs text-red-500 pl-2">{field.error}</span>
-          {(field.key === "memberId" || field.key === "email") && (
-            <span className="text-xs text-green-500">{field.validMsg}</span>
-          )}
-        </div>
+        {(field.error || field.validMsg) && (
+          <div className="flex">
+            <span className="text-xs text-red-500 pl-2">{field.error}</span>
+            {(field.key === "memberId" || field.key === "email") && (
+              <span className="text-xs text-green-500">{field.validMsg}</span>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

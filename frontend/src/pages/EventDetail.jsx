@@ -4,18 +4,15 @@ import EventMaterial from "../components/ys/event/EventMaterial"
 
 const EventDetail = () => {
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="h-full flex flex-col">
       <Header
         pageTitle="(임시) Mom Loves Spot 읽기"
         to={`1`}
         backPageTitle="이전"
       />
+      <EventMaterial />
       <hr />
-      <article className="flex-1 px-6 flex flex-col">
-        <EventMaterial />
-        <hr />
-        <ChatListContainer />
-      </article>
+      <ChatListContainer />
       <article className="p-2">채팅form</article>
     </div>
   )
