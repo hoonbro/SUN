@@ -19,7 +19,7 @@
 
 @layer components {
   #root {
-    @apply min-h-screen;
+    @apply min-h-screen flex flex-col;
   }
 
   .label_input {

@@ -6,11 +6,10 @@ import { BrowserRouter } from "react-router-dom"
 import BottomNav from "./components/BottomNav"
 
 ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-      <BottomNav />
-    </BrowserRouter>
-  </React.StrictMode>,
+  // <React.StrictMode>
+  <BrowserRouter>
+    <App />
+    <BottomNav />
+  </BrowserRouter>,
   document.getElementById("root")
 )
