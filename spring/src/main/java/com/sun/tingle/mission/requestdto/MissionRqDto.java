@@ -13,9 +13,9 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MissionRqDto {
-    String missionName;
-    String startDate;
-    String endDate;
+    String title;
+    String start;
+    String end;
     List<String> tag;
     String calendarCode;
 
