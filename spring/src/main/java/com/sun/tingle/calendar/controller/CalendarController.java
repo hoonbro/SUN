@@ -4,11 +4,15 @@ package com.sun.tingle.calendar.controller;
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
+import com.sun.tingle.member.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,13 +24,20 @@ public class CalendarController {
     @Autowired
     CalendarService calendarService;
 
+    @Lazy
+    @Autowired
+    JwtUtil jwtUtil;
+
     @PostMapping
-    public ResponseEntity<CalendarRpDto> insertCalendar(@RequestBody Map<String,String> map) {
+    public ResponseEntity<CalendarRpDto> insertCalendar(HttpServletRequest request, @RequestBody Map<String,String> map) {
         String calendarCode = getRandomSentence();
-//        map.put("calendarCode",calendarCode);
-        String memberId = map.get("memberId");
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         String calendarName = map.get("calendarName");
-        CalendarRpDto calendarRpDto =  calendarService.insertCalendar(calendarCode,calendarName,memberId);
+        CalendarRpDto calendarRpDto =  calendarService.insertCalendar(calendarCode,calendarName,id);
+        if(calendarRpDto == null) {
+            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CONFLICT);
+        }
         return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.OK);
     }
 
@@ -59,15 +70,16 @@ public class CalendarController {
                                                          @RequestBody Map<String,String> map) {
         String calendarName = map.get("calendarName");
         CalendarRpDto calendarRpDto = calendarService.updateCalendar(calendarCode,calendarName);
-        return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.OK);
+        return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
 
     @PostMapping("/share")
-    public ResponseEntity<CalendarRpDto> insertShareCalendar(@RequestBody Map<String,String> map) {
+    public ResponseEntity<CalendarRpDto> insertShareCalendar(HttpServletRequest request,@RequestBody Map<String,String> map) {
         String calendarCode = map.get("calendarCode");
-        String memberId = map.get("memberId");
-        Map<String,Object> map2 = calendarService.insertShareCalendar(calendarCode,memberId);
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        Map<String,Object> map2 = calendarService.insertShareCalendar(calendarCode,id);
         int flag = (Integer)map2.get("flag");
         CalendarRpDto calendarRpDto = (CalendarRpDto)map2.get("calendarRpDto");
         if(flag == -1) { // 애초에 등록 안된 달력일 때
@@ -81,10 +93,11 @@ public class CalendarController {
     }
 
     @DeleteMapping("/share/{calendarCode}")
-    public ResponseEntity<Void> deleteShareCalendar(@PathVariable("calendarCode") String calendarCode) {
-        String memberId = "audwns11111"; /// 임시 !! 나중에 토큰에서 아이디 뽑을 거임
+    public ResponseEntity<Void> deleteShareCalendar(HttpServletRequest request,@PathVariable("calendarCode") String calendarCode) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         try {
-            calendarService.deleteShareCalendar(calendarCode,memberId);
+            calendarService.deleteShareCalendar(calendarCode,id);
             return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 떄
         }
         catch (Exception e) {
@@ -93,11 +106,12 @@ public class CalendarController {
     }
 
     @GetMapping("/every/calendars")
-    public ResponseEntity<Map<String,List<CalendarRpDto>>> selectEveryCalendarList() {
-        String memberId = "audwns102";
+    public ResponseEntity<Map<String,List<CalendarRpDto>>> selectEveryCalendarList(HttpServletRequest request) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         Map<String,List<CalendarRpDto>> map = new HashMap<>();
-        List<CalendarRpDto> list = calendarService.getMyCalendarList(memberId);
-        List<CalendarRpDto> list2 = calendarService.getShareCalendarList(memberId);
+        List<CalendarRpDto> list = calendarService.getMyCalendarList(id);
+        List<CalendarRpDto> list2 = calendarService.getShareCalendarList(id);
 
         System.out.println(list.size());
         System.out.println(list2.size());
@@ -110,9 +124,10 @@ public class CalendarController {
 
 
     @GetMapping("/my/calendars")
-    public ResponseEntity<List<CalendarRpDto>> selectMyCalendarList() {
-        String memberId = "audwns102";
-        List<CalendarRpDto> list = calendarService.getMyCalendarList(memberId);
+    public ResponseEntity<List<CalendarRpDto>> selectMyCalendarList(HttpServletRequest request) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        List<CalendarRpDto> list = calendarService.getMyCalendarList(id);
         if(list == null) {
             return new ResponseEntity<List<CalendarRpDto>>(list,HttpStatus.NO_CONTENT);
         }
@@ -120,9 +135,10 @@ public class CalendarController {
     }
 
     @GetMapping("/share/calendars")
-    public ResponseEntity<List<CalendarRpDto>> selectShareCalendarList() {
-        String memberId = "audwns102";
-        List<CalendarRpDto> list = calendarService.getShareCalendarList(memberId);
+    public ResponseEntity<List<CalendarRpDto>> selectShareCalendarList(HttpServletRequest request) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        List<CalendarRpDto> list = calendarService.getShareCalendarList(id);
         if(list == null) {
             return new ResponseEntity<List<CalendarRpDto>>(list,HttpStatus.NO_CONTENT);
         }

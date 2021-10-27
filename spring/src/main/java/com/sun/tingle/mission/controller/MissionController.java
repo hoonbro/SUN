@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -59,6 +60,20 @@ public class MissionController {
         catch (Exception e) {
             return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR); //삭제할 캘린더가 없을 때
         }
+
+    }
+
+    @GetMapping("{calendarCode}")
+    public ResponseEntity<List<MissionRpDto>> selectMissionList(@PathVariable("calendarCode") String calendarCode) {
+
+        List<MissionRpDto> list = missionService.selectMissionList(calendarCode);
+
+        if(list.size() ==0) {
+            return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.NO_CONTENT);
+        }
+
+        return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.OK);
+
 
     }
 

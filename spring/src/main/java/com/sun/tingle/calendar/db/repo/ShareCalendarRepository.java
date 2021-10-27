@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface ShareCalendarRepository extends JpaRepository<ShareCalendarEntity,String> {
-    public ShareCalendarEntity findByCalendarCodeAndMemberId(String calendarCode,String memberId);
-    public List<ShareCalendarEntity> findCalendarCodeByMemberId(String memberId);
+    public ShareCalendarEntity findByCalendarCodeAndId(String calendarCode,long id);
+    public List<ShareCalendarEntity> findCalendarCodeById(long id);
 
 }

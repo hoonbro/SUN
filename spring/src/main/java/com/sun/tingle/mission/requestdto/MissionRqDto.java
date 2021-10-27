@@ -15,9 +15,7 @@ import java.util.List;
 public class MissionRqDto {
     String missionName;
     String startDate;
-    String startTime;
     String endDate;
-    String endTime;
     List<String> tag;
     String calendarCode;
 

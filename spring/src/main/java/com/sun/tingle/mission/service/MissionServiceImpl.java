@@ -1,5 +1,6 @@
 package com.sun.tingle.mission.service;
 
+import com.sun.tingle.calendar.db.entity.CalendarEntity;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
@@ -119,5 +120,43 @@ public class MissionServiceImpl implements MissionService {
     @Override
     public void deleteMission(Long missionId) {
         missionRepository.deleteById(missionId);
+    }
+
+    @Override
+    public List<MissionRpDto> selectMissionList(String calendarCode) {
+        List<MissionEntity> list = missionRepository.findByCalendarCode(calendarCode);
+        if(list == null) {
+            return null;
+        }
+        List<MissionRpDto> list2 = builderMissionList(list);
+
+        return list2;
+    }
+
+
+    public List<MissionRpDto> builderMissionList(List<MissionEntity> list) {
+        List<MissionRpDto> list2 = new ArrayList<>();
+        MissionEntity m = new MissionEntity();
+        MissionRpDto missionRpDto = new MissionRpDto();
+        int size = list.size();
+        List<String> tags = null;
+        for(int i=0; i<size; i++) {
+            m = list.get(i);
+            String[] temp = m.getTag().split("#");
+            tags = new ArrayList<>();
+            for(int j=0;j<temp.length;j++) {
+                tags.add(temp[j]);
+            }
+            missionRpDto = missionRpDto.builder().calendarCode(m.getCalendarCode())
+                    .missionId(m.getMissionId())
+                    .missionName(m.getMissionName())
+                    .endDate(m.getEndDate())
+                    .startDate(m.getStartDate())
+                    .tag(tags)
+                    .build();
+            list2.add(missionRpDto);
+        }
+
+        return list2;
     }
 }
