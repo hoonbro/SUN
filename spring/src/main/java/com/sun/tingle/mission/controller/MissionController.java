@@ -1,14 +1,18 @@
 package com.sun.tingle.mission.controller;
 
+import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
 import com.sun.tingle.mission.responsedto.MissionRpDto;
 import com.sun.tingle.mission.service.MissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -18,10 +22,16 @@ public class MissionController {
     @Autowired
     MissionService missionService;
 
+    @Lazy
+    @Autowired
+    JwtUtil jwtUtil;
+
 
     @PostMapping
-    public ResponseEntity<MissionRpDto> insertMission(@RequestBody MissionRqDto missionRqDto) {
-        System.out.println(missionRqDto.toString());
+    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestBody MissionRqDto missionRqDto) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        missionRqDto.setId(id);
         MissionRpDto missionRpDto = missionService.insertMission(missionRqDto);
         if(missionRpDto == null) {
             return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.CONFLICT);

@@ -56,7 +56,20 @@ public class S3service {
                 .build();
     }
 
-    public List<MissionFileRpDto> upload(MultipartFile[] file,Long missionId,Long id) throws IOException {
+    public String upload(MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename();
+        s3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), null)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+       return s3Client.getUrl(bucket,fileName).toString();
+    }
+
+    public void deleteFile(String fileName) {
+        s3Client.deleteObject(new DeleteObjectRequest(bucket,fileName));
+    }
+
+
+
+    public List<MissionFileRpDto> uploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
         SimpleDateFormat date = new SimpleDateFormat("yyyy-mm-dd");
         String dateName = date.format(new Date());
         List<MissionFileRpDto> list = new ArrayList<>();
@@ -125,8 +138,8 @@ public class S3service {
 //    }
 
 
-    public void deleteFile(Long fileId,String uuid) {
-        s3Client.deleteObject(new DeleteObjectRequest(bucket,uuid));
+    public void deleteMissionFile(Long fileId,String fileName) {
+        s3Client.deleteObject(new DeleteObjectRequest(bucket,fileName));
         missionFileRepository.deleteById(fileId);
     }
 }

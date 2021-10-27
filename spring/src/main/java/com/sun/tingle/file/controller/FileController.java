@@ -28,14 +28,18 @@ public class FileController {
     @Autowired
     JwtUtil jwtUtil;
 
-    @GetMapping
-    public ResponseEntity<Void> test() {
-        System.out.println("하이");
-        return new ResponseEntity<Void>(HttpStatus.OK);
-    }
+
 
     @PostMapping
-    public ResponseEntity<List<MissionFileRpDto>> fileUpload(HttpServletRequest request, @RequestParam("missionFile") MultipartFile[] file, @RequestParam("missionId") String missionIds) throws IOException {
+    public ResponseEntity<String> fileUpload(@RequestParam("missionFile") MultipartFile file) throws IOException {
+        String url = s3service.upload(file);
+        return new ResponseEntity<String>(url,HttpStatus.OK);
+    }
+
+
+
+    @PostMapping("/list")
+    public ResponseEntity<List<MissionFileRpDto>> fileUploads(HttpServletRequest request, @RequestParam("missionFile") MultipartFile[] file, @RequestParam("missionId") String missionIds) throws IOException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         Long missionId=Long.parseLong(missionIds);
@@ -43,7 +47,7 @@ public class FileController {
             System.out.println("여긴안돼");
         }
 
-        List<MissionFileRpDto> list = s3service.upload(file,missionId,id);
+        List<MissionFileRpDto> list = s3service.uploads(file,missionId,id);
         return new ResponseEntity<List<MissionFileRpDto>>(list,HttpStatus.OK);
 
     }
@@ -84,15 +88,26 @@ public class FileController {
 //        return new ResponseEntity<InputStream>(inputStream,HttpStatus.OK);
 //    }
 
+    @DeleteMapping("{fileName}")
+    public ResponseEntity<Void> deleteFile(@PathVariable("fileName") String fileName) {
 
+        try {
+            s3service.deleteFile(fileName);
+            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+
+        }
+        catch (Exception e) {
+            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
 
     @DeleteMapping("{fileId}/{uuid}")
-    public ResponseEntity<Void> deleteFile(@PathVariable("fileId") Long fileId ,@PathVariable("uuid") String uuid) {
+    public ResponseEntity<Void> deleteMissionFile(@PathVariable("fileId") Long fileId ,@PathVariable("fileName") String fileName) {
 
         try {
-            s3service.deleteFile(fileId,uuid);
+            s3service.deleteMissionFile(fileId,fileName);
             return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
         }
         catch(Exception e) {

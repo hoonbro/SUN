@@ -30,6 +30,7 @@ public class MissionServiceImpl implements MissionService {
         missionEntity.setStart(missionRqDto.getStart());
         missionEntity.setEnd(missionRqDto.getEnd());
         missionEntity.setCalendarCode(missionRqDto.getCalendarCode());
+        missionEntity.setId(missionRqDto.getId());
         List<String> list = missionRqDto.getTag();
         StringBuilder sb = new StringBuilder();
         int size = list.size();
@@ -53,6 +54,7 @@ public class MissionServiceImpl implements MissionService {
                 .calendarCode(missionEntity.getCalendarCode())
                 .start(missionEntity.getStart())
                 .end(missionEntity.getEnd())
+                .id(missionEntity.getId())
                 .build();
 
         return missionRpDto;
@@ -74,6 +76,7 @@ public class MissionServiceImpl implements MissionService {
                 .calendarCode(missionEntity.getCalendarCode())
                 .start(missionEntity.getStart())
                 .end(missionEntity.getEnd())
+                .id(missionEntity.getId())
                 .build();
 
 
@@ -102,6 +105,7 @@ public class MissionServiceImpl implements MissionService {
                 .start(missionRqDto.getStart())
                 .end(missionRqDto.getEnd())
                 .tag(sb.toString()).calendarCode(missionRqDto.getCalendarCode())
+                .id(missionRqDto.getId())
                 .build();
 
         missionEntity = missionRepository.save(missionEntity);
@@ -112,6 +116,7 @@ public class MissionServiceImpl implements MissionService {
                 .start(missionEntity.getStart())
                 .end(missionEntity.getEnd())
                 .tag(missionRqDto.getTag()).
+                id(missionEntity.getId()).
                 calendarCode(missionEntity.getCalendarCode()).build();
 
         return missionRpDto;
@@ -153,6 +158,7 @@ public class MissionServiceImpl implements MissionService {
                     .end(m.getEnd())
                     .start(m.getStart())
                     .tag(tags)
+                    .id(m.getId())
                     .build();
             list2.add(missionRpDto);
         }
