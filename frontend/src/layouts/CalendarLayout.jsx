@@ -5,7 +5,7 @@ import EventDetail from "../pages/EventDetail"
 const CalendarLayout = () => {
   const { path } = useRouteMatch()
   return (
-    <>
+    <div className="flex-1 flex flex-col">
       <h1>CalendarLayout</h1>
       <Switch>
         <Route path={`${path}/:calendarId`} exact>
@@ -15,7 +15,7 @@ const CalendarLayout = () => {
           <EventDetail />
         </Route>
       </Switch>
-    </>
+    </div>
   )
 }
 

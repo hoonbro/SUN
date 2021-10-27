@@ -12,30 +12,32 @@ import CalendarLayout from "./layouts/CalendarLayout"
 function App() {
   return (
     <Switch>
-      <Route path="/login">
-        <Login />
-      </Route>
-      <Route path="/register">
-        <Register />
-      </Route>
-      <Route path="/auth/find-auth">
-        <FindAuth />
-      </Route>
-      <Route path="/auth/reset-password">
-        <ResetPassword />
-      </Route>
-      <Route path="/calendars">
-        <CalendarLayout />
-      </Route>
-      <Route path="/profile/edit" exact>
-        <EditProfile />
-      </Route>
-      <Route path="/profile/change-password" exact>
-        <ChangePassword />
-      </Route>
-      <Route path="/profile/:email">
-        <Profile />
-      </Route>
+      <main className="flex-1 flex flex-col">
+        <Route path="/login">
+          <Login />
+        </Route>
+        <Route path="/register">
+          <Register />
+        </Route>
+        <Route path="/auth/find-auth">
+          <FindAuth />
+        </Route>
+        <Route path="/auth/reset-password">
+          <ResetPassword />
+        </Route>
+        <Route path="/calendars">
+          <CalendarLayout />
+        </Route>
+        <Route path="/profile/edit" exact>
+          <EditProfile />
+        </Route>
+        <Route path="/profile/change-password" exact>
+          <ChangePassword />
+        </Route>
+        <Route path="/profile/:email">
+          <Profile />
+        </Route>
+      </main>
     </Switch>
   )
 }

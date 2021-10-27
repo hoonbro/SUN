@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import ChatItem from "./ChatItem"
 
-const Chat = () => {
+const ChatListContainer = () => {
   const chatItem = {
     picture: require("../../../assets/images/test-profile-img.png"),
     name: "김병훈",
@@ -17,13 +17,18 @@ const Chat = () => {
     content: "안녕하세요, 선생님!",
   }
   return (
-    <div>
+    <div className="flex-1 overflow-y-scroll h-full">
       <section className="pt-6 grid gap-6">
         <ChatItem chatItem={chatItem} />
+        <ChatItem chatItem={chatItem2} />
+        <ChatItem chatItem={chatItem2} />
+        <ChatItem chatItem={chatItem2} />
+        <ChatItem chatItem={chatItem2} />
+        <ChatItem chatItem={chatItem2} />
         <ChatItem chatItem={chatItem2} />
       </section>
     </div>
   )
 }
 
-export default Chat
+export default ChatListContainer
