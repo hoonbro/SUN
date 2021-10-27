@@ -11,7 +11,7 @@ const EventDetail = () => {
         to={`1`}
         backPageTitle="이전"
       />
-      <EventMaterial />
+      {/* <EventMaterial /> */}
       <hr />
       <ChatListContainer />
       <hr />
