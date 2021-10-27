@@ -1,13 +1,15 @@
 package com.sun.tingle.member.api.service;
 
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
+import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
+import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
 
+import java.util.Map;
 import java.util.Optional;
 
 public interface MemberService {
-    MemberResDto registMember(MemberReqDto member);
 
     MemberResDto getMemberInfo(Long id);
 
@@ -15,9 +17,7 @@ public interface MemberService {
 
     void deleteMemberInfo(Long id);
 
-    void duplicateId(String id);
 
-    void duplicateEmail(String email);
 
     Optional<MemberEntity> getMemberByMemberId(String id);
 
@@ -25,8 +25,10 @@ public interface MemberService {
 
     MemberEntity getMemberByEmail(String email);
 
-    void changePassword(MemberEntity memberEntity, String password);
+
 
     MemberResDto entity2Dto(MemberEntity memberEntity);
+
+    TokenResDto reissue(TokenReqDto tokenReqDto);
 }
  
