@@ -1,6 +1,11 @@
 package com.sun.tingle.chat.controller;
 
 
+import com.sun.tingle.chat.dto.ChatMessageRequestDto;
+import com.sun.tingle.chat.dto.ChatMessageResponseDto;
+import com.sun.tingle.chat.dto.ChatRoomResponseDto;
+import com.sun.tingle.chat.dto.MemberChatRoomResponseDto;
+import com.sun.tingle.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.Header;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,7 +48,7 @@ public class ChatController {
     }
 
     @GetMapping("/member/{email}")
-    public ResponseEntity<MemberChatRoomResponse> getMemberChat(@PathVariable("email") String email) throws Exception {
+    public ResponseEntity<MemberChatRoomResponseDto> getMemberChat(@PathVariable("email") String email) throws Exception {
         return ResponseEntity.ok(chatService.getChatroomId(email));
     }
 }

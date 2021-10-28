@@ -11,6 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
 @Builder
+@Getter
 @Table(name = "member")
 public class MemberEntity {
     @Id

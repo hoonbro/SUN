@@ -2,6 +2,7 @@ package com.sun.tingle.chat.config;
 
 
 import com.google.common.collect.ImmutableMap;
+import com.sun.tingle.chat.entity.ChatMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.LongDeserializer;
