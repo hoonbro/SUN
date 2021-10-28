@@ -18,7 +18,13 @@ const CalendarAddForm = () => {
       <div className="label_input">
         <label htmlFor="calendar_code">캘린더 코드</label>
         <div className="input-wrapper">
-          <input type="text" name="code" value={code} onChange={handleChange} />
+          <input
+            type="text"
+            name="code"
+            id="calendar_code"
+            value={code}
+            onChange={handleChange}
+          />
         </div>
       </div>
       <button className="justify-self-end py-2 px-6 text-sm text-white bg-gray-400 rounded">

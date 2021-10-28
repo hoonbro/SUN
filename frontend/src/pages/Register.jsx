@@ -113,7 +113,7 @@ const Register = () => {
         password,
         setPassword,
         isPasswordValid,
-        "문자, 숫자, 특수문자를 포함하여 7자 이상",
+        "문자, 숫자, 특수문자를 포함하여 8자 이상",
       ]
     else if (targetId === "passwordConfirm")
       [state, setState, isStateValid, error] = [
@@ -198,11 +198,11 @@ const Register = () => {
   }
 
   return (
-    <>
+    <div className="bg-gray-50 pb-20">
       <Header pageTitle="회원가입" to="/login" backPageTitle="로그인" />
-      <div className="grid gap-10 py-10">
-        <div className="px-6 grid gap-10">
-          <div className=" grid gap-4">
+      <div className="container max-w-lg bg-white px-6 py-6 xs:rounded-xl xs:shadow-lg">
+        <div className=" grid gap-10">
+          <div className="grid gap-4">
             <InputFormField
               field={memberId}
               setField={setMemberId}
@@ -248,7 +248,7 @@ const Register = () => {
           </SubmitButton>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

@@ -61,32 +61,34 @@ const Login = () => {
   }
 
   return (
-    <div className="py-10 px-6 grid gap-10">
-      <Welcome />
-      <div className="grid gap-6">
-        <InputFormField field={memberId} setField={setMemberId} />
-        <InputFormField field={password} setField={setPassword} />
-      </div>
-      <div className="grid gap-4">
-        <SubmitButton
-          disabled={!canSubmit}
-          handleButtonClick={handleButtonClick}
-        >
-          로그인
-        </SubmitButton>
-        <div className="grid gap-2">
-          <Link
-            className="font-bold text-sm text-gray-700 text-center"
-            to="/register"
+    <div className="h-full flex items-center justify-center xs:bg-gray-50">
+      <div className="grid gap-10 container max-w-lg px-6 py-10 xs:bg-white xs:shadow-lg xs:rounded-xl">
+        <Welcome />
+        <div className="grid gap-6">
+          <InputFormField field={memberId} setField={setMemberId} />
+          <InputFormField field={password} setField={setPassword} />
+        </div>
+        <div className="grid gap-4">
+          <SubmitButton
+            disabled={!canSubmit}
+            handleButtonClick={handleButtonClick}
           >
-            팅글 회원가입
-          </Link>
-          <Link
-            className="font-bold text-sm text-gray-700 text-center"
-            to="/auth/find-auth"
-          >
-            아이디 / 비밀번호 찾기
-          </Link>
+            로그인
+          </SubmitButton>
+          <div className="grid gap-2">
+            <Link
+              className="font-bold text-sm text-gray-700 text-center"
+              to="/register"
+            >
+              팅글 회원가입
+            </Link>
+            <Link
+              className="font-bold text-sm text-gray-700 text-center"
+              to="/auth/find-auth"
+            >
+              아이디 / 비밀번호 찾기
+            </Link>
+          </div>
         </div>
       </div>
     </div>

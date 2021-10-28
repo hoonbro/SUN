@@ -5,7 +5,7 @@ import FindAuth from "./pages/FindAuth"
 import Login from "./pages/Login"
 import Profile from "./pages/Profile"
 import Register from "./pages/Register"
-import EditProfile from "./pages/EditProfile"
+import ProfileEdit from "./pages/ProfileEdit"
 import ChangePassword from "./pages/ChangePassword"
 import CalendarLayout from "./layouts/CalendarLayout"
 
@@ -30,7 +30,7 @@ function App() {
           <CalendarLayout />
         </Route>
         <Route path="/profile/edit" exact>
-          <EditProfile />
+          <ProfileEdit />
         </Route>
         <Route path="/profile/change-password" exact>
           <ChangePassword />

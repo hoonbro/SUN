@@ -148,7 +148,7 @@ const MyCalendar = () => {
   }
 
   return (
-    <div className="flex flex-col h-full relative">
+    <div className="flex flex-col h-full relative pb-10">
       <header className="p-4">
         <button
           className="flex items-center gap-1"

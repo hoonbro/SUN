@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useRouteMatch } from "react-router-dom"
 import { FcSettings } from "react-icons/fc"
 import { MdExpandMore, MdExpandLess } from "react-icons/md"
 import { useState } from "react"
@@ -25,9 +25,9 @@ const CalendarListItem = ({
           {codeOpen ? <MdExpandLess size={20} /> : <MdExpandMore size={20} />}
         </button>
       </div>
-      <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="flex items-center justify-between text-sm ">
         <span>캘린더코드</span>
-        <span>{code}</span>
+        <span className="text-gray-600">{code}</span>
       </div>
     </div>
   )
@@ -50,7 +50,7 @@ const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
         <section className="grid gap-6 mb-10">
           <header className="flex items-center justify-between">
             <h3>캘린더 목록</h3>
-            <Link to="/calendars/:calendarId/edit">
+            <Link to={`/calendars/setting`}>
               <FcSettings size={24} />
             </Link>
           </header>
@@ -61,7 +61,7 @@ const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
           </div>
         </section>
         <hr />
-        <section className="mt-6">
+        <section className="mt-6 grid gap-4">
           <h4>공유 캘린더 추가하기</h4>
           <CalendarAddForm />
         </section>

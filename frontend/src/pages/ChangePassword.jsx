@@ -39,9 +39,9 @@ const ChangePassword = () => {
   }
 
   return (
-    <>
+    <div className="bg-gray-50 min-h-full">
       <Header pageTitle="비밀번호 수정" to="/profile/edit" />
-      <div className="container px-4">
+      <div className="container max-w-xl p-6 bg-white xs:rounded-xl xs:shadow-lg">
         <form className="grid gap-10" onSubmit={handleSubmit}>
           <div className="fields grid gap-4">
             <LabelInput
@@ -71,7 +71,7 @@ const ChangePassword = () => {
           <Button disabled={!canSubmit}>확인</Button>
         </form>
       </div>
-    </>
+    </div>
   )
 }
 
