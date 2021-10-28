@@ -5,7 +5,9 @@ import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
@@ -17,18 +19,16 @@ public interface MemberService {
 
     void deleteMemberInfo(Long id);
 
-
-
     Optional<MemberEntity> getMemberByMemberId(String id);
 
     Optional<MemberEntity> getMemberById(Long id);
 
     MemberEntity getMemberByEmail(String email);
 
-
-
     MemberResDto entity2Dto(MemberEntity memberEntity);
 
-    TokenResDto reissue(TokenReqDto tokenReqDto);
+    String updateProfileImage(Long id, MultipartFile file) throws IOException;
+
+    void logout(String refreshToken);
 }
  

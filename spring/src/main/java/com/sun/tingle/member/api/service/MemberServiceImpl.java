@@ -1,21 +1,27 @@
 package com.sun.tingle.member.api.service;
 
+import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
+import com.sun.tingle.member.db.entity.TokenEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
+import com.sun.tingle.member.db.repository.TokenRepository;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.member.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -24,6 +30,12 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    TokenRepository tokenRepository;
+
+    @Autowired
+    S3service s3service;
 
     @Autowired
     JwtUtil jwtUtil;
@@ -70,8 +82,6 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
     }
 
-
-
     @Override
     public MemberResDto entity2Dto(MemberEntity memberEntity) {
         MemberResDto memberResDto = MemberResDto.builder()
@@ -87,19 +97,17 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public TokenResDto reissue(TokenReqDto tokenReqDto){
-        TokenResDto tokenResDto = new TokenResDto();
-        TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(tokenReqDto.getRefreshToken());
+    public String updateProfileImage(Long id, MultipartFile file) throws IOException {
+        MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
+        String url = s3service.upload(file);
+        memberEntity.setProfileImage(url);
 
-        if (tokenInfo.getId() == Long.parseLong(redisUtil.getData(tokenReqDto.getRefreshToken()))) {
-            String newAccessToken = jwtUtil.createToken(tokenInfo.getId(), tokenInfo.getEmail(), tokenInfo.getName());
-            tokenResDto.setAccessToken(newAccessToken);
-            //재인증
-            Authentication authentication = jwtUtil.getAuthentication(newAccessToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-
-        return tokenResDto;
+        memberRepository.save(memberEntity);
+        return url;
     }
 
+    @Override
+    public void logout(String refreshToken){
+        redisUtil.deleteData(refreshToken);
+    }
 }
