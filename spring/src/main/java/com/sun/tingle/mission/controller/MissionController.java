@@ -11,8 +11,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -27,18 +29,50 @@ public class MissionController {
     JwtUtil jwtUtil;
 
 
+//    @PostMapping
+//    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestBody MissionRqDto missionRqDto) {
+//        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+//        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+//        missionRqDto.setId(id);
+//        System.out.println("하하하하하");
+//        System.out.println(name);
+//        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto);
+//        if(missionRpDto == null) {
+//            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.CONFLICT);
+//        }
+//        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
+//    }
     @PostMapping
-    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestBody MissionRqDto missionRqDto) {
+    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("teacherFile") MultipartFile[] teacherFile, @RequestParam("tag") List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException {
+//      public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestParam("missionId") Long missionId) {
+
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-        missionRqDto.setId(id);
-        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto);
-        if(missionRpDto == null) {
-            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.CONFLICT);
-        }
-        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
-    }
+//        System.out.println(missionId);
+        System.out.println(title);
+        System.out.println(start);
+        System.out.println(end);
 
+//        for(int i=0; i<tag.size(); i++) {
+//            System.out.print(tag.get(i)+" ");
+//        }
+//        System.out.println();
+//        System.out.println(calendarCode);
+//        System.out.println(teacherFile[0].getOriginalFilename().toString());
+//        System.out.println(teacherFile[1].getOriginalFilename().toString());
+
+
+
+
+        MissionRpDto h = new MissionRpDto();
+        return new ResponseEntity<MissionRpDto>(h,HttpStatus.CREATED);
+
+//        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto);
+//        if(missionRpDto == null) {
+//            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.CONFLICT);
+//        }
+//        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
+    }
 
     @GetMapping
     public ResponseEntity<MissionRpDto> selectMission(@RequestParam("missionId") Long missionId) {

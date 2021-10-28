@@ -1,10 +1,15 @@
 package com.sun.tingle.mission.db.entity;
 
 
+import com.sun.tingle.calendar.db.entity.ShareCalendarEntity;
+import com.sun.tingle.file.db.entity.MissionFileEntity;
+import com.sun.tingle.file.db.entity.TeacherFileEntity;
 import lombok.*;
 import org.hibernate.annotations.Columns;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -34,6 +39,12 @@ public class MissionEntity {
     @Column(name="id")
     Long id;
 
+
+    @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
+    private List<MissionFileEntity> teacherFileList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
+    private List<TeacherFileEntity> missionFileList = new ArrayList<>();
 
 
 }

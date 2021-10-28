@@ -14,6 +14,7 @@ import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.member.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,6 +38,7 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     S3service s3service;
 
+    @Lazy
     @Autowired
     JwtUtil jwtUtil;
 
@@ -99,7 +101,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public String updateProfileImage(Long id, MultipartFile file) throws IOException {
         MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
-        String url = s3service.upload(file);
+        String url = s3service.ProfileUpload(file);
         memberEntity.setProfileImage(url);
 
         memberRepository.save(memberEntity);
