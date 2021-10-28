@@ -18,5 +18,6 @@ public interface CalendarService {
 
     List<CalendarRpDto> getMyCalendarList(long id);
     List<CalendarRpDto> getShareCalendarList(long id);
+    String getRandomSentence();
 
 }
