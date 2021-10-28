@@ -30,7 +30,7 @@ public class CalendarController {
 
     @PostMapping
     public ResponseEntity<CalendarRpDto> insertCalendar(HttpServletRequest request, @RequestBody Map<String,String> map) {
-        String calendarCode = getRandomSentence();
+        String calendarCode = calendarService.getRandomSentence();
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         String calendarName = map.get("calendarName");
@@ -38,7 +38,7 @@ public class CalendarController {
         if(calendarRpDto == null) {
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.OK);
+        return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
     @DeleteMapping("{calendarCode}")
@@ -148,19 +148,6 @@ public class CalendarController {
 
 
 
-    public String getRandomSentence() {
-        String randomValue = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-        int len = randomValue.length();
-        StringBuilder sb = new StringBuilder();
 
-        for(int i=0; i<10; i++) {
-            int idx = (int)(len * Math.random());
-
-            sb.append(randomValue.charAt(idx));
-        }
-
-
-        return sb.toString();
-    }
 
 }

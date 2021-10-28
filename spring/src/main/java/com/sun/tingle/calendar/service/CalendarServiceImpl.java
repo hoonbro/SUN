@@ -144,4 +144,20 @@ public class CalendarServiceImpl implements CalendarService{
         }
         return list2;
     }
+
+    @Override
+    public String getRandomSentence() {
+        String randomValue = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        int len = randomValue.length();
+        StringBuilder sb = new StringBuilder();
+
+        for(int i=0; i<10; i++) {
+            int idx = (int)(len * Math.random());
+
+            sb.append(randomValue.charAt(idx));
+        }
+
+
+        return sb.toString();
+    }
 }

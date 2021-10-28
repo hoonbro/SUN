@@ -1,5 +1,6 @@
 package com.sun.tingle.file.service;
 
+import ch.qos.logback.core.net.SyslogOutputStream;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -23,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @NoArgsConstructor
@@ -46,6 +48,9 @@ public class S3service {
     @Value("${cloud.aws.region.static}")
     private String region;
 
+    @ Value("${cloud.aws.credentials.profile-path}")
+    private String bucketUrl;
+
     @PostConstruct
     public void setS3Client() {
         AWSCredentials credentials = new BasicAWSCredentials(this.accessKey, this.secretKey);
@@ -56,42 +61,94 @@ public class S3service {
                 .build();
     }
 
-    public String upload(MultipartFile file) throws IOException {
-        String fileName = file.getOriginalFilename();
-        s3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), null)
+
+
+
+    public MissionFileRpDto fileUpload(MultipartFile file,Long missionId, Long id) throws IOException {
+        String fileName = file.getOriginalFilename(); // 중복 코드라서 뜨는 노란줄
+        int len = fileName.lastIndexOf(".");
+        String fileNameE = fileName.substring(len,fileName.length());
+        String randomUuid= UUID.randomUUID().toString().replaceAll("-","");
+        randomUuid += fileNameE;
+        s3Client.putObject(new PutObjectRequest(bucket, randomUuid, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
-       return s3Client.getUrl(bucket,fileName).toString();
-    }
 
-    public void deleteFile(String fileName) {
-        s3Client.deleteObject(new DeleteObjectRequest(bucket,fileName));
-    }
-
-
-
-    public List<MissionFileRpDto> uploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
-        SimpleDateFormat date = new SimpleDateFormat("yyyy-mm-dd");
-        String dateName = date.format(new Date());
-        List<MissionFileRpDto> list = new ArrayList<>();
-        String[] url = new String[file.length];
-
-        for(int i=0; i<file.length; i++) {
-            String fileName = file[i].getOriginalFilename();
-            s3Client.putObject(new PutObjectRequest(bucket, fileName, file[i].getInputStream(), null)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
-            url[i] = s3Client.getUrl(bucket,fileName).toString();
-
-            MissionFileEntity mEntity = new MissionFileEntity();
-            mEntity = mEntity.builder().fileUuid(url[i]).fileName(file[i].
-                            getOriginalFilename()).missionId(missionId).id(id).
+        String uuid = s3Client.getUrl(bucket,randomUuid).toString();
+        MissionFileEntity mEntity = new MissionFileEntity();
+            mEntity = mEntity.builder().fileUuid(uuid).fileName(fileName).missionId(missionId).id(id).
                             build();
 
             mEntity = missionFileRepository.save(mEntity);
             MissionFileRpDto missionFileRpDto = buildMissionFile(mEntity);
-            list.add(missionFileRpDto);
-        }
-        return list;
+            return missionFileRpDto;
+
     }
+
+    public String ProfileUpload(MultipartFile file) throws IOException {
+        String fileName = file.getOriginalFilename(); // 중복 코드라서 뜨는 노란줄
+        int len = fileName.lastIndexOf(".");
+        String fileNameE = fileName.substring(len,fileName.length());
+        String randomUuid= UUID.randomUUID().toString().replaceAll("-","");
+        randomUuid += fileNameE;
+        s3Client.putObject(new PutObjectRequest(bucket, randomUuid, file.getInputStream(), null)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+       return s3Client.getUrl(bucket,randomUuid).toString();
+    }
+
+
+
+
+    public int deleteMissionFile(String uuid,Long id) {
+        MissionFileEntity m = missionFileRepository.findByFileUuid(uuid);
+        if(m == null) {
+            return 0; // 삭제할 사진이 없다.
+        }
+        else if(m.getId() != id) {
+            return 1; //권한 없다
+        }
+        else {
+            missionFileRepository.delete(m);
+            String s3Uuid = uuid.replace("https://d101.s3.ap-northeast-2.amazonaws.com/","");
+            s3Client.deleteObject(new DeleteObjectRequest(bucket,s3Uuid));
+            return 2; // 삭제 완료
+        }
+    }
+
+
+
+
+
+
+    public void deleteProfileFile(String uuid) {
+        String s3Uuid = uuid.replace("https://d101.s3.ap-northeast-2.amazonaws.com/","");
+        s3Client.deleteObject(new DeleteObjectRequest(bucket,s3Uuid));
+    }
+
+
+
+//    public List<MissionFileRpDto> uploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
+//        SimpleDateFormat date = new SimpleDateFormat("yyyy-mm-dd");
+//        String dateName = date.format(new Date());
+//        List<MissionFileRpDto> list = new ArrayList<>();
+//        String[] url = new String[file.length];
+//
+//        for(int i=0; i<file.length; i++) {
+//            String fileName = file[i].getOriginalFilename();
+//            s3Client.putObject(new PutObjectRequest(bucket, fileName, file[i].getInputStream(), null)
+//                    .withCannedAcl(CannedAccessControlList.PublicRead));
+//            url[i] = s3Client.getUrl(bucket,fileName).toString();
+//
+//            MissionFileEntity mEntity = new MissionFileEntity();
+//            mEntity = mEntity.builder().fileUuid(url[i]).fileName(file[i].
+//                            getOriginalFilename()).missionId(missionId).id(id).
+//                            build();
+//
+//            mEntity = missionFileRepository.save(mEntity);
+//            MissionFileRpDto missionFileRpDto = buildMissionFile(mEntity);
+//            list.add(missionFileRpDto);
+//        }
+//        return list;
+//    }
 
 
 
@@ -100,8 +157,8 @@ public class S3service {
     public  MissionFileRpDto buildMissionFile(MissionFileEntity mEntity) {
         MissionFileRpDto mDto = new MissionFileRpDto();
 
-        mDto = mDto.builder().fileId(mEntity.getFileId()).fileName(mEntity.getFileName())
-                        .missionId(mEntity.getMissionId()).fileUuid(mEntity.getFileUuid()).
+        mDto = mDto.builder().fileName(mEntity.getFileName())
+                        .fileUuid(mEntity.getFileUuid()).
                 build();
 
         return mDto;
@@ -138,8 +195,8 @@ public class S3service {
 //    }
 
 
-    public void deleteMissionFile(Long fileId,String fileName) {
-        s3Client.deleteObject(new DeleteObjectRequest(bucket,fileName));
-        missionFileRepository.deleteById(fileId);
-    }
+//    public void deleteMissionFile(Long fileId,String fileName) {
+//        s3Client.deleteObject(new DeleteObjectRequest(bucket,fileName));
+//        missionFileRepository.deleteById(fileId);
+//    }
 }

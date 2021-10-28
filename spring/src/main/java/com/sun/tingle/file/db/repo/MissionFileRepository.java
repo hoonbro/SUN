@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface MissionFileRepository extends JpaRepository<MissionFileEntity,Long> {
     public List<MissionFileEntity> findByMissionId(Long missionId);
+    public MissionFileEntity findByFileUuid(String Uuid);
 }
