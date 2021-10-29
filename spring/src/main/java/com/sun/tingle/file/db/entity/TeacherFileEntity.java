@@ -13,6 +13,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name="teacher_file")
 public class TeacherFileEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
