@@ -6,7 +6,6 @@ import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
-import com.sun.tingle.member.db.entity.TokenEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
 import com.sun.tingle.member.db.repository.TokenRepository;
 import com.sun.tingle.member.util.JwtUtil;
@@ -61,7 +60,7 @@ public class AuthServiceImpl implements AuthService{
 
         memberEntity = memberRepository.save(memberEntity);
 
-//        calendarService.insertCalendar(calendarService.getRandomSentence(),memberEntity.getName() + "의 캘린더", memberEntity.getId());
+        calendarService.insertCalendar(calendarService.getRandomSentence(),memberEntity.getName() + "의 캘린더", memberEntity.getId());
 
         return memberService.entity2Dto(memberEntity);
     }
