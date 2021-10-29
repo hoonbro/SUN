@@ -12,6 +12,8 @@ import com.sun.tingle.chat.util.SecurityUtil;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
 import com.sun.tingle.member.util.JwtUtil;
+import com.sun.tingle.mission.db.entity.MissionEntity;
+import com.sun.tingle.mission.db.repo.MissionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,6 +39,7 @@ public class ChatService {
     private final JwtUtil tokenProvider;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final MissionRepository missionRepository;
 
     @Autowired
     MemberRepository memberRepository;
@@ -44,15 +47,15 @@ public class ChatService {
     private static String BOOT_TOPIC = "kafka-chat";
 
     @Transactional
-    public void sendMessage(ChatMessageRequestDto chatMessageRequestDto, String token, Long id) {
+    public void sendMessage(ChatMessageRequestDto chatMessageRequestDto, String token, Long mid) {
         Long userid = tokenProvider.getIdFromJwt(token);
         MemberEntity user = memberRepository.findById(userid).orElseThrow(() -> new NullPointerException("잘못된 사용자 토큰입니다!"));
-        MemberEntity other = memberRepository.findById(id).orElseThrow(() -> new NullPointerException("존재하지 않는 사용자입니다!"));
-        String roomid = getRoomId(userid, other.getId());
+        MissionEntity missionEntity = missionRepository.findById(mid).orElseThrow(() -> new NullPointerException("존재하지 않는 mission입니다!"));
+        String roomid = getRoomId(mid);
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
         ChatMessage message;
         if (chatRoom.isEmpty()) {
-            ChatRoom inner_chatroom = createChatRoom(roomid, user, other);
+            ChatRoom inner_chatroom = createChatRoom(roomid, missionEntity);
             chatRoomRepository.save(inner_chatroom);
             message = chatMessageRequestDto.toChatMessage(user, inner_chatroom);
         } else {
@@ -63,18 +66,16 @@ public class ChatService {
     }
 
     @Transactional
-    public ChatRoom createChatRoom(String roomid, MemberEntity user, MemberEntity other) {
+    public ChatRoom createChatRoom(String roomid, MissionEntity mid) {
         return ChatRoom.builder()
                 .id(roomid)
-                .other(other)
-                .user(user)
+                .mission_id(mid)
                 .build();
     }
 
     @Transactional(readOnly = true)
-    public Page<ChatMessageResponseDto> getHistory(Long id, Pageable pageable) {
+    public Page<ChatMessageResponseDto> getHistory(String roomid, Pageable pageable) {
         MemberEntity member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new NullPointerException("잘못된 토큰입니다."));
-        String roomid = getRoomId(member.getId(), id);
         ChatRoom chatRoom = chatRoomRepository.findById(roomid).orElseThrow(() -> new NullPointerException("존재하지 않는 채팅방입니다!"));
         Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoom(chatRoom, pageable);
         return chatMessages.map(m -> ChatMessageResponseDto.of(m));
@@ -96,27 +97,23 @@ public class ChatService {
     }
 
     @Transactional
-    public MemberChatRoomResponseDto getChatroomId(String email) {
+    public MemberChatRoomResponseDto getChatroomId(Long mid) {
         MemberEntity user = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new NullPointerException("잘못된 사용자 토큰입니다!"));
-        MemberEntity other = memberRepository.findByEmail(email).orElseThrow(() -> new NullPointerException("존재하지 않는 사용자입니다!"));
-        String roomid = getRoomId(user.getId(), other.getId());
+        MissionEntity missionEntity = missionRepository.findById(mid).orElseThrow(() -> new NullPointerException("존재하지 않는 mission입니다!"));
+        String roomid = getRoomId(mid);
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
         if (chatRoom.isEmpty()) {
-            ChatRoom inner_chatroom = createChatRoom(roomid, user, other);
+
+            ChatRoom inner_chatroom = createChatRoom(roomid, missionEntity);
             chatRoomRepository.save(inner_chatroom);
-            return MemberChatRoomResponseDto.of(inner_chatroom, other.getId());
+            return MemberChatRoomResponseDto.of(inner_chatroom, missionEntity);
         } else {
-            return MemberChatRoomResponseDto.of(chatRoom.get(), other.getId());
+            return MemberChatRoomResponseDto.of(chatRoom.get(), missionEntity);
         }
     }
 
-    private String getRoomId(Long myid, Long id) {
-        String roomid;
-        if (myid > id){
-            roomid = Long.toString(id) + '-' + Long.toString(myid);
-        } else {
-            roomid = Long.toString(myid) + '-' + Long.toString(id);
-        }
+    private String getRoomId(Long mid) {
+        String roomid = Long.toString(mid);
         return roomid;
     }
 }

@@ -1,6 +1,7 @@
 package com.sun.tingle.chat.entity;
 
 import com.sun.tingle.member.db.entity.MemberEntity;
+import com.sun.tingle.mission.db.entity.MissionEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,17 +16,12 @@ public class ChatRoom {
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private MemberEntity user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "other_id")
-    private MemberEntity other;
+    @JoinColumn(name = "mission_id")
+    private MissionEntity mission_id;
 
     @Builder
-    public ChatRoom(String id, MemberEntity user, MemberEntity other) {
+    public ChatRoom(String id, MissionEntity mission_id) {
         this.id = id;
-        this.user = user;
-        this.other = other;
+        this.mission_id = mission_id;
     }
 }

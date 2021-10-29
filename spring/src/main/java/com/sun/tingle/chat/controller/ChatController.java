@@ -30,14 +30,14 @@ import java.util.List;
 public class ChatController {
     private final ChatService chatService;
 
-    @MessageMapping("/user/{id}")
+    @MessageMapping("/mission/{mid}")
     @SendTo("/room/{id}")
-    public void sendMessage(ChatMessageRequestDto chatMessageRequestDto, @Header("Authorization") String token, @DestinationVariable Long id) throws Exception {
-        chatService.sendMessage(chatMessageRequestDto, token, id);
+    public void sendMessage(@DestinationVariable("mid") Long mid, ChatMessageRequestDto chatMessageRequestDto, @Header("Authorization") String token) throws Exception {
+        chatService.sendMessage(chatMessageRequestDto, token, mid);
     }
 
     @GetMapping("/chatroom/{id}")
-    public ResponseEntity<Page<ChatMessageResponseDto>> getChattingHistory(@PathVariable("id") Long id,
+    public ResponseEntity<Page<ChatMessageResponseDto>> getChattingHistory(@PathVariable("id") String id,
                                                                            @PageableDefault(size = 10) @SortDefault(sort = "sentTime", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
         return ResponseEntity.ok(chatService.getHistory(id, pageable));
     }
@@ -47,8 +47,8 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getChattingRooms());
     }
 
-    @GetMapping("/member/{email}")
-    public ResponseEntity<MemberChatRoomResponseDto> getMemberChat(@PathVariable("email") String email) throws Exception {
-        return ResponseEntity.ok(chatService.getChatroomId(email));
+    @GetMapping("/mission/{mid}")
+    public ResponseEntity<MemberChatRoomResponseDto> getMemberChat(@PathVariable("mid") Long mid) throws Exception {
+        return ResponseEntity.ok(chatService.getChatroomId(mid));
     }
 }
