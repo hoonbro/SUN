@@ -11,7 +11,7 @@ import java.util.List;
 public interface MissionService {
     public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException;
     public MissionRpDto selectMission(Long missionId);
-    public MissionRpDto updateMission(Long missionId, MissionRqDto missionRqDto);
+    public MissionRpDto updateMission(Long missionId, MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException;
     public int deleteMission(Long missionId,Long id);
     public List<MissionRpDto> selectMissionList(String calendarCode);
 }
