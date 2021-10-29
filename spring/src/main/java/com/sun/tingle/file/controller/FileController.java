@@ -28,17 +28,6 @@ public class FileController {
     @Autowired
     JwtUtil jwtUtil;
 
-
-
-//    @PostMapping
-//    public ResponseEntity<String> fileUpload(@RequestParam("missionFile") MultipartFile file) throws IOException {
-//        String url = s3service.ProfileUpload(file);
-//
-//        return new ResponseEntity<String>(url,HttpStatus.OK);
-//    }
-
-
-
     @PostMapping("/child")
     public ResponseEntity<MissionFileRpDto> missionFileUpload(HttpServletRequest request,@RequestParam("missionFile") MultipartFile file, @RequestParam("missionId") Long missionId ) throws IOException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -49,62 +38,27 @@ public class FileController {
     }
 
 
-
-
-//    @PostMapping("/list")
-//    public ResponseEntity<List<MissionFileRpDto>> fileUploads(HttpServletRequest request, @RequestParam("missionFile") MultipartFile[] file, @RequestParam("missionId") String missionIds) throws IOException {
-//        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
-//        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-//        Long missionId=Long.parseLong(missionIds);
-//        if(file == null) {
-//            System.out.println("여긴안돼");
+//    @GetMapping("/list") // 미션 조회 시 어짜피 같이 반환 되서 안쓸 거 같음
+//    public ResponseEntity<List<MissionFileRpDto>> selectFileList(@RequestParam("missionId") Long missionId) {
+//        List<MissionFileRpDto> list = new ArrayList<>();
+//
+//        list = s3service.selectFileList(missionId);
+//
+//        if(list.size() ==0) {
+//            return new ResponseEntity<List<MissionFileRpDto>>(list,HttpStatus.NO_CONTENT);
 //        }
 //
-//        List<MissionFileRpDto> list = s3service.uploads(file,missionId,id);
 //        return new ResponseEntity<List<MissionFileRpDto>>(list,HttpStatus.OK);
 //
-//    }
-
-    @GetMapping("/list")
-    public ResponseEntity<List<MissionFileRpDto>> selectFileList(@RequestParam("missionId") Long missionId) {
-        List<MissionFileRpDto> list = new ArrayList<>();
-
-        list = s3service.selectFileList(missionId);
-
-        if(list.size() ==0) {
-            return new ResponseEntity<List<MissionFileRpDto>>(list,HttpStatus.NO_CONTENT);
-        }
-
-        return new ResponseEntity<List<MissionFileRpDto>>(list,HttpStatus.OK);
-
-
-    }
-
-
-//    @GetMapping("{uuid}")
-//    public ResponseEntity<InputStream> selectFile(@PathVariable("uuid") String uuid) {
 //
-////        Resouce r = null;
-//        InputStream inputStream = null;
-//        try {
-//            inputStream  = s3service.download(uuid);
-//
-//            System.out.println("여긴지1");
-//        }
-//        catch(Exception e) {
-//            System.out.println(e.getMessage());
-//            System.out.println("여긴지2");
-//            return new ResponseEntity<InputStream>(inputStream,HttpStatus.OK);
-//
-//        }
-//
-//        return new ResponseEntity<InputStream>(inputStream,HttpStatus.OK);
 //    }
 
 
-    @DeleteMapping
-    public ResponseEntity<Void> deleteMissionFile(@RequestParam("uuid") String uuid) {
-        long id = 8;
+
+    @DeleteMapping("/child")
+    public ResponseEntity<Void> deleteMissionFile(HttpServletRequest request, @RequestParam("uuid") String uuid) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         try {
 //            s3service.deleteFile(uuid);
             int result = s3service.deleteMissionFile(uuid,id);
@@ -124,21 +78,27 @@ public class FileController {
         }
     }
 
+    @DeleteMapping("/teacher")
+    public ResponseEntity<Void> deleteTeacherFile(HttpServletRequest request,@RequestParam("uuid") String uuid) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        try {
+//            s3service.deleteFile(uuid);
+            int result = s3service.deleteTeacherFile(uuid,id);
+            if(result==0) { // 삭제할 사진이  없을 때
+                return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            else if(result ==1) { // 본인이 아니라서 권한 없을 때
+                return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
+            }
+            else { // 삭제 완료
+                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+            }
 
-
-//    @DeleteMapping("{fileId}/{uuid}")
-//    public ResponseEntity<Void> deleteMissionFile(@PathVariable("fileId") Long fileId ,@PathVariable("fileName") String fileName) {
-//
-//        try {
-//            s3service.deleteMissionFile(fileId,fileName);
-//            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-//        }
-//        catch(Exception e) {
-//            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//
-//
-//
-//    }
+        }
+        catch (Exception e) {
+            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 }

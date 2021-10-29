@@ -65,7 +65,7 @@ public class S3service {
                 .build();
     }
 
-    public String s3upload(MultipartFile file) throws IOException { //s3에 올림
+    public String s3upload(MultipartFile file) throws IOException { //s3에 올림(프로필 변경 포함)
         String fileName = file.getOriginalFilename(); // 중복 코드라서 뜨는 노란줄
         int len = fileName.lastIndexOf(".");
         String fileNameE = fileName.substring(len,fileName.length());
@@ -92,7 +92,24 @@ public class S3service {
     }
 
 
+    public void teacherFileUploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
 
+//        List<MissionFileRpDto> list = new ArrayList<>();
+        String[] url = new String[file.length];
+
+        for(int i=0; i<file.length; i++) {
+            String fileName = file[i].getOriginalFilename();
+            String uuid = s3upload(file[i]);
+
+            TeacherFileEntity tEntity = new TeacherFileEntity();
+            tEntity = tEntity.builder().fileUuid(uuid).fileName(fileName).
+                    missionId(missionId).id(id).
+                    build();
+
+            teacherFileRepository.save(tEntity);
+
+        }
+    }
 
     public int deleteMissionFile(String uuid,Long id) { // 아이가 자신이 올린 파일을 삭제할 때
         MissionFileEntity m = missionFileRepository.findByFileUuid(uuid);
@@ -111,8 +128,21 @@ public class S3service {
     }
 
 
-
-
+    public int deleteTeacherFile(String uuid,Long id) { // 선생이 자신이 올린 파일을 삭제할 때
+        TeacherFileEntity m = teacherFileRepository.findByFileUuid(uuid);
+        if(m == null) {
+            return 0; // 삭제할 사진이 없다.
+        }
+        else if(m.getId() != id) {
+            return 1; //권한 없다
+        }
+        else {
+            teacherFileRepository.delete(m);
+            String s3Uuid = uuid.replace("https://d101.s3.ap-northeast-2.amazonaws.com/","");
+            s3Client.deleteObject(new DeleteObjectRequest(bucket,s3Uuid));
+            return 2; // 삭제 완료
+        }
+    }
 
 
     public void deleteProfileFile(String uuid) { // S3에 있는 프로필 정보 삭제
@@ -122,24 +152,7 @@ public class S3service {
 
 
 
-    public void teacherFileUploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
 
-//        List<MissionFileRpDto> list = new ArrayList<>();
-        String[] url = new String[file.length];
-
-        for(int i=0; i<file.length; i++) {
-            String fileName = file[i].getOriginalFilename();
-            String uuid = s3upload(file[i]);
-
-            TeacherFileEntity tEntity = new TeacherFileEntity();
-            tEntity = tEntity.builder().fileUuid(uuid).fileName(fileName).
-                    missionId(missionId).id(id).
-                            build();
-
-            teacherFileRepository.save(tEntity);
-
-        }
-    }
 
 
     public  MissionFileRpDto buildMissionFile(MissionFileEntity mEntity) {
