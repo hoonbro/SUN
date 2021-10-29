@@ -3,16 +3,25 @@ package com.sun.tingle.member.api.controller;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
+import com.sun.tingle.member.api.dto.response.ResponseDto;
 import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.api.service.MemberService;
+import com.sun.tingle.member.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
@@ -21,6 +30,9 @@ import javax.servlet.http.HttpServletRequest;
 public class MemberController {
     @Autowired
     MemberService memberService;
+
+    @Autowired
+    JwtUtil jwtUtil;
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberResDto> getMemberInfo(@PathVariable Long id){
@@ -70,19 +82,28 @@ public class MemberController {
         return new ResponseEntity<>( httpStatus);
     }
 
-    @GetMapping("/invalid")
-    public ResponseEntity<Boolean> tokenTest(HttpServletRequest request){
-        HttpStatus httpStatus = HttpStatus.OK;
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-//        boolean auth = jwtUtil.validateToken(token.substring("Bearer ".length()));
-        return new ResponseEntity<>(httpStatus);
+    @PutMapping("/profile-image")
+    public ResponseEntity<?> updateProfileImage(HttpServletRequest request, @RequestParam("image") MultipartFile file) throws IOException {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+
+        String url = memberService.updateProfileImage(id, file);
+
+        Map<String, String> map = new HashMap<>();
+        map.put("url", url);
+        return new ResponseEntity<>(map, HttpStatus.CREATED);
     }
 
-
-
-    @PostMapping("/reissue")
-    public ResponseEntity<?> reissue(@RequestBody TokenReqDto tokenReqDto){
-        TokenResDto tokenResDto = memberService.reissue(tokenReqDto);
-        return new ResponseEntity<>(tokenResDto, HttpStatus.CREATED);
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request){
+        String refreshToken =request.getHeader("refreshToken");
+        try {
+            memberService.logout(refreshToken);
+            log.info("로그아웃 완료");
+        }catch(Exception e){
+            log.info("존재하지 않는 refresh 토큰");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

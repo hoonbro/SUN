@@ -1,21 +1,28 @@
 package com.sun.tingle.member.api.service;
 
+import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
+import com.sun.tingle.member.db.entity.TokenEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
+import com.sun.tingle.member.db.repository.TokenRepository;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.member.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -26,11 +33,18 @@ public class MemberServiceImpl implements MemberService {
     MemberRepository memberRepository;
 
     @Autowired
+    TokenRepository tokenRepository;
+
+    @Autowired
+    S3service s3service;
+
+    @Lazy
+    @Autowired
     JwtUtil jwtUtil;
 
     @Autowired
     RedisUtil redisUtil;
- 
+
     @Override
     public MemberResDto getMemberInfo(Long id) {
         MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(NoSuchElementException::new);
@@ -70,8 +84,6 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.findByEmail(email).orElseThrow(NoSuchElementException::new);
     }
 
-
-
     @Override
     public MemberResDto entity2Dto(MemberEntity memberEntity) {
         MemberResDto memberResDto = MemberResDto.builder()
@@ -87,19 +99,25 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public TokenResDto reissue(TokenReqDto tokenReqDto){
-        TokenResDto tokenResDto = new TokenResDto();
-        TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(tokenReqDto.getRefreshToken());
+    public String updateProfileImage(Long id, MultipartFile file) throws IOException {
+        MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
 
-        if (tokenInfo.getId() == Long.parseLong(redisUtil.getData(tokenReqDto.getRefreshToken()))) {
-            String newAccessToken = jwtUtil.createToken(tokenInfo.getId(), tokenInfo.getEmail(), tokenInfo.getName());
-            tokenResDto.setAccessToken(newAccessToken);
-            //재인증
-            Authentication authentication = jwtUtil.getAuthentication(newAccessToken);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+        // 새로운 프로필 이미지 url
+        String newUrl = s3service.ProfileUpload(file);
 
-        return tokenResDto;
+        // s3에서 기존 프로필 이미지 삭제
+        if(memberEntity.getProfileImage()!=null)
+            s3service.deleteProfileFile(memberEntity.getProfileImage());
+
+        //DB에 저장
+        memberEntity.setProfileImage(newUrl);
+        memberRepository.save(memberEntity);
+
+        return newUrl;
     }
 
+    @Override
+    public void logout(String refreshToken){
+        redisUtil.deleteData(refreshToken);
+    }
 }

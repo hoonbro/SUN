@@ -3,10 +3,13 @@ package com.sun.tingle.member.api.controller;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.request.PasswordCodeDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
+import com.sun.tingle.member.api.dto.response.ResponseDto;
+import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.api.service.AuthService;
 import com.sun.tingle.member.api.service.EmailService;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.db.entity.MemberEntity;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -170,5 +174,29 @@ public class AuthController {
             return new ResponseEntity<>(httpStatus);
         }
         return new ResponseEntity<>(httpStatus);
+    }
+
+    @GetMapping("/reissue")
+    public ResponseEntity<?> reissue(HttpServletRequest request){
+        TokenResDto tokenResDto;
+        try {
+            String refreshToken =request.getHeader("refreshToken");
+            tokenResDto = authService.reissue(refreshToken);
+            log.info("새로운 AccessToken 발급");
+        }catch(NumberFormatException e){
+            log.error("존재하지 않는 refreshToken", e);
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new ResponseDto(HttpStatus.NOT_FOUND, "존재하지 않는 refreshToken", null), HttpStatus.NOT_FOUND);
+        }catch (ExpiredJwtException e){
+            log.error("refreshToken 만료", e);
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseDto(HttpStatus.BAD_REQUEST, "refreshToken 만료", null), HttpStatus.BAD_REQUEST);
+        }catch (Exception e){
+            log.error("잘못된 token", e);
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResponseDto(HttpStatus.BAD_REQUEST, "잘못된 Token", null), HttpStatus.BAD_REQUEST);
+        }
+//        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseDto(HttpStatus.OK, "토큰 재발급", tokenResDto), HttpStatus.CREATED);
     }
 }
