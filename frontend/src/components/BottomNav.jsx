@@ -1,7 +1,16 @@
-import { Link } from "react-router-dom"
+import { Link, useHistory } from "react-router-dom"
 import { FcCalendar, FcReadingEbook } from "react-icons/fc"
+import { logout, useAuthDispatch, useAuthState } from "../context"
 
 const BottomNav = () => {
+  const history = useHistory()
+  const dispatch = useAuthDispatch()
+  const userDetails = useAuthState()
+  const handleLogout = () => {
+    logout(dispatch)
+    history.push("/login")
+  }
+
   return (
     <nav className="fixed bottom-0 left-0 w-full px-6 py-2 flex items-center justify-between border border-t border-gray-200 rounded-t-xl bg-white">
       <Link

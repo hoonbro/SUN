@@ -3,7 +3,8 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
 import moment from "moment"
 import "moment/locale/ko"
 import { useMemo, useState } from "react"
-import { MdClose, MdSwapHoriz } from "react-icons/md"
+import { Link, useRouteMatch } from "react-router-dom"
+import { MdClose, MdSwapHoriz, MdAdd } from "react-icons/md"
 import Modal from "../components/modal/Modal"
 import EventListItem from "../components/EventListItem"
 
@@ -108,6 +109,8 @@ const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
 }
 
 const MyCalendar = () => {
+  const r = useRouteMatch()
+  console.log(r)
   const [selectedDate, setSelectedDate] = useState(null)
   const [events, setEvents] = useState(DUMMY_EVENTS)
   const [modalOpen, setModalOpen] = useState(false)
@@ -148,7 +151,7 @@ const MyCalendar = () => {
   }
 
   return (
-    <div className="flex flex-col h-full relative pb-10">
+    <div className="relative flex flex-col h-full pb-10">
       <header className="p-4">
         <button
           className="flex items-center gap-1"
@@ -171,6 +174,12 @@ const MyCalendar = () => {
         onSelectSlot={handleSelectSlot}
         onSelectEvent={(e) => console.log(e)}
       />
+      <Link
+        className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white"
+        to={`/calenaers`}
+      >
+        <MdAdd size={28} />
+      </Link>
       {modalOpen && (
         <EventsModal date={selectedDate} onClose={handleModalClose} />
       )}

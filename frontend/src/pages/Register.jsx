@@ -6,6 +6,7 @@ import InputFormField from "../components/ys/common/InputFormField"
 import Header from "../components/Header"
 import client from "../api/client.js"
 import { useHistory } from "react-router"
+import auth from "../api/auth"
 
 const Register = () => {
   const history = useHistory()
@@ -148,25 +149,33 @@ const Register = () => {
       setState({ ...state, error: "필수 입력값입니다", validMsg: "" })
     else if (!isStateValid) setState({ ...state, error, validMsg: "" })
     else if (targetId === "memberId" || targetId === "email") {
-      const path = targetId === "memberId" ? "id" : "email"
       try {
-        const res = await client.get(
-          `/members/duplicate-${path}/${state.value}`
-        )
-        console.log(res)
+        await auth.checkDuplicateIdOREmail({
+          memberIdOrEmail: state.value,
+          type: targetId,
+        })
         setState({
           ...state,
           error: "",
           validMsg: `사용 가능한 ${state.label}입니다`,
         })
       } catch (error) {
-        console.log(error.response)
-        if (error.response.status === 409)
-          setState({
-            ...state,
-            error: `이미 가입한 ${state.label}입니다`,
-            validMsg: "",
-          })
+        const { status } = error.response
+        switch (status) {
+          case 409: {
+            setState({
+              ...state,
+              error: `이미 가입한 ${state.label}입니다`,
+              validMsg: "",
+            })
+            break
+          }
+
+          default: {
+            alert("알 수 없는 문제 발생")
+            break
+          }
+        }
       }
     } else setState({ ...state, error: "" })
   }
@@ -183,7 +192,8 @@ const Register = () => {
     }
     console.log(reqForm)
     try {
-      const res = await client.post(`/members`, reqForm)
+      // const res = await client.post(`/members`, reqForm)
+      const res = await auth.register(reqForm)
       console.log(res)
       history.push({ pathname: "/login" })
     } catch (error) {
