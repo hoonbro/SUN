@@ -39,11 +39,12 @@ public class FileController {
 
 
 
-    @PostMapping
+    @PostMapping("/child")
     public ResponseEntity<MissionFileRpDto> missionFileUpload(HttpServletRequest request,@RequestParam("missionFile") MultipartFile file, @RequestParam("missionId") Long missionId ) throws IOException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-        MissionFileRpDto r = s3service.fileUpload(file,missionId,id);
+        MissionFileRpDto r = s3service.missionFileUpload(file,missionId,id);
+
         return new ResponseEntity<MissionFileRpDto>(r,HttpStatus.OK);
     }
 

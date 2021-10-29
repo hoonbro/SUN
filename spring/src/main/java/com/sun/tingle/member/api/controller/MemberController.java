@@ -1,17 +1,12 @@
 package com.sun.tingle.member.api.controller;
 
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
-import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
-import com.sun.tingle.member.api.dto.response.ResponseDto;
-import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.util.JwtUtil;
-import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +16,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
