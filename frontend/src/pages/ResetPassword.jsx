@@ -10,7 +10,7 @@ function useQuery() {
   return new URLSearchParams(useLocation().search)
 }
 
-const ChangePassword = () => {
+const ResetPassword = () => {
   const query = useQuery()
 
   const [state, handleChange] = useInputs({
@@ -65,4 +65,4 @@ const ChangePassword = () => {
   )
 }
 
-export default ChangePassword
+export default ResetPassword

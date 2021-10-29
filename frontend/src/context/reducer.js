@@ -10,7 +10,7 @@ export const initialState = {
   user,
   token,
   loading: false,
-  errorMessage: null,
+  errorMessage: "",
 }
 
 export const AuthReducer = (initialState, action) => {
@@ -27,6 +27,7 @@ export const AuthReducer = (initialState, action) => {
         user: action.payload.user,
         token: action.payload.token,
         loading: false,
+        errorMessage: "",
       }
     }
     case "LOGOUT": {

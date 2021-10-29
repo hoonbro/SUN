@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
-import { loginUser, useAuthDispatch } from "../context"
+import { loginUser, useAuthDispatch, useAuthState } from "../context"
 import { useHistory } from "react-router"
 
 const Login = () => {
@@ -28,6 +28,7 @@ const Login = () => {
 
   // dispatch method 가져오기
   const dispatch = useAuthDispatch()
+  const auth = useAuthState()
 
   const isAllFill = memberId.value && password.value ? true : false
   const canSubmit = useMemo(() => {
@@ -40,24 +41,11 @@ const Login = () => {
       memberId: memberId.value,
       password: password.value,
     }
-    try {
-      const user = await loginUser(dispatch, reqForm)
-      console.log(user)
-      if (user) {
-        history.push(`/profile/${user.email}`)
-      }
+    const user = await loginUser(dispatch, reqForm)
+    console.log(user)
+    if (user) {
       alert("임시: 로그인 성공")
-    } catch (error) {
-      console.log(error)
-      // switch (error.status) {
-      //   case 404: {
-      //     alert("가입되지 않은 아이디입니다.")
-      //     break
-      //   }
-      //   case 401: {
-      //     alert("비밀번호가 일치하지 않습니다.")
-      //   }
-      // }
+      history.push(`/profile/${user.email}`)
     }
   }
 
@@ -69,6 +57,7 @@ const Login = () => {
           <InputFormField field={memberId} setField={setMemberId} />
           <InputFormField field={password} setField={setPassword} />
         </div>
+        {auth.errorMessage}
         <div className="grid gap-4">
           <SubmitButton disabled={!canSubmit} handleButtonClick={handleLogin}>
             로그인
