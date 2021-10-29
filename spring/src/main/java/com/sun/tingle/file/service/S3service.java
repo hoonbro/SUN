@@ -181,23 +181,10 @@ public class S3service {
 
 
 
-//    public InputStream download(String uuid) throws IOException {
-//
-////        MultipartFile[] file = new MultipartFile[]
-//
-//        S3Object o = s3Client.getObject(new GetObjectRequest(bucket,uuid));
-//        return o.getObjectContent();
-////        S3ObjectInputStream objectInputStream = o.getObjectContent();
-//
-////        byte[] bytes = IOUtils.toByteArray(objectInputStream);
-////        Resource resource = (Resource) new ByteArrayResource(bytes);
-////        return resource;
-//
-//    }
 
 
-//    public void deleteMissionFile(Long fileId,String fileName) {
-//        s3Client.deleteObject(new DeleteObjectRequest(bucket,fileName));
-//        missionFileRepository.deleteById(fileId);
-//    }
+    public void updateDeleteTeacherFile(String uuid) {
+        String s3Uuid = uuid.replace("https://d101.s3.ap-northeast-2.amazonaws.com/","");
+        s3Client.deleteObject(new DeleteObjectRequest(bucket,s3Uuid));
+    }
 }

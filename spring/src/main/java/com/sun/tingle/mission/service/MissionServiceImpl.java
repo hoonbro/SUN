@@ -1,6 +1,9 @@
 package com.sun.tingle.mission.service;
 
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.file.db.entity.TeacherFileEntity;
+import com.sun.tingle.file.db.repo.TeacherFileRepository;
 import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
@@ -19,6 +22,8 @@ public class MissionServiceImpl implements MissionService {
     @Autowired
     MissionRepository missionRepository;
 
+    @Autowired
+    TeacherFileRepository teacherFileRepository;
 
     @Autowired
     S3service s3service;
@@ -107,7 +112,7 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto) {
+    public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException {
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
         if(missionEntity == null) { //미션이 없을 때
             return null;
@@ -117,6 +122,18 @@ public class MissionServiceImpl implements MissionService {
         if(missionEntity.getId() != missionRqDto.getId()) { // 권한 없을 때
             return missionRpDto;
         }
+
+        List<TeacherFileEntity> list2 = teacherFileRepository.findByMissionId(missionId);
+        int file_size = list2.size();
+
+        for(int i=0; i<file_size; i++) { // 업데이트전 db 파일 삭제
+             Long fileId = list2.get(i).getFileId();
+             teacherFileRepository.deleteById(fileId);
+             s3service.updateDeleteTeacherFile(list2.get(i).fileUuid);
+        }
+
+        s3service.teacherFileUploads(teacherFile,missionId,missionRqDto.getId());
+
 
 
 
@@ -133,7 +150,6 @@ public class MissionServiceImpl implements MissionService {
 
 
         missionEntity = missionRepository.save(missionEntity);
-
 
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
                 .title(missionEntity.getTitle())
