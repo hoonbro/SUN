@@ -32,22 +32,9 @@ public class MissionController {
     JwtUtil jwtUtil;
 
 
-//    @PostMapping
-//    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestBody MissionRqDto missionRqDto) {
-//        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
-//        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-//        missionRqDto.setId(id);
-//        System.out.println("하하하하하");
-//        System.out.println(name);
-//        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto);
-//        if(missionRpDto == null) {
-//            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.CONFLICT);
-//        }
-//        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
-//    }
+
     @PostMapping
     public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("teacherFile") MultipartFile[] teacherFile, @RequestParam("tag") List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException {
-//      public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestParam("missionId") Long missionId) {
 
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
@@ -79,24 +66,35 @@ public class MissionController {
 
 
     @PutMapping("{missionId}")
-    public ResponseEntity<MissionRpDto> updateMission(@PathVariable("missionId") Long missionId,@RequestBody MissionRqDto missionRqDto) {
+    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestBody MissionRqDto missionRqDto) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        missionRqDto.setId(id);
         MissionRpDto missionRpDto = missionService.updateMission(missionId,missionRqDto);
         if(missionRpDto == null) {
             return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
+        else if(missionRpDto.getTitle() == null) { // 임시 처리 권한 없을 때
+            return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(missionRpDto, HttpStatus.CREATED);
 
     }
 
     @DeleteMapping("{missionId}")
-    public ResponseEntity<Void> deleteMission(@PathVariable("missionId") Long missionId) {
+    public ResponseEntity<Void> deleteMission(HttpServletRequest request,@PathVariable("missionId") Long missionId) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
 
         try {
-            missionService.deleteMission(missionId);
-            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 때
+            int result = missionService.deleteMission(missionId,id);
+            if(result == 1) {
+                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 때
+            }
+            return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED); // 등록한 사람 아닐 때 (권한 x)
         }
         catch (Exception e) {
-            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR); //삭제할 캘린더가 없을 때
+            return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR); //삭제할 미션 없을 때
         }
 
     }

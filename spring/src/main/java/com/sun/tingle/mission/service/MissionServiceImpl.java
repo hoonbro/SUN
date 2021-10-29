@@ -109,9 +109,16 @@ public class MissionServiceImpl implements MissionService {
     @Override
     public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto) {
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
-        if(missionEntity == null) {
+        if(missionEntity == null) { //미션이 없을 때
             return null;
         }
+
+        MissionRpDto missionRpDto = new MissionRpDto();
+        if(missionEntity.getId() != missionRqDto.getId()) { // 권한 없을 때
+            return missionRpDto;
+        }
+
+
 
         List<String> list = missionRqDto.getTag();
         int size = list.size();
@@ -124,18 +131,10 @@ public class MissionServiceImpl implements MissionService {
         missionEntity = new MissionEntity(missionId,missionRqDto.getTitle(),missionRqDto.getStart(),
                 missionRqDto.getEnd(),sb.toString(),missionRqDto.getCalendarCode(),missionRqDto.getId());
 
-//        missionEntity = new MissionEntity();
-//        missionEntity = missionEntity.builder().missionId(missionId).title(missionRqDto.getTitle())
-//                .start(missionRqDto.getStart())
-//                .end(missionRqDto.getEnd())
-//                .tag(sb.toString()).calendarCode(missionRqDto.getCalendarCode())
-//                .id(missionRqDto.getId())
-//                .build();
-
 
         missionEntity = missionRepository.save(missionEntity);
 
-        MissionRpDto missionRpDto = new MissionRpDto();
+
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
                 .title(missionEntity.getTitle())
                 .start(missionEntity.getStart())
@@ -150,8 +149,14 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public void deleteMission(Long missionId) {
-        missionRepository.deleteById(missionId);
+    public int deleteMission(Long missionId,Long id) {
+        int result = 0;
+        MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
+        if(missionEntity.getId() == id) {
+            missionRepository.deleteById(missionId);
+            result = 1;
+        }
+        return result;
     }
 
     @Override
