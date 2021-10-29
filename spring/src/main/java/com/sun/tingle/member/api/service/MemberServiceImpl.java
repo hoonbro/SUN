@@ -44,7 +44,7 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     RedisUtil redisUtil;
- 
+
     @Override
     public MemberResDto getMemberInfo(Long id) {
         MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(NoSuchElementException::new);
@@ -101,11 +101,19 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public String updateProfileImage(Long id, MultipartFile file) throws IOException {
         MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
-        String url = s3service.ProfileUpload(file);
-        memberEntity.setProfileImage(url);
 
+        // 새로운 프로필 이미지 url
+        String newUrl = s3service.ProfileUpload(file);
+
+        // s3에서 기존 프로필 이미지 삭제
+        if(memberEntity.getProfileImage()!=null)
+            s3service.deleteProfileFile(memberEntity.getProfileImage());
+
+        //DB에 저장
+        memberEntity.setProfileImage(newUrl);
         memberRepository.save(memberEntity);
-        return url;
+
+        return newUrl;
     }
 
     @Override

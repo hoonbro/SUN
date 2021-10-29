@@ -1,16 +1,14 @@
 package com.sun.tingle.mission.requestdto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class MissionRqDto {
@@ -19,6 +17,5 @@ public class MissionRqDto {
     String end;
     List<String> tag;
     String calendarCode;
-    MultipartFile[] teacherfile;
     Long id;
 }

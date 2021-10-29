@@ -15,7 +15,6 @@ import java.util.List;
 @Setter
 @Data
 @Entity
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "mission")
@@ -41,10 +40,22 @@ public class MissionEntity {
 
 
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
-    private List<MissionFileEntity> teacherFileList = new ArrayList<>();
+    private List<MissionFileEntity> missionFileList = new ArrayList<>();
 
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
-    private List<TeacherFileEntity> missionFileList = new ArrayList<>();
+    private List<TeacherFileEntity> teacherFileList = new ArrayList<>();
+
+    public MissionEntity(Long missionId, String title, String start, String end, String toString, String calendarCode, Long id) {
+        this.missionId = missionId;
+        this.title = title;
+        this.start = start;
+        this.end = end;
+        this.tag = toString;
+        this.calendarCode = calendarCode;
+        this.id = id;
+
+    }
+
 
 
 }

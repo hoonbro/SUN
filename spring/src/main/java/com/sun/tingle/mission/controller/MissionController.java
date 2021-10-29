@@ -1,5 +1,6 @@
 package com.sun.tingle.mission.controller;
 
+import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
@@ -23,6 +24,8 @@ import java.util.Map;
 public class MissionController {
     @Autowired
     MissionService missionService;
+
+
 
     @Lazy
     @Autowired
@@ -48,30 +51,21 @@ public class MissionController {
 
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-//        System.out.println(missionId);
-        System.out.println(title);
-        System.out.println(start);
-        System.out.println(end);
 
-//        for(int i=0; i<tag.size(); i++) {
-//            System.out.print(tag.get(i)+" ");
-//        }
-//        System.out.println();
-//        System.out.println(calendarCode);
-//        System.out.println(teacherFile[0].getOriginalFilename().toString());
-//        System.out.println(teacherFile[1].getOriginalFilename().toString());
+
+        MissionRqDto missionRqDto = new MissionRqDto();
+        missionRqDto = missionRqDto.builder().id(id).tag(tag).calendarCode(calendarCode).
+                        start(start).end(end).title(title).build();
 
 
 
+        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto,teacherFile);
 
-        MissionRpDto h = new MissionRpDto();
-        return new ResponseEntity<MissionRpDto>(h,HttpStatus.CREATED);
 
-//        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto);
-//        if(missionRpDto == null) {
-//            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.CONFLICT);
-//        }
-//        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
+        if(missionRpDto == null) {
+            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
     }
 
     @GetMapping
