@@ -103,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
         MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
 
         // 새로운 프로필 이미지 url
-        String newUrl = s3service.ProfileUpload(file);
+        String newUrl = s3service.s3upload(file);
 
         // s3에서 기존 프로필 이미지 삭제
         if(memberEntity.getProfileImage()!=null)
