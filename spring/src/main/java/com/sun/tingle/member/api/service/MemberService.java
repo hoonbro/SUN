@@ -1,14 +1,11 @@
 package com.sun.tingle.member.api.service;
 
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
-import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
-import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.Optional;
 
 public interface MemberService {

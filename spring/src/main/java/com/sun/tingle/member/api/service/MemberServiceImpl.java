@@ -1,13 +1,9 @@
 package com.sun.tingle.member.api.service;
 
 import com.sun.tingle.file.service.S3service;
-import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
-import com.sun.tingle.member.api.dto.request.TokenReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
-import com.sun.tingle.member.api.dto.response.TokenResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
-import com.sun.tingle.member.db.entity.TokenEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
 import com.sun.tingle.member.db.repository.TokenRepository;
 import com.sun.tingle.member.util.JwtUtil;
@@ -15,9 +11,6 @@ import com.sun.tingle.member.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -103,7 +96,8 @@ public class MemberServiceImpl implements MemberService {
         MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
 
         // 새로운 프로필 이미지 url
-        String newUrl = s3service.ProfileUpload(file);
+//        String newUrl = s3service.ProfileUpload(file);
+      String newUrl = s3service.s3upload(file);
 
         // s3에서 기존 프로필 이미지 삭제
         if(memberEntity.getProfileImage()!=null)
