@@ -55,7 +55,37 @@ CREATE TABLE IF NOT EXISTS `tingle`.`mission_file` (
   UNIQUE KEY `mission_id_UNIQUE` (`mission_id`),
   CONSTRAINT `mission_file_fk_mission_id` FOREIGN KEY (`mission_id`) REFERENCES `mission` (`mission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `tingle`.`chat_message` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `sender_id` BIGINT NOT NULL,
+  `sent_time` DATETIME(6) NOT NULL,
+  `content` TEXT NULL,
+  `is_read` BIT(1) NULL,
+  `file_id` VARCHAR(255) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci' NULL DEFAULT NULL,
+  `chat_room_id` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_message_member1_idx` (`sender_id` ASC) VISIBLE,
+  INDEX `fk_chat_message_files2_idx` (`file_id` ASC) VISIBLE,
+  CONSTRAINT `fk_message_member1` FOREIGN KEY (`sender_id`) REFERENCES `tingle`.`member` (`id`))
+ ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS `tingle`.`chat_room` (
+  `id` VARCHAR(255) NOT NULL,
+  `user_id` BIGINT NOT NULL,
+  `other_id` BIGINT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_chat_room_member1_idx` (`user_id` ASC) VISIBLE,
+  INDEX `fk_chat_room_member2_idx` (`other_id` ASC) VISIBLE,
+  CONSTRAINT `fk_chat_room_member1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `tingle`.`member` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_chat_room_member2`
+    FOREIGN KEY (`other_id`)
+    REFERENCES `tingle`.`member` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
  
-
-
-
