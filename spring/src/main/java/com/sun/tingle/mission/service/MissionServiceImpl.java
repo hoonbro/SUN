@@ -1,13 +1,16 @@
 package com.sun.tingle.mission.service;
 
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
 import com.sun.tingle.mission.responsedto.MissionRpDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +20,11 @@ public class MissionServiceImpl implements MissionService {
     MissionRepository missionRepository;
 
 
+    @Autowired
+    S3service s3service;
 
     @Override
-    public MissionRpDto insertMission(MissionRqDto missionRqDto) {
+    public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException {
         MissionEntity missionEntity = missionRepository.findByTitle(missionRqDto.getTitle());
         if(missionEntity != null) { // 이미 같은 미션 이름 있을 때
             return null;
@@ -36,10 +41,20 @@ public class MissionServiceImpl implements MissionService {
         int size = list.size();
 
         for(int i=0; i<size; i++) {
-            sb.append("#").append(list.get(i));
+            String temp = list.get(i);
+            temp = temp.replaceAll("\"","");
+            temp = temp.replaceAll("\\[","");
+            temp = temp.replaceAll("\\]","");
+
+            sb.append("#").append(temp);
+
         }
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
+
+
+
+
 
         MissionRpDto missionRpDto = new MissionRpDto();
         String[] tagArr = missionEntity.getTag().split("#");
@@ -48,14 +63,19 @@ public class MissionServiceImpl implements MissionService {
         for(int i=1; i<size; i++) {
             list.add(tagArr[i]);
         }
-
+        s3service.teacherFileUploads(teacherFile,missionEntity.getMissionId(),missionEntity.getId());
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
                 .tag(list).title(missionEntity.getTitle())
                 .calendarCode(missionEntity.getCalendarCode())
                 .start(missionEntity.getStart())
                 .end(missionEntity.getEnd())
                 .id(missionEntity.getId())
+//                .teacherFileList(missionEntity.getTeacherFileList()) 따로 조회
+//                .missionFileList(missionEntity.getMissionFileList()) 따로 조회
                 .build();
+
+
+
 
         return missionRpDto;
     }
@@ -77,7 +97,8 @@ public class MissionServiceImpl implements MissionService {
                 .start(missionEntity.getStart())
                 .end(missionEntity.getEnd())
                 .id(missionEntity.getId())
-                .build();
+                 .missionFileList(missionEntity.getMissionFileList()).
+                teacherFileList(missionEntity.getTeacherFileList()).build();
 
 
 
@@ -99,14 +120,18 @@ public class MissionServiceImpl implements MissionService {
         for(int i=0; i<size; i++) {
             sb.append("#").append(list.get(i));
         }
-        missionEntity = new MissionEntity();
 
-        missionEntity = missionEntity.builder().missionId(missionId).title(missionRqDto.getTitle())
-                .start(missionRqDto.getStart())
-                .end(missionRqDto.getEnd())
-                .tag(sb.toString()).calendarCode(missionRqDto.getCalendarCode())
-                .id(missionRqDto.getId())
-                .build();
+        missionEntity = new MissionEntity(missionId,missionRqDto.getTitle(),missionRqDto.getStart(),
+                missionRqDto.getEnd(),sb.toString(),missionRqDto.getCalendarCode(),missionRqDto.getId());
+
+//        missionEntity = new MissionEntity();
+//        missionEntity = missionEntity.builder().missionId(missionId).title(missionRqDto.getTitle())
+//                .start(missionRqDto.getStart())
+//                .end(missionRqDto.getEnd())
+//                .tag(sb.toString()).calendarCode(missionRqDto.getCalendarCode())
+//                .id(missionRqDto.getId())
+//                .build();
+
 
         missionEntity = missionRepository.save(missionEntity);
 
@@ -117,7 +142,9 @@ public class MissionServiceImpl implements MissionService {
                 .end(missionEntity.getEnd())
                 .tag(missionRqDto.getTag()).
                 id(missionEntity.getId()).
-                calendarCode(missionEntity.getCalendarCode()).build();
+                calendarCode(missionEntity.getCalendarCode()).
+                missionFileList(missionEntity.getMissionFileList()).
+                teacherFileList(missionEntity.getTeacherFileList()).build();
 
         return missionRpDto;
     }
@@ -159,6 +186,8 @@ public class MissionServiceImpl implements MissionService {
                     .start(m.getStart())
                     .tag(tags)
                     .id(m.getId())
+//                    .missionFileList(m.getMissionFileList())
+//                    .teacherFileList(m.getTeacherFileList())
                     .build();
             list2.add(missionRpDto);
         }

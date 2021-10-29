@@ -10,7 +10,9 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.sun.tingle.file.db.entity.MissionFileEntity;
+import com.sun.tingle.file.db.entity.TeacherFileEntity;
 import com.sun.tingle.file.db.repo.MissionFileRepository;
+import com.sun.tingle.file.db.repo.TeacherFileRepository;
 import com.sun.tingle.file.responsedto.MissionFileRpDto;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,8 @@ public class S3service {
     @Autowired
     MissionFileRepository missionFileRepository;
 
+    @Autowired
+    TeacherFileRepository teacherFileRepository;
 
     private AmazonS3 s3Client;
 
@@ -61,10 +65,7 @@ public class S3service {
                 .build();
     }
 
-
-
-
-    public MissionFileRpDto fileUpload(MultipartFile file,Long missionId, Long id) throws IOException {
+    public String s3upload(MultipartFile file) throws IOException { //s3에 올림
         String fileName = file.getOriginalFilename(); // 중복 코드라서 뜨는 노란줄
         int len = fileName.lastIndexOf(".");
         String fileNameE = fileName.substring(len,fileName.length());
@@ -73,7 +74,13 @@ public class S3service {
         s3Client.putObject(new PutObjectRequest(bucket, randomUuid, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
-        String uuid = s3Client.getUrl(bucket,randomUuid).toString();
+        return s3Client.getUrl(bucket,randomUuid).toString();
+    }
+
+                            //가르침을 받는 아이가 올릴 때
+    public MissionFileRpDto missionFileUpload(MultipartFile file,Long missionId, Long id) throws IOException {
+        String fileName = file.getOriginalFilename();
+        String uuid = s3upload(file);
         MissionFileEntity mEntity = new MissionFileEntity();
             mEntity = mEntity.builder().fileUuid(uuid).fileName(fileName).missionId(missionId).id(id).
                             build();
@@ -84,21 +91,10 @@ public class S3service {
 
     }
 
-    public String ProfileUpload(MultipartFile file) throws IOException {
-        String fileName = file.getOriginalFilename(); // 중복 코드라서 뜨는 노란줄
-        int len = fileName.lastIndexOf(".");
-        String fileNameE = fileName.substring(len,fileName.length());
-        String randomUuid= UUID.randomUUID().toString().replaceAll("-","");
-        randomUuid += fileNameE;
-        s3Client.putObject(new PutObjectRequest(bucket, randomUuid, file.getInputStream(), null)
-                .withCannedAcl(CannedAccessControlList.PublicRead));
-       return s3Client.getUrl(bucket,randomUuid).toString();
-    }
 
 
 
-
-    public int deleteMissionFile(String uuid,Long id) {
+    public int deleteMissionFile(String uuid,Long id) { // 아이가 자신이 올린 파일을 삭제할 때
         MissionFileEntity m = missionFileRepository.findByFileUuid(uuid);
         if(m == null) {
             return 0; // 삭제할 사진이 없다.
@@ -119,39 +115,31 @@ public class S3service {
 
 
 
-    public void deleteProfileFile(String uuid) {
+    public void deleteProfileFile(String uuid) { // S3에 있는 프로필 정보 삭제
         String s3Uuid = uuid.replace("https://d101.s3.ap-northeast-2.amazonaws.com/","");
         s3Client.deleteObject(new DeleteObjectRequest(bucket,s3Uuid));
     }
 
 
 
-//    public List<MissionFileRpDto> uploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
-//        SimpleDateFormat date = new SimpleDateFormat("yyyy-mm-dd");
-//        String dateName = date.format(new Date());
+    public void teacherFileUploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
+
 //        List<MissionFileRpDto> list = new ArrayList<>();
-//        String[] url = new String[file.length];
-//
-//        for(int i=0; i<file.length; i++) {
-//            String fileName = file[i].getOriginalFilename();
-//            s3Client.putObject(new PutObjectRequest(bucket, fileName, file[i].getInputStream(), null)
-//                    .withCannedAcl(CannedAccessControlList.PublicRead));
-//            url[i] = s3Client.getUrl(bucket,fileName).toString();
-//
-//            MissionFileEntity mEntity = new MissionFileEntity();
-//            mEntity = mEntity.builder().fileUuid(url[i]).fileName(file[i].
-//                            getOriginalFilename()).missionId(missionId).id(id).
-//                            build();
-//
-//            mEntity = missionFileRepository.save(mEntity);
-//            MissionFileRpDto missionFileRpDto = buildMissionFile(mEntity);
-//            list.add(missionFileRpDto);
-//        }
-//        return list;
-//    }
+        String[] url = new String[file.length];
 
+        for(int i=0; i<file.length; i++) {
+            String fileName = file[i].getOriginalFilename();
+            String uuid = s3upload(file[i]);
 
+            TeacherFileEntity tEntity = new TeacherFileEntity();
+            tEntity = tEntity.builder().fileUuid(uuid).fileName(fileName).
+                    missionId(missionId).id(id).
+                            build();
 
+            teacherFileRepository.save(tEntity);
+
+        }
+    }
 
 
     public  MissionFileRpDto buildMissionFile(MissionFileEntity mEntity) {
