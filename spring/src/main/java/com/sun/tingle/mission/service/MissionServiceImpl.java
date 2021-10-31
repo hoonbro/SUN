@@ -47,12 +47,13 @@ public class MissionServiceImpl implements MissionService {
 
         for(int i=0; i<size; i++) {
             String temp = list.get(i);
-            temp = temp.replaceAll("\"","");
-            temp = temp.replaceAll("\\[","");
-            temp = temp.replaceAll("\\]","");
+//            temp = temp.replaceAll("\"","");
+//            temp = temp.replaceAll("\\[","");
+//            temp = temp.replaceAll("\\]","");
 
-            sb.append("#").append(temp);
 
+//            sb.append("#").append(temp); // #없이 넘어오실 시
+            sb.append(temp); // #이랑 같이 리스트에 넘어올 떄
         }
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
@@ -142,7 +143,7 @@ public class MissionServiceImpl implements MissionService {
         StringBuilder sb = new StringBuilder();
 
         for(int i=0; i<size; i++) {
-            sb.append("#").append(list.get(i));
+            sb.append(list.get(i));
         }
 
         missionEntity = new MissionEntity(missionId,missionRqDto.getTitle(),missionRqDto.getStart(),

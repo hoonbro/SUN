@@ -111,7 +111,7 @@ public class S3service {
         }
     }
 
-    public int deleteMissionFile(String uuid,Long id) { // 아이가 자신이 올린 파일을 삭제할 때
+    public int deleteMissionFile(String uuid,Long id) { // 채팅방에 자신이 올린 파일을 삭제할 때
         MissionFileEntity m = missionFileRepository.findByFileUuid(uuid);
         if(m == null) {
             return 0; // 삭제할 사진이 없다.
