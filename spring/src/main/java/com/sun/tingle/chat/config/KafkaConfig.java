@@ -35,7 +35,7 @@ public class KafkaConfig {
     public Map<String, Object> producerConfigurations() {
 
         return ImmutableMap.<String, Object>builder()
-                .put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+                .put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092")
                 .put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, LongSerializer.class)
                 .put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class)
                 .put(ConsumerConfig.GROUP_ID_CONFIG, "spring-boot-test")
@@ -57,7 +57,7 @@ public class KafkaConfig {
     @Bean
     public Map<String, Object> consumerConfigs() {
         return ImmutableMap.<String, Object>builder()
-                .put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+                .put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "kafka:9092")
                 .put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, LongDeserializer.class)
                 .put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class)
                 .put(ConsumerConfig.GROUP_ID_CONFIG, "spring-boot-test")
