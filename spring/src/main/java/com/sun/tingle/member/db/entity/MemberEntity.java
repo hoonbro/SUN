@@ -1,9 +1,13 @@
 package com.sun.tingle.member.db.entity;
 
+import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.calendar.db.entity.ShareCalendarEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -25,5 +29,9 @@ public class MemberEntity {
     private String phone;
     private String profileImage;
     private String auth;
+    private String defaultCalendar;
+
+    @OneToMany(mappedBy = "calendarCode", cascade = CascadeType.ALL)
+    private List<CalendarEntity> calendarEntities = new ArrayList<>();
 }
  
