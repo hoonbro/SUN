@@ -60,15 +60,12 @@ public class AuthServiceImpl implements AuthService{
                 .build();
 
         memberEntity = memberRepository.save(memberEntity);
-        log.info(memberEntity.toString());
+        
+        //dafault calender 생성
         CalendarRpDto calendarRpDto = calendarService.insertCalendar(calendarService.getRandomSentence(),memberEntity.getName() + "의 캘린더", memberEntity.getId());
-        log.info("gdgd");
-        log.info(calendarRpDto.getCalendarName());
         memberEntity.setDefaultCalendar(calendarRpDto.getCalendarCode());
-        log.info("gd");
-        log.info(memberEntity.toString());
         memberEntity = memberRepository.save(memberEntity);
-        log.info("gd");
+
         return memberService.entity2Dto(memberEntity);
     }
 
