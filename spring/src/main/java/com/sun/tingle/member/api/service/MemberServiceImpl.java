@@ -1,5 +1,8 @@
 package com.sun.tingle.member.api.service;
 
+import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.calendar.db.repo.CalendarRepository;
+import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
@@ -27,6 +30,12 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     TokenRepository tokenRepository;
+
+    @Autowired
+    CalendarRepository calendarRepository;
+
+    @Autowired
+    CalendarService calendarService;
 
     @Autowired
     S3service s3service;
@@ -87,6 +96,7 @@ public class MemberServiceImpl implements MemberService {
                 .email(memberEntity.getEmail())
                 .auth(memberEntity.getAuth())
                 .profileImage(memberEntity.getProfileImage())
+                .defaultCalendar(memberEntity.getDefaultCalendar())
                 .build();
         return memberResDto;
     }

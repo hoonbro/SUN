@@ -1,5 +1,6 @@
 package com.sun.tingle.member.api.service;
 
+import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
@@ -59,11 +60,18 @@ public class AuthServiceImpl implements AuthService{
                 .build();
 
         memberEntity = memberRepository.save(memberEntity);
-
-        calendarService.insertCalendar(calendarService.getRandomSentence(),memberEntity.getName() + "의 캘린더", memberEntity.getId());
-
+        log.info(memberEntity.toString());
+        CalendarRpDto calendarRpDto = calendarService.insertCalendar(calendarService.getRandomSentence(),memberEntity.getName() + "의 캘린더", memberEntity.getId());
+        log.info("gdgd");
+        log.info(calendarRpDto.getCalendarName());
+        memberEntity.setDefaultCalendar(calendarRpDto.getCalendarCode());
+        log.info("gd");
+        log.info(memberEntity.toString());
+        memberEntity = memberRepository.save(memberEntity);
+        log.info("gd");
         return memberService.entity2Dto(memberEntity);
     }
+
 
     @Override
     public Map<String, Object> login(MemberEntity memberEntity){
