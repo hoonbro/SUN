@@ -77,7 +77,7 @@ public class S3service {
         return s3Client.getUrl(bucket,randomUuid).toString();
     }
 
-                            //가르침을 받는 아이가 올릴 때
+                            //채팅에 올라온 파일 업로드할 때
     public MissionFileRpDto missionFileUpload(MultipartFile file,Long missionId, Long id) throws IOException {
         String fileName = file.getOriginalFilename();
         String uuid = s3upload(file);
@@ -91,7 +91,7 @@ public class S3service {
 
     }
 
-
+                        //미션 등록 시 선생님이 파일 업로드할 때
     public void teacherFileUploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
 
 //        List<MissionFileRpDto> list = new ArrayList<>();
@@ -183,7 +183,7 @@ public class S3service {
 
 
 
-    public void updateDeleteTeacherFile(String uuid) {
+    public void updateDeleteTeacherFile(String uuid) { // 선생님이 등록한 파일 삭제할 떄
         String s3Uuid = uuid.replace("https://d101.s3.ap-northeast-2.amazonaws.com/","");
         s3Client.deleteObject(new DeleteObjectRequest(bucket,s3Uuid));
     }
