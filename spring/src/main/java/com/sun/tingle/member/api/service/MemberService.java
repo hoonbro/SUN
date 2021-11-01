@@ -27,5 +27,7 @@ public interface MemberService {
     String updateProfileImage(Long id, MultipartFile file) throws IOException;
 
     void logout(String refreshToken);
+
+    void changePassword(Long id, String password);
 }
  

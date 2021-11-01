@@ -14,6 +14,7 @@ import com.sun.tingle.member.util.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +37,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     CalendarService calendarService;
+
+    @Lazy
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     S3service s3service;
@@ -123,5 +128,12 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void logout(String refreshToken){
         redisUtil.deleteData(refreshToken);
+    }
+
+    @Override
+    public void changePassword(Long id, String password){
+        MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
+        memberEntity.setPassword(passwordEncoder.encode(password));
+        memberRepository.save(memberEntity);
     }
 }
