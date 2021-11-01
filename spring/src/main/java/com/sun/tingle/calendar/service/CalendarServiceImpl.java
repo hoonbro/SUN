@@ -23,11 +23,7 @@ public class CalendarServiceImpl implements CalendarService{
     @Override
     public CalendarRpDto insertCalendar(String calendarCode,String calendarName,long id) {
 
-        CalendarEntity calendarEntity = calendarRepository.findByCalendarName(calendarName);
-        if(calendarEntity != null) {
-            return null;
-        }
-        calendarEntity = new CalendarEntity();
+        CalendarEntity calendarEntity = new CalendarEntity();
         calendarEntity.setCalendarCode(calendarCode);
         calendarEntity.setCalendarName(calendarName);
         calendarEntity.setId(id);
