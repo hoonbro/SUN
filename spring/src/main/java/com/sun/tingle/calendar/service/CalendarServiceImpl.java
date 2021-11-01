@@ -5,6 +5,7 @@ import com.sun.tingle.calendar.db.entity.ShareCalendarEntity;
 import com.sun.tingle.calendar.db.repo.CalendarRepository;
 import com.sun.tingle.calendar.db.repo.ShareCalendarRepository;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
+import com.sun.tingle.file.service.S3service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,10 @@ public class CalendarServiceImpl implements CalendarService{
 
     @Autowired
     ShareCalendarRepository shareCalendarRepository;
+
+    @Autowired
+    S3service s3service;
+
     @Override
     public CalendarRpDto insertCalendar(String calendarCode,String calendarName,long id) {
 
@@ -54,7 +59,9 @@ public class CalendarServiceImpl implements CalendarService{
 
     @Override
     public void deleteCalendar(String calendarCode) {
+
         calendarRepository.deleteById(calendarCode);
+        s3service.s3CalendarDelete(calendarCode);
     }
 
 
