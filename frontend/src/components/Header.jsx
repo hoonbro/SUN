@@ -1,16 +1,21 @@
 import { Link } from "react-router-dom"
 import { IoIosArrowBack } from "react-icons/io"
 
-function Header({ pageTitle = "페이지 이름", to, backPageTitle = "뒤로가기" }) {
+const Header = ({
+  pageTitle = "페이지 이름",
+  to = "/",
+  backPageTitle = "뒤로가기",
+}) => {
   return (
-    <header className="py-4 mb-10 grid gap-2 relative">
+    <header className="sticky z-10 left-0 top-0 py-4 mb-10 grid gap-2 bg-white shadow">
       {to && (
-        <div className="px-2">
-          <Link to={to} className="flex gap-1 items-center">
-            <IoIosArrowBack />
-            <span className="text-sm font-medium">{backPageTitle}</span>
-          </Link>
-        </div>
+        <Link
+          to={to}
+          className="xs:absolute xs:left-2 xs:top-5 px-2 flex gap-1 items-center justify-self-start"
+        >
+          <IoIosArrowBack />
+          <span className="text-sm font-medium">{backPageTitle}</span>
+        </Link>
       )}
       <h3 className="place-self-center">{pageTitle}</h3>
     </header>

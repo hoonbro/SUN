@@ -4,12 +4,15 @@ import "./index.css"
 import App from "./App"
 import { BrowserRouter } from "react-router-dom"
 import BottomNav from "./components/BottomNav"
+import { AuthProvider } from "./context"
 
 ReactDOM.render(
   // <React.StrictMode>
-  <BrowserRouter>
-    <App />
-    <BottomNav />
-  </BrowserRouter>,
+  <AuthProvider>
+    <BrowserRouter>
+      <App />
+      <BottomNav />
+    </BrowserRouter>
+  </AuthProvider>,
   document.getElementById("root")
 )

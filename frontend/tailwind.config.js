@@ -1,4 +1,5 @@
 const colors = require("tailwindcss/colors")
+const defaultTheme = require("tailwindcss/defaultTheme")
 
 module.exports = {
   purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
@@ -66,6 +67,10 @@ module.exports = {
         '"Courier New"',
         "monospace",
       ],
+    },
+    screens: {
+      xs: "475px",
+      ...defaultTheme.screens,
     },
   },
   variants: {

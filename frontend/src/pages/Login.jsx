@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
-import client from "../api/client"
+import { loginUser, useAuthDispatch, useAuthState } from "../context"
 import { useHistory } from "react-router"
 
 const Login = () => {
@@ -26,26 +26,29 @@ const Login = () => {
     disabled: false,
   })
 
+  // dispatch method 가져오기
+  const dispatch = useAuthDispatch()
+  const auth = useAuthState()
+
   const isAllFill = memberId.value && password.value ? true : false
   const canSubmit = useMemo(() => {
     return isAllFill
   }, [isAllFill])
 
-  const handleButtonClick = async () => {
+  const handleLogin = async () => {
     console.log({ memberId: memberId.value, password: password.value })
     const reqForm = {
       memberId: memberId.value,
       password: password.value,
     }
     try {
-      const res = await client.post("/members/login", reqForm)
-      localStorage.setItem("accessToken", res.data["access-token"])
-      // history.push({
-      //   pathname: "/profile",
-      //   state: { memberId: memberId.value },
-      // })
-      alert("임시: 로그인 성공")
-      console.log(res)
+      const user = await loginUser(dispatch, reqForm)
+      console.log(user)
+      if (user) {
+        alert("임시: 로그인 성공")
+        console.log(res)
+        history.push(`/profile/${user.email}`)
+      }
     } catch (error) {
       console.log(error)
       const { status } = error.response
@@ -62,32 +65,32 @@ const Login = () => {
   }
 
   return (
-    <div className="py-10 px-6 grid gap-10">
-      <Welcome />
-      <div className="grid gap-6">
-        <InputFormField field={memberId} setField={setMemberId} />
-        <InputFormField field={password} setField={setPassword} />
-      </div>
-      <div className="grid gap-4">
-        <SubmitButton
-          disabled={!canSubmit}
-          handleButtonClick={handleButtonClick}
-        >
-          로그인
-        </SubmitButton>
-        <div className="grid gap-2">
-          <Link
-            className="font-bold text-sm text-gray-700 text-center"
-            to="/register"
-          >
-            팅글 회원가입
-          </Link>
-          <Link
-            className="font-bold text-sm text-gray-700 text-center"
-            to="/auth/find-auth"
-          >
-            아이디 / 비밀번호 찾기
-          </Link>
+    <div className="h-full flex items-center justify-center xs:bg-gray-50">
+      <div className="grid gap-10 container max-w-lg px-6 py-10 xs:bg-white xs:shadow-lg xs:rounded-xl">
+        <Welcome />
+        <div className="grid gap-6">
+          <InputFormField field={memberId} setField={setMemberId} />
+          <InputFormField field={password} setField={setPassword} />
+        </div>
+        {auth.errorMessage}
+        <div className="grid gap-4">
+          <SubmitButton disabled={!canSubmit} handleButtonClick={handleLogin}>
+            로그인
+          </SubmitButton>
+          <div className="grid gap-2">
+            <Link
+              className="font-bold text-sm text-gray-700 text-center"
+              to="/register"
+            >
+              팅글 회원가입
+            </Link>
+            <Link
+              className="font-bold text-sm text-gray-700 text-center"
+              to="/auth/find-auth"
+            >
+              아이디 / 비밀번호 찾기
+            </Link>
+          </div>
         </div>
       </div>
     </div>
