@@ -47,6 +47,7 @@ const Login = () => {
       alert("임시: 로그인 성공")
       console.log(res)
     } catch (error) {
+      console.log(error)
       const { status } = error.response
       switch (status) {
         case 404: {

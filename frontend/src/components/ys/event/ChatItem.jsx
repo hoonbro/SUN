@@ -37,7 +37,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
       )}
       <span
         className={
-          "border rounded-xl p-2 mx-12" +
+          "border-2 rounded-xl py-1 px-2 mx-12" +
           contentBorderColor +
           contentRoundedNone
         }

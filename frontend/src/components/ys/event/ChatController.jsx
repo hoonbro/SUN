@@ -1,6 +1,7 @@
 import React from "react"
 import { IoSendSharp } from "react-icons/io5"
 import { BsPaperclip, BsImageFill } from "react-icons/bs"
+
 const ChatController = () => {
   return (
     <div className="p-2 flex gap-2">

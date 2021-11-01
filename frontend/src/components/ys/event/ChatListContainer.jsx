@@ -49,14 +49,30 @@ const ChatListContainer = () => {
     date: new Date(),
     content: "저는 홍길동입니다 잘부탁해요",
   }
+  const chatItem6 = {
+    picture: require("../../../assets/images/test-profile-img.png"),
+    name: "김병훈",
+    auth: "ROLE_TEACHER",
+    date: new Date(),
+    content: "반가워요 남아리 학생",
+  }
+  const chatItem7 = {
+    picture: require("../../../assets/images/test-profile-img.png"),
+    name: "김병훈",
+    auth: "ROLE_TEACHER",
+    date: new Date(),
+    content: "반가워요 홍길동 학생",
+  }
   return (
     <div className="overflow-y-scroll flex-1">
-      <section className="pb-4 px-6 flex flex-col gap-1" ref={chatList}>
+      <section className="pb-4 px-4 flex flex-col gap-1" ref={chatList}>
         <ChatItem chatItem={chatItem} />
         <ChatItem chatItem={chatItem2} exChatItem={chatItem} />
         <ChatItem chatItem={chatItem3} exChatItem={chatItem2} />
         <ChatItem chatItem={chatItem4} exChatItem={chatItem3} />
         <ChatItem chatItem={chatItem5} exChatItem={chatItem4} />
+        <ChatItem chatItem={chatItem6} exChatItem={chatItem5} />
+        <ChatItem chatItem={chatItem7} exChatItem={chatItem6} />
       </section>
     </div>
   )
