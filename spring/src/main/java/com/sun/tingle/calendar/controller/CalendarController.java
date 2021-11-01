@@ -82,7 +82,8 @@ public class CalendarController {
         Map<String,Object> map2 = calendarService.insertShareCalendar(calendarCode,id);
         int flag = (Integer)map2.get("flag");
         CalendarRpDto calendarRpDto = (CalendarRpDto)map2.get("calendarRpDto");
-        if(flag == -1) { // 애초에 등록 안된 달력일 때
+        if(flag == -1) { // 애초에 등록 안된 달력일
+            // 때
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.NO_CONTENT);
         }
         else if(flag == -2) { // 이미 공유 달력에 등록되어 있을 때
