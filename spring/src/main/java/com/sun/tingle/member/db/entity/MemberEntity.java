@@ -43,7 +43,7 @@ public class MemberEntity {
         this.defaultCalendar = defaultCalendar;
     }
 
-    @OneToMany(mappedBy = "calendarCode", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "id", cascade = CascadeType.ALL)
     private List<CalendarEntity> calendarEntities = new ArrayList<>();
 }
  

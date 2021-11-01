@@ -130,7 +130,7 @@ public class MissionServiceImpl implements MissionService {
         for(int i=0; i<file_size; i++) { // 업데이트전 db 파일 삭제
              Long fileId = list2.get(i).getFileId();
              teacherFileRepository.deleteById(fileId);
-             s3service.updateDeleteTeacherFile(list2.get(i).fileUuid);
+             s3service.deleteTeacherFile(list2.get(i).fileUuid,list2.get(i).getId());
         }
 
         s3service.teacherFileUploads(teacherFile,missionId,missionRqDto.getId());
@@ -170,6 +170,7 @@ public class MissionServiceImpl implements MissionService {
         int result = 0;
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
         if(missionEntity.getId() == id) {
+            s3service.s3MissionDelete(missionId);
             missionRepository.deleteById(missionId);
             result = 1;
         }
