@@ -42,11 +42,6 @@ public class ChatController {
         return ResponseEntity.ok(chatService.getHistory(id, pageable));
     }
 
-    @GetMapping("/chatroom")
-    public ResponseEntity<List<ChatRoomResponseDto>> getChattingRooms() throws Exception {
-        return ResponseEntity.ok(chatService.getChattingRooms());
-    }
-
     @GetMapping("/mission/{mid}")
     public ResponseEntity<MemberChatRoomResponseDto> getMemberChat(@PathVariable("mid") Long mid) throws Exception {
         return ResponseEntity.ok(chatService.getChatroomId(mid));

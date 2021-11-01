@@ -49,27 +49,30 @@ public class ChatService {
     @Transactional
     public void sendMessage(ChatMessageRequestDto chatMessageRequestDto, String token, Long mid) {
         Long userid = tokenProvider.getIdFromJwt(token);
-        MemberEntity user = memberRepository.findById(userid).orElseThrow(() -> new NullPointerException("잘못된 사용자 토큰입니다!"));
+//        MemberEntity user = memberRepository.findById(userid).orElseThrow(() -> new NullPointerException("잘못된 사용자 토큰입니다!"));
         MissionEntity missionEntity = missionRepository.findById(mid).orElseThrow(() -> new NullPointerException("존재하지 않는 mission입니다!"));
         String roomid = getRoomId(mid);
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
         ChatMessage message;
+
         if (chatRoom.isEmpty()) {
             ChatRoom inner_chatroom = createChatRoom(roomid, missionEntity);
             chatRoomRepository.save(inner_chatroom);
-            message = chatMessageRequestDto.toChatMessage(user, inner_chatroom);
+            message = chatMessageRequestDto.toChatMessage(userid, inner_chatroom);
         } else {
-            message = chatMessageRequestDto.toChatMessage(user, chatRoom.get());
+            message = chatMessageRequestDto.toChatMessage(userid, chatRoom.get());
         }
+
+        ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
         chatMessageRepository.save(message);
-        kafkaSenderService.send(BOOT_TOPIC, message);
+        kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
     }
 
     @Transactional
     public ChatRoom createChatRoom(String roomid, MissionEntity mid) {
         return ChatRoom.builder()
                 .id(roomid)
-                .mission_id(mid)
+                .mission(mid)
                 .build();
     }
 
@@ -78,22 +81,7 @@ public class ChatService {
         MemberEntity member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new NullPointerException("잘못된 토큰입니다."));
         ChatRoom chatRoom = chatRoomRepository.findById(roomid).orElseThrow(() -> new NullPointerException("존재하지 않는 채팅방입니다!"));
         Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoom(chatRoom, pageable);
-        return chatMessages.map(m -> ChatMessageResponseDto.of(m));
-    }
-
-    @Transactional(readOnly = true)
-    public List<ChatRoomResponseDto> getChattingRooms() throws Exception {
-        MemberEntity user = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new NullPointerException("잘못된 토큰입니다."));
-        List<ChatRoom> chatRoomsUser = chatRoomRepository.findAllByUser(user);
-        List<ChatRoom> chatRoomsOther = chatRoomRepository.findAllByOther(user);
-        List<ChatRoomResponseDto> chatRoomResponseDtos = new ArrayList<>();
-        for (ChatRoom chatRoom: chatRoomsUser) {
-            chatRoomResponseDtos.add(ChatRoomResponseDto.ofOther(chatRoom));
-        }
-        for (ChatRoom chatRoom: chatRoomsOther) {
-            chatRoomResponseDtos.add(ChatRoomResponseDto.ofUser(chatRoom));
-        }
-        return chatRoomResponseDtos;
+        return chatMessages.map(m -> ChatMessageResponseDto.of(memberRepository, m));
     }
 
     @Transactional

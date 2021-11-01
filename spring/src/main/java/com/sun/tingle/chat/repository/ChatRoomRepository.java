@@ -9,6 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, String> {
-    List<ChatRoom> findAllByUser(MemberEntity user);
-    List<ChatRoom> findAllByOther(MemberEntity other);
+//    List<ChatRoom> findAllByUser(MemberEntity user);
+//    List<ChatRoom> findAllByOther(MemberEntity other);
 }

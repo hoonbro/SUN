@@ -31,6 +31,18 @@ public class MemberEntity {
     private String auth;
     private String defaultCalendar;
 
+    public MemberEntity(Long id, String memberId, String email, String password, String name, String phone, String profileImage, String auth, String defaultCalendar) {
+        this.id = id;
+        this.memberId = memberId;
+        this.email = email;
+        this.password = password;
+        this.name = name;
+        this.phone = phone;
+        this.profileImage = profileImage;
+        this.auth = auth;
+        this.defaultCalendar = defaultCalendar;
+    }
+
     @OneToMany(mappedBy = "calendarCode", cascade = CascadeType.ALL)
     private List<CalendarEntity> calendarEntities = new ArrayList<>();
 }

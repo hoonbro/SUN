@@ -2,6 +2,7 @@ package com.sun.tingle.chat.config;
 
 
 import com.google.common.collect.ImmutableMap;
+import com.sun.tingle.chat.dto.ChatMessageResponseDto;
 import com.sun.tingle.chat.entity.ChatMessage;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -21,12 +22,12 @@ import java.util.Map;
 @Configuration
 public class KafkaConfig {
     @Bean
-    public ProducerFactory<String, ChatMessage> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerConfigurations(), null, new JsonSerializer<ChatMessage>());
+    public ProducerFactory<String, ChatMessageResponseDto> producerFactory() {
+        return new DefaultKafkaProducerFactory<>(producerConfigurations(), null, new JsonSerializer<ChatMessageResponseDto>());
     }
 
     @Bean
-    public KafkaTemplate<String, ChatMessage> kafkaTemplate() {
+    public KafkaTemplate<String, ChatMessageResponseDto> kafkaTemplate() {
         return new KafkaTemplate<>(producerFactory());
     }
 
@@ -42,15 +43,15 @@ public class KafkaConfig {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, ChatMessage> kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, ChatMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, ChatMessageResponseDto> kafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, ChatMessageResponseDto> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
 
     @Bean
-    public ConsumerFactory<String, ChatMessage> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), null, new JsonDeserializer<>(ChatMessage.class));
+    public ConsumerFactory<String, ChatMessageResponseDto> consumerFactory() {
+        return new DefaultKafkaConsumerFactory<>(consumerConfigs(), null, new JsonDeserializer<>(ChatMessageResponseDto.class));
     }
 
     @Bean

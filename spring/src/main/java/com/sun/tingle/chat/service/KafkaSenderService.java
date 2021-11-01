@@ -1,5 +1,6 @@
 package com.sun.tingle.chat.service;
 
+import com.sun.tingle.chat.dto.ChatMessageResponseDto;
 import com.sun.tingle.chat.entity.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +14,9 @@ public class KafkaSenderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaSenderService.class);
 
     @Autowired
-    private KafkaTemplate<String, ChatMessage> kafkaTemplate;
+    private KafkaTemplate<String, ChatMessageResponseDto> kafkaTemplate;
 
-    public void send(String topic, ChatMessage data) {
+    public void send(String topic, ChatMessageResponseDto data) {
         LOGGER.info("sending data='{}' to topic='{}'", data, topic);
         kafkaTemplate.send(topic, data);
     }

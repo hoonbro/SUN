@@ -2,7 +2,11 @@ package com.sun.tingle.chat.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tingle.chat.dto.ChatMessageResponseDto;
 import com.sun.tingle.chat.entity.ChatMessage;
+import com.sun.tingle.member.db.entity.MemberEntity;
+import com.sun.tingle.member.db.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,25 +18,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 @Service
+@RequiredArgsConstructor
 public class KafkaReceiverService {
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaReceiverService.class);
+
+    private final MemberRepository memberRepository;
 
     @Autowired
     private SimpMessagingTemplate template;
 
     @KafkaListener(id = "main-listener", topics = "kafka-chat")
-    public void receive(ChatMessage message) throws Exception {
+    public void receive(ChatMessageResponseDto message) throws Exception {
+//        MemberEntity member = memberRepository.getById(message.getSender());
+//        System.out.println("Hereee12222" + member);
         LOGGER.info("message='{}'", message);
         HashMap<String, String> msg = new HashMap<>();
         msg.put("sentTime", message.getSentTime().format(DateTimeFormatter.ISO_DATE_TIME));
-        msg.put("name", message.getSender().getName());
+        msg.put("name", message.getNickname());
         msg.put("content", message.getContent());
-        msg.put("pic_uri", message.getSender().getProfileImage());
-        msg.put("sender_id", Long.toString(message.getSender().getId()));
+        msg.put("pic_uri", message.getPic_uri());
+        msg.put("sender_id", Long.toString(message.getSender_id()));
 
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(msg);
 
-        this.template.convertAndSend("/room/" + message.getChatRoom().getId(), json);
+        this.template.convertAndSend("/room/" + message.getRoom_id(), json);
     }
 }

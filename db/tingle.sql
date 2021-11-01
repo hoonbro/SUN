@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS `tingle`.`member` (
   `password` varchar(255) DEFAULT NULL,
   `phone` varchar(255) DEFAULT NULL,
   `auth` varchar(255) DEFAULT NULL,
+  `profile_image` varchar(255) DEFAULT NULL,
+  `default_calendar` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `member_id_UNIQUE` (`member_id`)
@@ -99,5 +101,3 @@ CREATE TABLE IF NOT EXISTS `tingle`.`chat_room` (
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_mission_chat_room` FOREIGN KEY (`mission_id`) REFERENCES `tingle`.`mission` (`mission_id`))
 ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
- 
-

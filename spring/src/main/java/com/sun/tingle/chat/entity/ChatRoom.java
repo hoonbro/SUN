@@ -10,18 +10,18 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity(name = "tingle.chat_room")
+@Entity(name = "chat_room")
 public class ChatRoom {
     @Id
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mission_id")
-    private MissionEntity mission_id;
+    private MissionEntity mission;
 
     @Builder
-    public ChatRoom(String id, MissionEntity mission_id) {
+    public ChatRoom(String id, MissionEntity mission) {
         this.id = id;
-        this.mission_id = mission_id;
+        this.mission = mission;
     }
 }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @ToString
-@Entity(name = "tingle.chat_message")
+@Entity(name = "chat_message")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessage {
     @Id
@@ -20,9 +20,8 @@ public class ChatMessage {
 
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id")
-    private MemberEntity sender;
+    @Column(name = "sender_id")
+    private Long sender;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
@@ -36,7 +35,7 @@ public class ChatMessage {
 //    private DBFile dbFile;
 
     @Builder
-    public ChatMessage(String content, MemberEntity sender, ChatRoom chatRoom, LocalDateTime sentTime) {
+    public ChatMessage(String content, Long sender, ChatRoom chatRoom, LocalDateTime sentTime) {
         this.content = content;
         this.sender = sender;
         this.chatRoom = chatRoom;

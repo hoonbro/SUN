@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class ChatMessageRequestDto {
     private String content;
 
-    public ChatMessage toChatMessage(MemberEntity sender, ChatRoom inner_chatroom) {
+    public ChatMessage toChatMessage(Long sender, ChatRoom inner_chatroom) {
         return ChatMessage.builder()
                 .content(content)
                 .sender(sender)
