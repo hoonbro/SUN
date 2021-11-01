@@ -44,7 +44,6 @@ const Login = () => {
     const user = await loginUser(dispatch, reqForm)
     console.log(user)
     if (user) {
-      alert("임시: 로그인 성공")
       history.push(`/profile/${user.email}`)
     }
   }
