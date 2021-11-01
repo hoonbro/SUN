@@ -41,26 +41,11 @@ const Login = () => {
       memberId: memberId.value,
       password: password.value,
     }
-    try {
-      const user = await loginUser(dispatch, reqForm)
-      console.log(user)
-      if (user) {
-        alert("임시: 로그인 성공")
-        console.log(res)
-        history.push(`/profile/${user.email}`)
-      }
-    } catch (error) {
-      console.log(error)
-      const { status } = error.response
-      switch (status) {
-        case 404: {
-          alert("가입되지 않은 아이디입니다.")
-          break
-        }
-        case 401: {
-          alert("비밀번호가 일치하지 않습니다.")
-        }
-      }
+    const user = await loginUser(dispatch, reqForm)
+    console.log(user)
+    if (user) {
+      alert("임시: 로그인 성공")
+      history.push(`/profile/${user.email}`)
     }
   }
 
