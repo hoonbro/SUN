@@ -4,6 +4,7 @@ import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.util.JwtUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +21,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/members")
+@RequiredArgsConstructor
 @CrossOrigin("*")
 public class MemberController {
     @Autowired
@@ -99,5 +101,14 @@ public class MemberController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<Void> changePassword(HttpServletRequest request, @RequestBody MemberReqDto memberReqDto){
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        memberService.changePassword(id, memberReqDto.getPassword());
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
