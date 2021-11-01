@@ -37,8 +37,16 @@ public class FileController {
         return new ResponseEntity<MissionFileRpDto>(r,HttpStatus.OK);
     }
 
+    @PostMapping("/test")
+    public ResponseEntity<String> test(@RequestParam("missionFile") MultipartFile file,@RequestParam("missionId") Long missionId) throws IOException {
+        String calendarCode = "gkgk";
+        String url = s3service.s3folderIncludingUpload(file,calendarCode,missionId);
+        return new ResponseEntity<String>(url,HttpStatus.OK);
+    }
 
-//    @GetMapping("/list") // 미션 조회 시 어짜피 같이 반환 되서 안쓸 거 같음
+
+
+//    @GetMapping("/list") // 미션 조회 시 어짜피 같이 반환 되서 안쓸 거 같음 혹시 몰라 나둠
 //    public ResponseEntity<List<MissionFileRpDto>> selectFileList(@RequestParam("missionId") Long missionId) {
 //        List<MissionFileRpDto> list = new ArrayList<>();
 //
