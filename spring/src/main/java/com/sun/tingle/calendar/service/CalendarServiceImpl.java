@@ -48,8 +48,12 @@ public class CalendarServiceImpl implements CalendarService{
     }
 
     @Override
-    public CalendarRpDto updateCalendar(String calendarCode,String calendarName) {
+    public CalendarRpDto updateCalendar(String calendarCode,String calendarName,Long id) {
+
         CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(calendarCode);
+        if(calendarEntity.getId() != id) {
+            return null;
+        }
         calendarEntity.setCalendarName(calendarName);
         calendarEntity=calendarRepository.save(calendarEntity);
     //        CalendarRpDto calendarRpDto = buildCalendar(calendarEntity);
@@ -58,10 +62,14 @@ public class CalendarServiceImpl implements CalendarService{
     }
 
     @Override
-    public void deleteCalendar(String calendarCode) {
-
+    public int deleteCalendar(String calendarCode,Long id) {
+        CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(calendarCode);
+        if(calendarEntity.getId() != id) { // 등록한 사람아닐 때 권한 x
+            return 1;
+        }
         calendarRepository.deleteById(calendarCode);
         s3service.s3CalendarDelete(calendarCode);
+        return 2;
     }
 
 
