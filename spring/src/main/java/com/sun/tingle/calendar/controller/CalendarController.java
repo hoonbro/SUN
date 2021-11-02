@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/calendar")
+@CrossOrigin("*")
 public class CalendarController {
 
     @Autowired
