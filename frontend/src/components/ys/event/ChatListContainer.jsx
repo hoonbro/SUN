@@ -5,13 +5,11 @@ const ChatListContainer = () => {
   const chatList = useRef(null)
 
   useEffect(() => {
-    console.log(
-      chatList.current.scrollIntoView({
-        behavior: "auto", // "smooth", "auto"(default)
-        block: "end", // "start", "center", "end", "nearest"(default)
-        inline: "nearest", // "start", "center", "end", "nearest"(default)
-      })
-    )
+    chatList.current.scrollIntoView({
+      behavior: "auto", // "smooth", "auto"(default)
+      block: "end", // "start", "center", "end", "nearest"(default)
+      inline: "nearest", // "start", "center", "end", "nearest"(default)
+    })
   })
 
   const chatItem = {

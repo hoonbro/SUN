@@ -1,9 +1,20 @@
+import { useEffect } from "react"
+import { useRouteMatch } from "react-router"
 import Header from "../components/Header"
 import ChatController from "../components/ys/event/ChatController"
 import ChatListContainer from "../components/ys/event/ChatListContainer"
 import EventMaterial from "../components/ys/event/EventMaterial"
+import ChatAPI from "../api/chat"
 
 const EventDetail = () => {
+  const { eventId } = useRouteMatch().params
+  console.log(eventId)
+
+  useEffect(async () => {
+    const resData = await ChatAPI.getChatRoomInfo(eventId)
+    console.log(resData)
+  }, [])
+
   return (
     <div className="h-full flex flex-col">
       <Header
