@@ -42,7 +42,7 @@ const Login = () => {
     }
     const user = await loginUser(dispatch, reqForm)
     if (user) {
-      history.push(`/profile/${user.email}`)
+      history.push(`/calendars/${user.defaultCalendar}`)
       alert("임시: 로그인 성공")
       return
     }
