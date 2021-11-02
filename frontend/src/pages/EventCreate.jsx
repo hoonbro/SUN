@@ -1,9 +1,9 @@
 import { useHistory } from "react-router"
 import Header from "../components/Header"
+import EventForm from "../components/EventForm"
 
 const EventCreate = () => {
   const history = useHistory()
-  console.log(history)
 
   const handleGoBack = () => {
     history.goBack()
@@ -12,6 +12,9 @@ const EventCreate = () => {
   return (
     <>
       <Header pageTitle="과제 등록" handleGoBack={handleGoBack} />
+      <div className="container max-w-xl">
+        <EventForm />
+      </div>
     </>
   )
 }
