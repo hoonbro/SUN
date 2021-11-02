@@ -52,8 +52,8 @@ public class MissionServiceImpl implements MissionService {
 //            temp = temp.replaceAll("\\]","");
 
 
-//            sb.append("#").append(temp); // #없이 넘어오실 시
-            sb.append(temp); // #이랑 같이 리스트에 넘어올 떄
+            sb.append("&@&").append(temp); // #없이 넘어오실 시
+//            sb.append(temp); // #이랑 같이 리스트에 넘어올 떄
         }
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
@@ -63,13 +63,16 @@ public class MissionServiceImpl implements MissionService {
 
 
         MissionRpDto missionRpDto = new MissionRpDto();
-        String[] tagArr = missionEntity.getTag().split("#");
+        String[] tagArr = missionEntity.getTag().split("&@&");
+        System.out.println(tagArr.toString());
         list = new ArrayList<>();
         size = tagArr.length;
         for(int i=1; i<size; i++) {
             list.add(tagArr[i]);
+            System.out.println(tagArr[i]);
         }
         s3service.teacherFileUploads(teacherFile,missionEntity.getMissionId(),missionEntity.getId());
+
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
                 .tag(list).title(missionEntity.getTitle())
                 .calendarCode(missionEntity.getCalendarCode())
@@ -90,7 +93,7 @@ public class MissionServiceImpl implements MissionService {
     public MissionRpDto selectMission(Long missionId) {
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
         MissionRpDto missionRpDto = new MissionRpDto();
-        String[] tagArr = missionEntity.getTag().split("#");
+        String[] tagArr = missionEntity.getTag().split("&@&");
         List<String> list = new ArrayList<>();
         int size = tagArr.length;
         for(int i=1; i<size; i++) {
@@ -143,7 +146,8 @@ public class MissionServiceImpl implements MissionService {
         StringBuilder sb = new StringBuilder();
 
         for(int i=0; i<size; i++) {
-            sb.append(list.get(i));
+
+            sb.append("&@&").append(list.get(i));
         }
 
         missionEntity = new MissionEntity(missionId,missionRqDto.getTitle(),missionRqDto.getStart(),
@@ -159,8 +163,9 @@ public class MissionServiceImpl implements MissionService {
                 .tag(missionRqDto.getTag()).
                 id(missionEntity.getId()).
                 calendarCode(missionEntity.getCalendarCode()).
-                missionFileList(missionEntity.getMissionFileList()).
-                teacherFileList(missionEntity.getTeacherFileList()).build();
+//                missionFileList(missionEntity.getMissionFileList()).
+//                teacherFileList(missionEntity.getTeacherFileList()).
+                build();
 
         return missionRpDto;
     }
@@ -197,7 +202,7 @@ public class MissionServiceImpl implements MissionService {
         List<String> tags = null;
         for(int i=0; i<size; i++) {
             m = list.get(i);
-            String[] temp = m.getTag().split("#");
+            String[] temp = m.getTag().split("&@&");
             tags = new ArrayList<>();
             for(int j=0;j<temp.length;j++) {
                 tags.add(temp[j]);
