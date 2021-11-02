@@ -22,6 +22,7 @@ public class ChatMessageResponseDto {
     private String nickname;
     private LocalDateTime sentTime;
     private String room_id;
+    private String fileName;
 
     public static ChatMessageResponseDto of(MemberRepository memberRepository, ChatMessage chatMessage) {
 //        MemberRepository memberRepository;
@@ -33,6 +34,7 @@ public class ChatMessageResponseDto {
                 .sender_id(memberEntity.getId())
                 .sentTime(chatMessage.getSentTime())
                 .room_id(chatMessage.getChatRoom().getId())
+                .fileName(chatMessage.getFile_id())
                 .build();
 //        return ChatMessageResponseDto.builder()
 //                .room_id(chatMessage.getChatRoom().getId())

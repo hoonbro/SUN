@@ -3,7 +3,6 @@ package com.sun.tingle.chat.controller;
 
 import com.sun.tingle.chat.dto.ChatMessageRequestDto;
 import com.sun.tingle.chat.dto.ChatMessageResponseDto;
-import com.sun.tingle.chat.dto.ChatRoomResponseDto;
 import com.sun.tingle.chat.dto.MemberChatRoomResponseDto;
 import com.sun.tingle.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +17,7 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
@@ -43,5 +41,11 @@ public class ChatController {
     @GetMapping("/mission/{mid}")
     public ResponseEntity<MemberChatRoomResponseDto> getMemberChat(@PathVariable("mid") Long mid) throws Exception {
         return ResponseEntity.ok(chatService.getChatroomId(mid));
+    }
+
+    @MessageMapping("/mission/{mid}/file")
+    @SendTo("/room/{id}")
+    public void sendFile(@RequestParam("file") MultipartFile file, @DestinationVariable("mid") Long mid, @Header("Authorization") String token) throws Exception {
+        chatService.sendFile(file, token, mid);
     }
 }
