@@ -21,6 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/mission")
+@CrossOrigin("*")
 public class MissionController {
     @Autowired
     MissionService missionService;
