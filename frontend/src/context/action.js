@@ -67,6 +67,7 @@ export const silentRefresh = async (dispatch, payload) => {
       type: "TOKEN_REFRESH",
       payload: { accessToken: res.data?.data?.accessToken },
     })
+    applyToken(res.data?.data?.accessToken)
     const user = JSON.parse(localStorage.getItem("currentUser"))
     localStorage.setItem(
       "currentUser",

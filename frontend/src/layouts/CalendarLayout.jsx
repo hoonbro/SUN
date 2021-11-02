@@ -3,6 +3,7 @@ import Calendar from "../pages/Calendar"
 import CalendarCreate from "../pages/CalendarCreate"
 import CalendarEdit from "../pages/CalendarEdit"
 import CalendarSetting from "../pages/CalendarSetting"
+import EventCreate from "../pages/EventCreate"
 import EventDetail from "../pages/EventDetail"
 
 const CalendarLayout = () => {
@@ -20,6 +21,9 @@ const CalendarLayout = () => {
       </Route>
       <Route path={`${path}/:calendarCode/edit`}>
         <CalendarEdit />
+      </Route>
+      <Route path={`${path}/:calendarCode/events/create`}>
+        <EventCreate />
       </Route>
       <Route path={`${path}/:calendarCode/events/:eventId`}>
         <EventDetail />

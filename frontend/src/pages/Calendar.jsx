@@ -2,7 +2,7 @@ import { Calendar, momentLocalizer } from "react-big-calendar"
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
 import moment from "moment"
 import "moment/locale/ko"
-import { useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Link, useRouteMatch } from "react-router-dom"
 import { MdClose, MdSwapHoriz, MdAdd } from "react-icons/md"
 import Modal from "../components/modal/Modal"
@@ -11,6 +11,7 @@ import EventListItem from "../components/EventListItem"
 import "../static/calendar.css"
 import "react-big-calendar/lib/addons/dragAndDrop/styles.scss"
 import CalendarAside from "../components/calendar/CalendarAside"
+import client from "../api/client"
 
 const DragAndDropCalendar = withDragAndDrop(Calendar)
 const localizer = momentLocalizer(moment)
@@ -109,12 +110,16 @@ const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
 }
 
 const MyCalendar = () => {
-  const r = useRouteMatch()
-  console.log(r)
+  const { params: routeParams } = useRouteMatch()
   const [selectedDate, setSelectedDate] = useState(null)
   const [events, setEvents] = useState(DUMMY_EVENTS)
   const [modalOpen, setModalOpen] = useState(false)
   const [asideOpen, setAsideOpen] = useState(false)
+  const [calendarInfo, setCalendarInfo] = useState({
+    calendarCode: "",
+    calendarName: "",
+    id: -1,
+  })
 
   const handleSelectSlot = (slotInfo) => {
     setSelectedDate(slotInfo.slots[0])
@@ -150,6 +155,22 @@ const MyCalendar = () => {
     )
   }
 
+  const getCalendarInfo = useCallback(async () => {
+    try {
+      const res = await client.get(`calendar/${routeParams?.calendarCode}`)
+      setCalendarInfo({ ...res.data })
+    } catch (error) {
+      console.log(error)
+    }
+  }, [routeParams])
+
+  useEffect(() => {
+    async function asyncEffect() {
+      await getCalendarInfo()
+    }
+    asyncEffect()
+  }, [getCalendarInfo])
+
   return (
     <div className="relative flex flex-col h-full pb-10">
       <header className="p-4">
@@ -158,7 +179,7 @@ const MyCalendar = () => {
           onClick={() => setAsideOpen(!asideOpen)}
         >
           <MdSwapHoriz size={20} />
-          <span className="font-bold">000의 캘린더</span>
+          <span className="font-bold">{calendarInfo.calendarName}</span>
         </button>
       </header>
       <DragAndDropCalendar
@@ -176,7 +197,7 @@ const MyCalendar = () => {
       />
       <Link
         className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white"
-        to={`/calenaers`}
+        to={`/calendars/${routeParams?.calendarCode}/events/create`}
       >
         <MdAdd size={28} />
       </Link>
