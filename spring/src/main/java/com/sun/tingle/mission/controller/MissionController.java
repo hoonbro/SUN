@@ -78,7 +78,7 @@ public class MissionController {
         if(missionRpDto == null) {
             return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.NO_CONTENT);
         }
-        else if(missionRpDto.getTitle() == null) { // 임시 처리 권한 없을 때
+        else if(missionRpDto.getTitle() == null) { // 처리 권한 없을 때
             return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.UNAUTHORIZED);
         }
         return new ResponseEntity<>(missionRpDto, HttpStatus.CREATED);

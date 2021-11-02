@@ -11,8 +11,8 @@ public interface CalendarService {
 
     CalendarRpDto insertCalendar(String calendarCode, String calendarName, long id);
     CalendarRpDto selectCalendar(String calendarCode);
-    CalendarRpDto updateCalendar(String calendarCode,String calendarName);
-    void deleteCalendar(String calendarCode);
+    CalendarRpDto updateCalendar(String calendarCode,String calendarName,Long id);
+    int deleteCalendar(String calendarCode,Long id);
     Map<String,Object> insertShareCalendar(String calendarCode,long id);
     void deleteShareCalendar(String calendarCode,long id);
 
