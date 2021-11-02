@@ -36,17 +36,17 @@ const Login = () => {
   }, [isAllFill])
 
   const handleLogin = async () => {
-    console.log({ memberId: memberId.value, password: password.value })
     const reqForm = {
       memberId: memberId.value,
       password: password.value,
     }
     const user = await loginUser(dispatch, reqForm)
-    console.log(user)
     if (user) {
-      alert("임시: 로그인 성공")
       history.push(`/profile/${user.email}`)
+      alert("임시: 로그인 성공")
+      return
     }
+    alert("로그인 실패")
   }
 
   return (
