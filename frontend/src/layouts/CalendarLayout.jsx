@@ -15,13 +15,13 @@ const CalendarLayout = () => {
       <Route path={`${path}/create`}>
         <CalendarCreate />
       </Route>
-      <Route path={`${path}/:calendarId`} exact>
+      <Route path={`${path}/:calendarCode`} exact>
         <Calendar />
       </Route>
-      <Route path={`${path}/:calendarId/edit`}>
+      <Route path={`${path}/:calendarCode/edit`}>
         <CalendarEdit />
       </Route>
-      <Route path={`${path}/:calendarId/events/:eventId`}>
+      <Route path={`${path}/:calendarCode/events/:eventId`}>
         <EventDetail />
       </Route>
     </Switch>
