@@ -114,8 +114,8 @@ public class S3service {
     }
 
                         //미션 등록 시 선생님이 파일 업로드할 때
-    public void teacherFileUploads(MultipartFile[] file,Long missionId,Long id) throws IOException {
-
+    public void teacherFileUploads(MultipartFile[] file, Long missionId, Long id) throws IOException {
+//        List<TeacherFileRpDto> list = new ArrayList<>();
         String[] url = new String[file.length];
 
         for(int i=0; i<file.length; i++) {
@@ -129,7 +129,12 @@ public class S3service {
                     build();
 
             teacherFileRepository.save(tEntity);
+//            TeacherFileRpDto teacherFileRpDto = new TeacherFileRpDto();
+//            teacherFileRpDto = teacherFileRpDto.builder().fileUuid(tEntity.getFileUuid()).
+//                    fileName(tEntity.getFileName()).build();
+//            list.add(teacherFileRpDto);
         }
+//        return list;
     }
 
     public int deleteMissionFile(String uuid,Long id) { // 채팅방에 자신이 올린 파일을 삭제할 때
