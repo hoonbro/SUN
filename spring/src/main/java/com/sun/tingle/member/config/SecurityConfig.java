@@ -51,6 +51,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/mission/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("/file/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("/messages/**").hasAnyRole("TEACHER","STUDENT")
+                .antMatchers("/message/**").hasAnyRole("TEACHER","STUDENT")
+                .antMatchers("/chat/**").hasAnyRole("TEACHER","STUDENT")
                 .anyRequest().authenticated()
 
                 .and().cors();
