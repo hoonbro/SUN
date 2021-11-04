@@ -124,6 +124,7 @@ const MyCalendar = () => {
   const handleSelectSlot = (slotInfo) => {
     setSelectedDate(slotInfo.slots[0])
     console.log(slotInfo)
+    console.log(moment(slotInfo.slots[0]).format("YYYY-MM-DD"))
     setModalOpen(true)
   }
 
@@ -164,12 +165,23 @@ const MyCalendar = () => {
     }
   }, [routeParams])
 
+  const getEvents = useCallback(async () => {
+    try {
+      const res = await client.get(`mission/${routeParams?.calendarCode}`)
+      setEvents([...res.data])
+    } catch (error) {
+      console.log("getEvents")
+      console.log(error)
+    }
+  }, [routeParams])
+
   useEffect(() => {
     async function asyncEffect() {
       await getCalendarInfo()
+      await getEvents()
     }
     asyncEffect()
-  }, [getCalendarInfo])
+  }, [getCalendarInfo, getEvents])
 
   return (
     <div className="relative flex flex-col h-full pb-10">

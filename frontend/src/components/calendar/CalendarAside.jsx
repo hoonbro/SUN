@@ -1,8 +1,9 @@
-import { Link, useRouteMatch } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { FcSettings } from "react-icons/fc"
 import { MdExpandMore, MdExpandLess } from "react-icons/md"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import CalendarAddForm from "./CalendarAddForm"
+import client from "../../api/client"
 
 const CalendarListItem = ({
   name = "캘린더 이름",
@@ -34,6 +35,16 @@ const CalendarListItem = ({
 }
 
 const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
+  const { calendarCode } = useParams()
+  console.log(calendarCode)
+  useEffect(() => {
+    async function asyncEffect() {
+      const res = await client.get(`calendar/every/calendars`)
+      console.log(res.data)
+    }
+    asyncEffect()
+  }, [])
+
   return (
     <>
       {asideOpen && (

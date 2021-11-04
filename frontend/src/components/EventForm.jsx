@@ -1,10 +1,12 @@
 import moment from "moment"
 import { v4 as uuidv4 } from "uuid"
 import { useRef, useState } from "react"
+import { useParams } from "react-router-dom"
 import useInputs from "../hooks/useInputs"
 import { MdClose } from "react-icons/md"
 
-const EventForm = () => {
+const EventForm = ({ onSubmit = (f) => f }) => {
+  const { calendarCode } = useParams()
   const [state, handleChange] = useInputs({
     title: {
       value: "",
@@ -83,7 +85,10 @@ const EventForm = () => {
     tags.forEach((tag) => {
       formData.append("tag", tag)
     })
+    formData.append("calendarCode", calendarCode)
+    onSubmit(formData)
   }
+
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
       <div className="form-field">

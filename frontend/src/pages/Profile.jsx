@@ -1,17 +1,17 @@
 import { useRef } from "react"
-import { Link, useHistory } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
-import { logout, useAuthDispatch, useAuthState } from "../context"
+// import { logout, useAuthDispatch, useAuthState } from "../context"
 import Header from "../components/Header"
 
 const Profile = () => {
-  const history = useHistory()
-  const dispatch = useAuthDispatch()
-  const authDetails = useAuthState()
-  const handleLogout = () => {
-    logout(dispatch)
-    history.push("/login")
-  }
+  // const history = useHistory()
+  // const dispatch = useAuthDispatch()
+  // const authDetails = useAuthState()
+  // const handleLogout = () => {
+  //   logout(dispatch)
+  //   history.push("/login")
+  // }
   const handleChangeFile = (e) => {
     console.log(e)
   }

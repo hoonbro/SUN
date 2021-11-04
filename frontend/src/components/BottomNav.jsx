@@ -11,13 +11,15 @@ const BottomNav = () => {
     history.push("/login")
   }
 
+  console.log(auth)
+
   return (
     <>
       {auth.token?.accessToken && (
         <nav className="fixed bottom-0 left-0 w-full px-6 py-2 flex items-center justify-between border border-t border-gray-200 rounded-t-xl bg-white">
           <Link
             key="캘린더"
-            to="/"
+            to={`/calendars/${auth?.user.defaultCalendar}`}
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
             <FcCalendar size="24px" />
