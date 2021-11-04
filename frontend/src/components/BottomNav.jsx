@@ -41,7 +41,7 @@ const BottomNav = () => {
           </Link>
           <Link
             key="프로필"
-            to="/profile/kepy1106@gmail.com"
+            to={`/profile/${auth.user.id}`}
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
             <FcReadingEbook size="24px" />

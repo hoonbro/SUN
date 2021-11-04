@@ -1,5 +1,6 @@
-import { useEffect } from "react"
+import { useCallback, useEffect } from "react"
 import { Link } from "react-router-dom"
+import client from "../api/client"
 import Button from "../components/Button"
 import Header from "../components/Header"
 import LabelInput from "../components/LabelInput"
@@ -32,17 +33,26 @@ const ProfileEdit = () => {
   })
   const { name, phone, email } = state
 
-  // useEffect(() => {
-  //   handleChange({ target: { name: "name", value: dummyData.name } })
-  //   handleChange({ target: { name: "phone", value: dummyData.phone } })
-  //   handleChange({ target: { name: "email", value: dummyData.email } })
-  // }, [])
+  const updateProfile = useCallback(async () => {
+    const res = await client.put(`members`, {
+      name: name.value,
+      phone: phone.value,
+      email: email.value,
+    })
+    console.log(res)
+  }, [name, phone, email])
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    console.log(name.value, phone.value, email.value)
+    updateProfile()
+  }
 
   return (
     <div className="min-h-full bg-gray-50">
       <Header pageTitle="마이페이지" to="/profile/kepy1106@gmail.com" />
       <main className="container max-w-xl bg-white p-6 grid gap-2 xs:rounded-xl xs:shadow-lg">
-        <form className="grid gap-10">
+        <form className="grid gap-10" onSubmit={handleSubmit}>
           <div className="grid gap-4">
             <LabelInput
               label="이름"

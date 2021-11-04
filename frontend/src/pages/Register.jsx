@@ -51,7 +51,7 @@ const Register = () => {
   }, [memberId])
   const isPasswordValid = useMemo(() => {
     const regex =
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,255}$/
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,255}$/
     return regex.test(password.value)
   }, [password])
   const isPasswordConfirmValid = useMemo(() => {

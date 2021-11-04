@@ -1,13 +1,18 @@
-import { useRef } from "react"
-import { Link, useHistory } from "react-router-dom"
+import { useEffect, useRef, useState } from "react"
+import { Link, useHistory, useParams } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
 import { logout, useAuthDispatch, useAuthState } from "../context"
 import Header from "../components/Header"
+import client from "../api/client"
 
 const Profile = () => {
   const history = useHistory()
+  const params = useParams()
   const dispatch = useAuthDispatch()
   const authDetails = useAuthState()
+  const [loading, setLoading] = useState(true)
+  const [profileUser, setProfileUser] = useState(null)
+
   const handleLogout = () => {
     logout(dispatch)
     history.push("/login")
@@ -21,6 +26,16 @@ const Profile = () => {
   const handleClick = () => {
     inputEl.current.click()
   }
+
+  useEffect(() => {
+    async function fetchProfileUser() {
+      const res = await client.get(`members/${params.userId}`)
+      setProfileUser(res.data)
+      setLoading(false)
+    }
+    fetchProfileUser()
+    return () => {}
+  }, [params])
 
   return (
     <div className="min-h-full bg-gray-50">
@@ -41,21 +56,33 @@ const Profile = () => {
             />
           </div>
           <div className="grid gap-2 content-start">
-            <p className="font-medium">김병훈</p>
-            <p className="text-sm font-medium">figma@kakao.com</p>
+            <p className="font-medium">{loading ? "" : profileUser.name}</p>
+            <p className="text-sm font-medium">
+              {loading ? "" : profileUser.email}
+            </p>
           </div>
         </div>
         <div>
           <p className="mb-2 font-medium text-sm text-gray-700">핸드폰 번호</p>
-          <p className="pt-2 pb-3 px-2 border-b border-gray-300">01032943270</p>
+          <p className="pt-2 pb-3 px-2 border-b border-gray-300">
+            {loading ? "" : profileUser.phone}
+          </p>
         </div>
         <div>
           <p className="mb-2 font-medium text-sm text-gray-700">구분</p>
-          <p className="pt-2 pb-3 px-2 border-b border-gray-300">선생님</p>
+          <p className="pt-2 pb-3 px-2 border-b border-gray-300">
+            {loading
+              ? ""
+              : profileUser.auth === "ROLE_TEACHER"
+              ? "선생님"
+              : "학생"}
+          </p>
         </div>
-        <Link to="/profile/edit" className="text-blue-400 justify-self-end">
-          프로필 수정
-        </Link>
+        {+params.userId === +authDetails?.user?.id && (
+          <Link to="/profile/edit" className="text-blue-400 justify-self-end">
+            프로필 수정
+          </Link>
+        )}
       </div>
       <input
         type="file"

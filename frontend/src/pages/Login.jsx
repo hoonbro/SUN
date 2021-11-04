@@ -45,7 +45,7 @@ const Login = () => {
     console.log(user)
     if (user) {
       alert("임시: 로그인 성공")
-      history.push(`/profile/${user.email}`)
+      history.push(`/profile/${user.id}`)
     }
   }
 
