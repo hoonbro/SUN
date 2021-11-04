@@ -53,6 +53,12 @@ dependencies {
     // ilmin
     implementation group: 'com.google.guava', name: 'guava', version: '30.1.1-jre'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    // SSE
+    implementation("org.infinispan:infinispan-core:12.0.1.Final")
+    implementation("org.infinispan:infinispan-commons:12.0.1.Final")
+    implementation("org.infinispan:infinispan-marshaller-protostuff:12.0.1.Final")
+    implementation("org.jboss.marshalling:jboss-marshalling-osgi:2.0.10.Final")
 }
 
 test {
