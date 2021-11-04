@@ -33,10 +33,6 @@ public class ChatMessage {
     @Column(name = "file_id")
     private String file_id;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "file_id")
-//    private DBFile dbFile;
-
     @Builder
     public ChatMessage(String content, Long sender, ChatRoom chatRoom, LocalDateTime sentTime, String file_id) {
         this.content = content;
