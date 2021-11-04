@@ -15,7 +15,7 @@ const CalendarAddForm = () => {
 
   return (
     <form className="grid gap-2" onSubmit={handleSubmit}>
-      <div className="label_input">
+      <div className="form-field">
         <label htmlFor="calendar_code">캘린더 코드</label>
         <div className="input-wrapper">
           <input
