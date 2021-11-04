@@ -30,6 +30,19 @@ export const AuthReducer = (initialState, action) => {
         errorMessage: "",
       }
     }
+    case "TOKEN_REFRESH": {
+      console.group("TOKEN_REFRESH")
+      console.log(action.payload)
+      console.groupEnd()
+      return {
+        ...initialState,
+        token: {
+          ...initialState.token,
+          accessToken: action.payload.accessToken,
+        },
+        loading: false,
+      }
+    }
     case "LOGOUT": {
       return {
         ...initialState,
@@ -42,6 +55,13 @@ export const AuthReducer = (initialState, action) => {
         ...initialState,
         loading: false,
         errorMessage: action.error,
+      }
+    }
+    case "REFRESH_ERROR": {
+      return {
+        ...initialState,
+        user: null,
+        token: null,
       }
     }
     default: {

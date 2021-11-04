@@ -9,7 +9,7 @@ const InputFormField = ({ field, setField, handleBlur }) => {
   }
 
   return (
-    <div className="label_input">
+    <div className="form-field">
       <label htmlFor={field.key}>{field.label}</label>
       <div className="grid gap-1">
         <div className={`input-wrapper ${field.error && "error"}`}>
@@ -24,7 +24,7 @@ const InputFormField = ({ field, setField, handleBlur }) => {
           />
           {field.type === "password" && (
             <div
-              className="absolute top-2 right-2 cursor-pointer"
+              className="absolute top-2.5 right-2 cursor-pointer"
               onClick={() =>
                 setInputType((prev) => (prev === "text" ? "password" : "text"))
               }

@@ -18,19 +18,19 @@
 }
 
 @layer components {
-  .label_input {
+  .form-field {
     @apply grid gap-2;
   }
-  .label_input label {
+  .form-field label {
     @apply text-sm font-medium text-gray-700 place-self-start;
   }
-  .label_input .input-wrapper {
-    @apply relative border border-gray-300 rounded;
+  .form-field .input-wrapper {
+    @apply relative;
   }
-  .label_input .input-wrapper.error {
+  .form-field .input-wrapper.error {
     @apply border-red-500;
   }
-  .label_input .input-wrapper input {
-    @apply w-full py-2 px-4 rounded outline-none focus:ring;
+  .form-field .input-wrapper input {
+    @apply w-full border border-gray-300 rounded py-2 px-4 outline-none focus:ring;
   }
 }

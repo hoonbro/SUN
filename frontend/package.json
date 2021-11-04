@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.23.0",
     "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
     "react-big-calendar": "^0.38.0",
@@ -17,6 +18,7 @@
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3",
     "styled-components": "^5.3.3",
+    "uuid": "^8.3.2",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
@@ -50,5 +52,6 @@
     "autoprefixer": "^9.8.8",
     "postcss": "^7.0.39",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.17"
-  }
+  },
+  "proxy": "http://13.209.9.223:8080"
 }

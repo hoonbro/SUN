@@ -1,6 +1,6 @@
 import axios from "axios"
 
-const client = axios.create({ baseURL: "http://13.209.9.223:8080/api" })
+const client = axios.create({ baseURL: "/api" })
 
 export function applyToken(token) {
   client.defaults.headers.common["Authorization"] = `Bearer ${token}`

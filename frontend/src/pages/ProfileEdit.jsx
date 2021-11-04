@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { Link } from "react-router-dom"
 import client from "../api/client"
 import Button from "../components/Button"

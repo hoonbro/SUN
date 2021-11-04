@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from "react"
-import { Link, useHistory, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
-import { logout, useAuthDispatch, useAuthState } from "../context"
+import { useAuthState } from "../context"
 import Header from "../components/Header"
 import client from "../api/client"
 
 const Profile = () => {
-  const history = useHistory()
+  // const history = useHistory()
   const params = useParams()
-  const dispatch = useAuthDispatch()
+  // const dispatch = useAuthDispatch()
   const authDetails = useAuthState()
   const [loading, setLoading] = useState(true)
   const [profileUser, setProfileUser] = useState(null)
 
-  const handleLogout = () => {
-    logout(dispatch)
-    history.push("/login")
-  }
+  // const handleLogout = () => {
+  //   logout(dispatch)
+  //   history.push("/login")
+  // }
   const handleChangeFile = (e) => {
     console.log(e)
   }

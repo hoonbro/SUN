@@ -11,7 +11,7 @@ const LabelInput = ({
   const [inputType, setInputType] = useState(type)
 
   return (
-    <div className="label_input">
+    <div className="form-field">
       <label htmlFor={label}>{label}</label>
       <div className="input-wrapper">
         <input id={label} onChange={onChange} type={inputType} {...rest} />

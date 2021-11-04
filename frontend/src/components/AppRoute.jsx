@@ -15,7 +15,9 @@ const AppRoute = ({ component: Component, path, ...rest }) => {
         rest.requiresAuth && !auth.token?.accessToken ? (
           <Redirect to={{ pathname: "/" }} />
         ) : rest.requiresNoAuth && !!auth.token?.accessToken ? (
-          <Redirect to={{ pathname: `/calendars/1` }} />
+          <Redirect
+            to={{ pathname: `/calendars/${auth.user.defaultCalendar}` }}
+          />
         ) : (
           <Component {...props} />
         )
