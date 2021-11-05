@@ -6,7 +6,7 @@ let token = localStorage.getItem("currentUser")
   ? JSON.parse(localStorage.getItem("currentUser"))?.token
   : null
 
-export const initialState = {
+export const authInitialState = {
   user,
   token,
   loading: false,

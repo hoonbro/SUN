@@ -8,6 +8,9 @@ import { useHistory } from "react-router"
 
 const Login = () => {
   const history = useHistory()
+  // dispatch method 가져오기
+  const dispatch = useAuthDispatch()
+  const auth = useAuthState()
 
   const [memberId, setMemberId] = useState({
     key: "memberId",
@@ -25,10 +28,6 @@ const Login = () => {
     value: "",
     disabled: false,
   })
-
-  // dispatch method 가져오기
-  const dispatch = useAuthDispatch()
-  const auth = useAuthState()
 
   const isAllFill = memberId.value && password.value ? true : false
   const canSubmit = useMemo(() => {

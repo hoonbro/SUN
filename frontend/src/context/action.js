@@ -1,4 +1,4 @@
-import client, { applyToken } from "../api/client"
+import client from "../api/client"
 
 export const loginUser = async (dispatch, payload) => {
   try {
@@ -16,8 +16,8 @@ export const loginUser = async (dispatch, payload) => {
         token,
       })
     )
-    applyToken(token.accessToken)
-    return res.data.member
+    // applyToken(token.accessToken)
+    return Promise.resolve(res.data.member)
   } catch (error) {
     const { status } = error.response
     let errorMessage = "올바르지 않은 요청입니다"
@@ -67,7 +67,7 @@ export const silentRefresh = async (dispatch, payload) => {
       type: "TOKEN_REFRESH",
       payload: { accessToken: res.data?.data?.accessToken },
     })
-    applyToken(res.data?.data?.accessToken)
+    // applyToken(res.data?.data?.accessToken)
     const user = JSON.parse(localStorage.getItem("currentUser"))
     localStorage.setItem(
       "currentUser",

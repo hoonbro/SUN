@@ -1,26 +1,53 @@
-import { useRef } from "react"
-import { Link, useHistory } from "react-router-dom"
+import { useEffect, useRef, useState, useCallback } from "react"
+import { Link, useParams } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
-import { logout, useAuthDispatch, useAuthState } from "../context"
+import { useAuthState } from "../context"
 import Header from "../components/Header"
+import client from "../api/client"
 
 const Profile = () => {
-  const history = useHistory()
-  const dispatch = useAuthDispatch()
+  const params = useParams()
   const authDetails = useAuthState()
-  const handleLogout = () => {
-    logout(dispatch)
-    history.push("/login")
-  }
-  const handleChangeFile = (e) => {
+  const [loading, setLoading] = useState(true)
+  const [profileUser, setProfileUser] = useState(null)
+
+  const handleChangeFile = useCallback(async (e) => {
     console.log(e)
-  }
+    const files = e.target.files || e.dataTransfer.files
+    if (!files.length) {
+      return
+    }
+    const formData = new FormData()
+    formData.append("image", files[0])
+    try {
+      const res = await client.put("members/profile-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      const { url } = res.data
+      setProfileUser((prevState) => ({ ...prevState, profileImage: url }))
+    } catch (error) {
+      alert("이미지 변경에 실패했습니다")
+      console.log(error)
+    }
+  }, [])
 
   const inputEl = useRef(null)
 
   const handleClick = () => {
     inputEl.current.click()
   }
+
+  useEffect(() => {
+    async function fetchProfileUser() {
+      const res = await client.get(`members/${params.userId}`)
+      setProfileUser(res.data)
+      setLoading(false)
+    }
+    fetchProfileUser()
+    return () => {}
+  }, [params])
 
   return (
     <div className="min-h-full bg-gray-50">
@@ -41,21 +68,33 @@ const Profile = () => {
             />
           </div>
           <div className="grid gap-2 content-start">
-            <p className="font-medium">김병훈</p>
-            <p className="text-sm font-medium">figma@kakao.com</p>
+            <p className="font-medium">{loading ? "" : profileUser.name}</p>
+            <p className="text-sm font-medium">
+              {loading ? "" : profileUser.email}
+            </p>
           </div>
         </div>
         <div>
           <p className="mb-2 font-medium text-sm text-gray-700">핸드폰 번호</p>
-          <p className="pt-2 pb-3 px-2 border-b border-gray-300">01032943270</p>
+          <p className="pt-2 pb-3 px-2 border-b border-gray-300">
+            {loading ? "" : profileUser.phone}
+          </p>
         </div>
         <div>
           <p className="mb-2 font-medium text-sm text-gray-700">구분</p>
-          <p className="pt-2 pb-3 px-2 border-b border-gray-300">선생님</p>
+          <p className="pt-2 pb-3 px-2 border-b border-gray-300">
+            {loading
+              ? ""
+              : profileUser.auth === "ROLE_TEACHER"
+              ? "선생님"
+              : "학생"}
+          </p>
         </div>
-        <Link to="/profile/edit" className="text-blue-400 justify-self-end">
-          프로필 수정
-        </Link>
+        {+params.userId === +authDetails?.user?.id && (
+          <Link to="/profile/edit" className="text-blue-400 justify-self-end">
+            프로필 수정
+          </Link>
+        )}
       </div>
       <input
         type="file"

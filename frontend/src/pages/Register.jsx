@@ -4,7 +4,7 @@ import SubmitButton from "../components/ys/common/SubmitButton"
 import RadioFormField from "../components/ys/common/RadioFormField"
 import InputFormField from "../components/ys/common/InputFormField"
 import Header from "../components/Header"
-import client from "../api/client.js"
+// import client from "../api/client.js"
 import { useHistory } from "react-router"
 import auth from "../api/auth"
 
@@ -72,14 +72,6 @@ const Register = () => {
   }, [email])
 
   const canSubmit = useMemo(() => {
-    // console.log("isAllFill:", isAllFill)
-    // console.log("isMemberIdValid:", isMemberIdValid)
-    // console.log("isPasswordValid:", isPasswordValid)
-    // console.log("isPasswordConfirmValid:", isPasswordConfirmValid)
-    // console.log("isNameValid:", isNameValid)
-    // console.log("isPhoneValid:", isPhoneValid)
-    // console.log("isEmailValid:", isEmailValid)
-    // console.log("")
     return (
       isAllFill &&
       isPasswordValid &&

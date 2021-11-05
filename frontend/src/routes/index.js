@@ -44,7 +44,7 @@ const routes = [
     requiresAuth: true,
   },
   {
-    path: "/profile/:email",
+    path: "/profile/:userId",
     component: Profile,
     requiresAuth: true,
   },
