@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useCallback } from "react"
 import { Link, useParams } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
 import { useAuthState } from "../context"
@@ -6,20 +6,32 @@ import Header from "../components/Header"
 import client from "../api/client"
 
 const Profile = () => {
-  // const history = useHistory()
   const params = useParams()
-  // const dispatch = useAuthDispatch()
   const authDetails = useAuthState()
   const [loading, setLoading] = useState(true)
   const [profileUser, setProfileUser] = useState(null)
 
-  // const handleLogout = () => {
-  //   logout(dispatch)
-  //   history.push("/login")
-  // }
-  const handleChangeFile = (e) => {
+  const handleChangeFile = useCallback(async (e) => {
     console.log(e)
-  }
+    const files = e.target.files || e.dataTransfer.files
+    if (!files.length) {
+      return
+    }
+    const formData = new FormData()
+    formData.append("image", files[0])
+    try {
+      const res = await client.put("members/profile-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      const { url } = res.data
+      setProfileUser((prevState) => ({ ...prevState, profileImage: url }))
+    } catch (error) {
+      alert("이미지 변경에 실패했습니다")
+      console.log(error)
+    }
+  }, [])
 
   const inputEl = useRef(null)
 

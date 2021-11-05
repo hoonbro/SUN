@@ -72,14 +72,6 @@ const Register = () => {
   }, [email])
 
   const canSubmit = useMemo(() => {
-    // console.log("isAllFill:", isAllFill)
-    // console.log("isMemberIdValid:", isMemberIdValid)
-    // console.log("isPasswordValid:", isPasswordValid)
-    // console.log("isPasswordConfirmValid:", isPasswordConfirmValid)
-    // console.log("isNameValid:", isNameValid)
-    // console.log("isPhoneValid:", isPhoneValid)
-    // console.log("isEmailValid:", isEmailValid)
-    // console.log("")
     return (
       isAllFill &&
       isPasswordValid &&
