@@ -3,7 +3,7 @@ import ChatItem from "./ChatItem"
 import { ChatContext } from "../../../pages/EventDetail"
 
 const ChatListContainer = () => {
-  const { chatList } = useContext(ChatContext)
+  const { chatHistory, newChatList } = useContext(ChatContext)
   const chatListEl = useRef(null)
 
   useEffect(() => {
@@ -14,10 +14,13 @@ const ChatListContainer = () => {
     })
   })
 
+  console.log(chatHistory)
+  console.log(newChatList)
+
   return (
     <div className="overflow-y-scroll flex-1">
       <section className="pb-4 px-4 flex flex-col gap-1" ref={chatListEl}>
-        {chatList.map((item) => (
+        {chatHistory.map((item) => (
           <ChatItem chatItem={item} key={item.sentTime} />
         ))}
       </section>
