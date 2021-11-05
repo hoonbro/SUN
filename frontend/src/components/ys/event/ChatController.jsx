@@ -6,6 +6,7 @@ import { ChatContext } from "../../../pages/EventDetail"
 const ChatController = () => {
   const { auth, missionId, client } = useContext(ChatContext)
   const send = (content) => {
+    console.log(missionId)
     if (client.current.connected) {
       client.current.publish({
         destination: `/message/mission/${missionId}`,

@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useRef } from "react"
+import React, { useContext, useEffect, useMemo, useRef } from "react"
 import ChatItem from "./ChatItem"
 import { ChatContext } from "../../../pages/EventDetail"
 
 const ChatListContainer = () => {
-  const { chatHistory, newChatList } = useContext(ChatContext)
+  const { chatList } = useContext(ChatContext)
   const chatListEl = useRef(null)
 
   useEffect(() => {
@@ -14,13 +14,10 @@ const ChatListContainer = () => {
     })
   })
 
-  console.log(chatHistory)
-  console.log(newChatList)
-
   return (
     <div className="overflow-y-scroll flex-1">
       <section className="pb-4 px-4 flex flex-col gap-1" ref={chatListEl}>
-        {chatHistory.map((item) => (
+        {chatList.map((item) => (
           <ChatItem chatItem={item} key={item.sentTime} />
         ))}
       </section>

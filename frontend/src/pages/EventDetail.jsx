@@ -20,7 +20,7 @@ const EventDetail = () => {
   const [missionId, setMissionId] = useState(null)
   const [roomId, setRoomId] = useState(null)
 
-  const [chatHistory, setChatHistory] = useState([])
+  const [chatList, setChatList] = useState([])
   const [lastPage, setLastPage] = useState(null)
 
   const [newChatList, setNewChatList] = useState([])
@@ -32,15 +32,15 @@ const EventDetail = () => {
       setMissionId(roomInfo.mission_id)
       setRoomId(roomInfo.room_id)
       console.log(roomInfo.room_id)
+
       const chatHistoryData = await ChatAPI.getHistory(roomInfo.room_id)
       console.log(chatHistoryData)
       setLastPage(chatHistoryData.totalPages - 1)
-      setChatHistory([...chatHistoryData.content.reverse()])
+      setChatList([...chatHistoryData.content.reverse()])
 
       connect(roomInfo.room_id)
     }
     getChatInfo()
-
     return disconnect()
   }, [])
 
@@ -71,14 +71,12 @@ const EventDetail = () => {
 
   const subscribe = (roomId) => {
     client.current.subscribe(`/room/${roomId}`, (res) => {
-      setNewChatList([...newChatList, JSON.parse(res.body)])
+      setChatList((prev) => [...prev, JSON.parse(res.body)])
     })
   }
 
   return (
-    <ChatContext.Provider
-      value={{ auth, missionId, chatHistory, client, newChatList }}
-    >
+    <ChatContext.Provider value={{ auth, missionId, chatList, client }}>
       <div className="h-full flex flex-col">
         <Header
           pageTitle="(임시) Mom Loves Spot 읽기"
