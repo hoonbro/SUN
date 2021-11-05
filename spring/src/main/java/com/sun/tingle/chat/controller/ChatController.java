@@ -3,7 +3,6 @@ package com.sun.tingle.chat.controller;
 
 import com.sun.tingle.chat.dto.ChatMessageRequestDto;
 import com.sun.tingle.chat.dto.ChatMessageResponseDto;
-import com.sun.tingle.chat.dto.ChatRoomResponseDto;
 import com.sun.tingle.chat.dto.MemberChatRoomResponseDto;
 import com.sun.tingle.chat.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -17,15 +16,12 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RequiredArgsConstructor
 @RestController
+@CrossOrigin("*")
 @RequestMapping("/messages")
 public class ChatController {
     private final ChatService chatService;
@@ -45,5 +41,11 @@ public class ChatController {
     @GetMapping("/mission/{mid}")
     public ResponseEntity<MemberChatRoomResponseDto> getMemberChat(@PathVariable("mid") Long mid) throws Exception {
         return ResponseEntity.ok(chatService.getChatroomId(mid));
+    }
+
+    @MessageMapping("/mission/{mid}/file")
+    @SendTo("/room/{id}")
+    public void sendFile(@RequestParam("file") MultipartFile file, @DestinationVariable("mid") Long mid, @Header("Authorization") String token) throws Exception {
+        chatService.sendFile(file, token, mid);
     }
 }

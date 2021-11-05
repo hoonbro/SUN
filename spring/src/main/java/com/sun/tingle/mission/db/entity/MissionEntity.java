@@ -10,6 +10,7 @@ import org.hibernate.annotations.Columns;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -27,10 +28,14 @@ public class MissionEntity {
     private Long missionId;
     @Column(name="title")
     String title;
-    @Column(name="start")
-    String start;
-    @Column(name="end")
-    String end;
+    @Column(name="start_date")
+    Date startDate;
+    @Column(name="start_time")
+    String startTime;
+    @Column(name="end_date")
+    Date endDate;
+    @Column(name="end_time")
+    String endTime;
     @Column(name="tag")
     String tag;
     @Column(name="calendar_code")
@@ -45,11 +50,13 @@ public class MissionEntity {
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
     private List<TeacherFileEntity> teacherFileList = new ArrayList<>();
 
-    public MissionEntity(Long missionId, String title, String start, String end, String toString, String calendarCode, Long id) {
+    public MissionEntity(Long missionId, String title, Date startDate,String startTime, Date endDate,String endTime, String toString, String calendarCode, Long id) {
         this.missionId = missionId;
         this.title = title;
-        this.start = start;
-        this.end = end;
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.endDate = endDate;
+        this.endTime = endTime;
         this.tag = toString;
         this.calendarCode = calendarCode;
         this.id = id;

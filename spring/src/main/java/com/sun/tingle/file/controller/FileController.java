@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/file")
+@CrossOrigin("*")
 public class FileController {
 
     @Autowired
@@ -32,10 +33,29 @@ public class FileController {
     public ResponseEntity<MissionFileRpDto> missionFileUpload(HttpServletRequest request,@RequestParam("missionFile") MultipartFile file, @RequestParam("missionId") Long missionId ) throws IOException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-        MissionFileRpDto r = s3service.missionFileUpload(file,missionId,id);
-
-        return new ResponseEntity<MissionFileRpDto>(r,HttpStatus.OK);
+        MissionFileRpDto r = null;
+        try {
+             r = s3service.missionFileUpload(file,missionId,id);
+            return new ResponseEntity<MissionFileRpDto>(r,HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<MissionFileRpDto>(r,HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
+
+//    @PostMapping("/teacher")
+//    public ResponseEntity<List<TeacherFileRpDto>> teacherFileUpload(HttpServletRequest request,@RequestParam("teacherFile") MultipartFile[] file,@RequestParam("missionId") Long missionId) throws IOException {
+//        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+//        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+//        List<TeacherFileRpDto> list = new ArrayList<>();
+//        list = s3service.teacherFileUploads(file,missionId,id);
+//        return new ResponseEntity<List<TeacherFileRpDto>>(list,HttpStatus.CREATED);
+//    }
+
+
+
+
 
     @PostMapping("/test")
     public ResponseEntity<String> test(@RequestParam("missionFile") MultipartFile file,@RequestParam("missionId") Long missionId) throws IOException {

@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/calendar")
+@CrossOrigin("*")
 public class CalendarController {
 
     @Autowired
@@ -42,16 +43,23 @@ public class CalendarController {
     }
 
     @DeleteMapping("{calendarCode}")
-    public ResponseEntity<Void> deleteCalendar(@PathVariable("calendarCode") String calendarCode){
+    public ResponseEntity<Void> deleteCalendar(HttpServletRequest request,@PathVariable("calendarCode") String calendarCode){
         HttpStatus httpStatus = HttpStatus.NO_CONTENT;
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         try{
-            calendarService.deleteCalendar(calendarCode);
+            int result = calendarService.deleteCalendar(calendarCode,id);
+            if(result ==1) { // 캘린더 등록한 사람이 아니라서 권한 없을 때
+                return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
+            }
+            else {  // 삭제 완료
+                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+            }
         }
         catch (Exception e){
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             return new ResponseEntity<Void>(httpStatus);
         }
-        return new ResponseEntity<Void>(httpStatus);
     }
 
     @GetMapping("{calendarCode}")
@@ -66,10 +74,15 @@ public class CalendarController {
 
 
     @PutMapping("{calendarCode}")
-    public ResponseEntity<CalendarRpDto> updateCalendar(@PathVariable("calendarCode") String calendarCode,
+    public ResponseEntity<CalendarRpDto> updateCalendar(HttpServletRequest request,@PathVariable("calendarCode") String calendarCode,
                                                          @RequestBody Map<String,String> map) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         String calendarName = map.get("calendarName");
-        CalendarRpDto calendarRpDto = calendarService.updateCalendar(calendarCode,calendarName);
+        CalendarRpDto calendarRpDto = calendarService.updateCalendar(calendarCode,calendarName,id);
+        if(calendarRpDto == null) {
+            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.UNAUTHORIZED);
+        }
         return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
