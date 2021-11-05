@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Title</title>
+  </head>
+  <body>
+    <input id = "connectId"/>
+    <button id="connect">연결</button>
+
+    <input id="input" />
+    <button id="send">send</button>
+
+    <pre id="messages"></pre>
+    <script>
+      // const id = 12;
+      let eventSource = null;
+
+      document.querySelector("#connect").addEventListener("click", () => {
+        eventSource = new EventSource(`/api/notification/subscribe/` + `${document.querySelector("#connectId").value}`);
+        eventSource.onopen = (e) => {
+          console.log(e);
+        };
+
+        eventSource.onerror = (e) => {
+          console.log(e);
+        };
+
+        eventSource.onmessage = (e) => {
+          console.log(e.data);
+          // document.querySelector("#messages").appendChild(document.createTextNode(e.data + "\n"));
+        };
+
+        eventSource.addEventListener(`${document.querySelector("#connectId").value}` , function (event) {
+          console.log(event);
+        })
+      });
+
+      // const eventSource = new EventSource(`/api/notification/subscribe/` + id);
+
+
+
+      document.querySelector("#send").addEventListener("click", () => {
+
+        fetch("/api/members/invite",
+                {
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization' : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjA3NDk0OX0.tDj6Pzfi-MFq4A_KRtKczoa17lEtaHndEgJ3sxYAUx0"
+                  },
+                  method: "POST",
+                  body: JSON.stringify({calendarCode: `${Math.random()}`, inviteeEmail: `${document.querySelector("#input").value}`})
+
+                })
+      });
+
+    </script>
+  </body>
+</html>

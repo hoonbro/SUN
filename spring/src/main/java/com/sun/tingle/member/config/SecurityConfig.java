@@ -3,6 +3,7 @@ import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.auth.JwtAuthenticationFilter;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.member.util.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +22,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 //Controller에서 특정 페이지에 특정 권한이 있는 유저만 접근을 허용할 경우 @PreAuthorize 어노테이션을 사용하는데
 //해당 어노테이션에 대한 설정을 활성화시키는 어노테이션.
 @EnableGlobalMethodSecurity(prePostEnabled = true)
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    MemberService memberService;
- 
-    @Autowired
-    JwtUtil jwtUtil;
-
-    @Autowired
-    RedisUtil redisUtil;
+    private final JwtUtil jwtUtil;
     // Password 인코딩 방식에 BCrypt 암호화 방식 사용
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -54,8 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("**/messages/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("**/message/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("**/chat/**").hasAnyRole("TEACHER","STUDENT")
-                .anyRequest().authenticated()
-
+//                .antMatchers("/").authenticated()
+                .anyRequest().permitAll()
                 .and().cors();
     }
 

@@ -29,8 +29,6 @@ public class KafkaReceiverService {
 
     @KafkaListener(id = "main-listener", topics = "kafka-chat")
     public void receive(ChatMessageResponseDto message) throws Exception {
-//        MemberEntity member = memberRepository.getById(message.getSender());
-//        System.out.println("Hereee12222" + member);
         LOGGER.info("message='{}'", message);
         HashMap<String, String> msg = new HashMap<>();
         msg.put("sentTime", message.getSentTime().format(DateTimeFormatter.ISO_DATE_TIME));
