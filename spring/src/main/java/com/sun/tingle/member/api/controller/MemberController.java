@@ -1,12 +1,15 @@
 package com.sun.tingle.member.api.controller;
 
+import com.sun.tingle.member.api.dto.TokenInfo;
+import com.sun.tingle.member.api.dto.request.InviteReqDto;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.api.service.MemberService;
+import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.util.JwtUtil;
+import com.sun.tingle.notification.api.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +27,11 @@ import java.util.Map;
 @RequiredArgsConstructor
 @CrossOrigin("*")
 public class MemberController {
-    @Autowired
-    MemberService memberService;
+    private final MemberService memberService;
 
-    @Autowired
-    JwtUtil jwtUtil;
+    private final NotificationService notificationService;
+
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberResDto> getMemberInfo(@PathVariable Long id){
@@ -110,5 +113,18 @@ public class MemberController {
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         memberService.changePassword(id, memberReqDto.getPassword());
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping("/invite")
+    public ResponseEntity<?> invite(HttpServletRequest request, @RequestBody InviteReqDto inviteReqDto){
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        log.info("토큰" + token);
+        TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
+
+        MemberEntity memberEntity = memberService.getMemberByEmail(inviteReqDto.getInviteeEmail());
+
+        notificationService.sendInvite(tokenInfo, inviteReqDto.getCalendarCode(), memberEntity.getId());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

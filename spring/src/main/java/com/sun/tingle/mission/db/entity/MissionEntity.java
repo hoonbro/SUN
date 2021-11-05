@@ -4,6 +4,7 @@ package com.sun.tingle.mission.db.entity;
 import com.sun.tingle.calendar.db.entity.ShareCalendarEntity;
 import com.sun.tingle.file.db.entity.MissionFileEntity;
 import com.sun.tingle.file.db.entity.TeacherFileEntity;
+import com.sun.tingle.notification.db.entity.NotificationEntity;
 import lombok.*;
 import org.hibernate.annotations.Columns;
 
@@ -37,7 +38,6 @@ public class MissionEntity {
 
     @Column(name="id")
     Long id;
-
 
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
     private List<MissionFileEntity> missionFileList = new ArrayList<>();
