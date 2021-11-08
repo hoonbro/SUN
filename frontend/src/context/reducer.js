@@ -13,6 +13,52 @@ export const authInitialState = {
   errorMessage: "",
 }
 
+export const calendarInitialState = {
+  myCalendar: [],
+  shareCalendar: [],
+  currentCalendarCode: "",
+}
+
+export const CalendarReducer = (initialState, action) => {
+  console.log(initialState)
+  console.log(action)
+  switch (action.type) {
+    case "SET_CALENDAR": {
+      console.log(action)
+      return {
+        ...initialState,
+        ...action.payload,
+      }
+    }
+    case "ADD_CALENDAR": {
+      return {
+        ...initialState,
+        myCalendar: [...initialState.myCalendar, { ...action.payload }],
+      }
+    }
+    case "EDIT_CALENDAR": {
+      const calendar = { ...action.payload }
+      const myCalendar = initialState.myCalendar.map((c) => {
+        if (c.calendarCode === calendar.calendarCode) {
+          return calendar
+        }
+        return c
+      })
+      return {
+        ...initialState,
+        myCalendar,
+      }
+    }
+    case "SET_CURRENT_CALENDAR": {
+      const currentCalendarCode = action.payload
+      return {
+        ...initialState,
+        currentCalendarCode,
+      }
+    }
+  }
+}
+
 export const AuthReducer = (initialState, action) => {
   switch (action.type) {
     case "REQUEST_LOGIN": {

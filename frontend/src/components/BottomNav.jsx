@@ -16,7 +16,7 @@ const BottomNav = () => {
   return (
     <>
       {auth.token?.accessToken && (
-        <nav className="fixed bottom-0 left-0 w-full px-6 py-2 flex items-center justify-between border border-t border-gray-200 rounded-t-xl bg-white">
+        <nav className="sticky bottom-0 left-0 w-full px-6 py-2 flex items-center justify-between border border-t border-gray-200 rounded-t-xl bg-white">
           <Link
             key="캘린더"
             to={`/calendars/${auth?.user.defaultCalendar}`}

@@ -12,19 +12,14 @@ import "../static/calendar.css"
 import "react-big-calendar/lib/addons/dragAndDrop/styles.scss"
 import CalendarAside from "../components/calendar/CalendarAside"
 import client from "../api/client"
+import {
+  getAllCalendar,
+  useCalendarDispatch,
+  useCalendarState,
+} from "../context"
 
 const DragAndDropCalendar = withDragAndDrop(Calendar)
 const localizer = momentLocalizer(moment)
-
-const DUMMY_EVENTS = [
-  {
-    title: "하나",
-    allDay: false,
-    start: new Date(2021, 9, 6, 10, 0),
-    end: new Date(2021, 9, 9, 10, 0),
-    id: "10",
-  },
-]
 
 const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
   const events = [
@@ -110,9 +105,11 @@ const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
 }
 
 const MyCalendar = () => {
+  const calendarState = useCalendarState()
+  const calendarDispatch = useCalendarDispatch()
   const { params: routeParams } = useRouteMatch()
   const [selectedDate, setSelectedDate] = useState(null)
-  const [events, setEvents] = useState(DUMMY_EVENTS)
+  const [events, setEvents] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
   const [asideOpen, setAsideOpen] = useState(false)
   const [calendarInfo, setCalendarInfo] = useState({
@@ -179,9 +176,10 @@ const MyCalendar = () => {
     async function asyncEffect() {
       await getCalendarInfo()
       await getEvents()
+      await getAllCalendar(calendarDispatch)
     }
     asyncEffect()
-  }, [getCalendarInfo, getEvents])
+  }, [getCalendarInfo, getEvents, calendarDispatch])
 
   return (
     <div className="relative flex flex-col h-full pb-10">

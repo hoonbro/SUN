@@ -4,10 +4,11 @@ import { MdExpandMore, MdExpandLess } from "react-icons/md"
 import { useEffect, useState } from "react"
 import CalendarAddForm from "./CalendarAddForm"
 import client from "../../api/client"
+import { useCalendarState } from "../../context"
 
 const CalendarListItem = ({
-  name = "캘린더 이름",
-  code = "캘린더 코드",
+  calendarName = "캘린더 이름",
+  calendarCode = "캘린더 코드",
   active = false,
 }) => {
   const [codeOpen, setCodeOpen] = useState(false)
@@ -20,7 +21,7 @@ const CalendarListItem = ({
     >
       <div className="flex items-center justify-between">
         <button className={`${active && "font-bold text-orange-500"}`}>
-          {name}
+          {calendarName}
         </button>
         <button className="flex" onClick={() => setCodeOpen(!codeOpen)}>
           {codeOpen ? <MdExpandLess size={20} /> : <MdExpandMore size={20} />}
@@ -28,7 +29,7 @@ const CalendarListItem = ({
       </div>
       <div className="flex items-center justify-between text-sm ">
         <span>캘린더코드</span>
-        <span className="text-gray-600">{code}</span>
+        <span className="text-gray-600">{calendarCode}</span>
       </div>
     </div>
   )
@@ -36,14 +37,15 @@ const CalendarListItem = ({
 
 const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
   const { calendarCode } = useParams()
+  const calendarState = useCalendarState()
   console.log(calendarCode)
-  useEffect(() => {
-    async function asyncEffect() {
-      const res = await client.get(`calendar/every/calendars`)
-      console.log(res.data)
-    }
-    asyncEffect()
-  }, [])
+  // useEffect(() => {
+  //   async function asyncEffect() {
+  //     const res = await client.get(`calendar/every/calendars`)
+  //     console.log(res.data)
+  //   }
+  //   asyncEffect()
+  // }, [])
 
   return (
     <>
@@ -66,9 +68,23 @@ const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
             </Link>
           </header>
           <div className="grid gap-2">
-            <CalendarListItem name="남아리 학생의 캘린더" code="Dfaqe" active />
-            <CalendarListItem name="죠르디 학생의 캘린더" code="Dfaqe" />
-            <CalendarListItem name="앙몬드 학생의 캘린더" code="Dfaqe" />
+            {[...calendarState.myCalendar, ...calendarState.shareCalendar].map(
+              (calendar) => (
+                <CalendarListItem
+                  {...calendar}
+                  key={calendar.calendarCode}
+                  active
+                />
+              )
+            )}
+            <CalendarListItem
+              calendarName="죠르디 학생의 캘린더"
+              calendarCode="Dfaqe"
+            />
+            <CalendarListItem
+              calendarName="앙몬드 학생의 캘린더"
+              calendarCode="Dfaqe"
+            />
           </div>
         </section>
         <hr />

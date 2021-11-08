@@ -3,14 +3,22 @@ import { Link } from "react-router-dom"
 import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
-import { loginUser, useAuthDispatch, useAuthState } from "../context"
+import {
+  getAllCalendar,
+  loginUser,
+  setCurrentCalendar,
+  useAuthDispatch,
+  useAuthState,
+  useCalendarDispatch,
+} from "../context"
 import { useHistory } from "react-router"
 
 const Login = () => {
   const history = useHistory()
   // dispatch method 가져오기
-  const dispatch = useAuthDispatch()
-  const auth = useAuthState()
+  const authDispatch = useAuthDispatch()
+  const authState = useAuthState()
+  const calendarDispatch = useCalendarDispatch()
 
   const [memberId, setMemberId] = useState({
     key: "memberId",
@@ -39,9 +47,11 @@ const Login = () => {
       memberId: memberId.value,
       password: password.value,
     }
-    const user = await loginUser(dispatch, reqForm)
+    const user = await loginUser(authDispatch, reqForm)
     if (user) {
+      await getAllCalendar(calendarDispatch)
       history.push(`/calendars/${user.defaultCalendar}`)
+      setCurrentCalendar(calendarDispatch, user.defaultCalendar)
       alert("임시: 로그인 성공")
       return
     }
@@ -56,7 +66,7 @@ const Login = () => {
           <InputFormField field={memberId} setField={setMemberId} />
           <InputFormField field={password} setField={setPassword} />
         </div>
-        {auth.errorMessage}
+        {authState.errorMessage}
         <div className="grid gap-4">
           <SubmitButton disabled={!canSubmit} handleButtonClick={handleLogin}>
             로그인
