@@ -167,7 +167,7 @@ public class CalendarController {
     public ResponseEntity<Void> testings(HttpServletRequest request,@RequestBody NotifyChangeRqDto notifyChangeRqDto) {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
-        notificationService.sendNotifyChange(tokenInfo,notifyChangeRqDto.getCalendarCode(),notifyChangeRqDto.getType(), notifyChangeRqDto.getMissionId());
+        notificationService.sendNotifyChange(tokenInfo.getId(),notifyChangeRqDto.getCalendarCode(),notifyChangeRqDto.getType(), notifyChangeRqDto.getMissionId());
 
         return new ResponseEntity<Void>(HttpStatus.OK);
     }
