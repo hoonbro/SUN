@@ -9,10 +9,6 @@ import com.sun.tingle.chat.entity.ChatRoom;
 import com.sun.tingle.chat.repository.ChatMessageRepository;
 import com.sun.tingle.chat.repository.ChatRoomRepository;
 import com.sun.tingle.chat.util.SecurityUtil;
-import com.sun.tingle.file.db.entity.MissionFileEntity;
-import com.sun.tingle.file.db.repo.MissionFileRepository;
-import com.sun.tingle.file.responsedto.MissionFileRpDto;
-import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
 import com.sun.tingle.member.util.JwtUtil;
@@ -22,13 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -40,9 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChatService {
     @Autowired
     private KafkaSenderService kafkaSenderService;
-
-    @Autowired
-    private S3service s3service;
 
     @Autowired
     private KafkaReceiverService kafkaReceiverService;
@@ -60,6 +49,7 @@ public class ChatService {
     @Transactional
     public void sendMessage(ChatMessageRequestDto chatMessageRequestDto, String token, Long mid) {
         Long userid = tokenProvider.getIdFromJwt(token);
+//        MemberEntity user = memberRepository.findById(userid).orElseThrow(() -> new NullPointerException("잘못된 사용자 토큰입니다!"));
         MissionEntity missionEntity = missionRepository.findById(mid).orElseThrow(() -> new NullPointerException("존재하지 않는 mission입니다!"));
         String roomid = getRoomId(mid);
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
@@ -113,35 +103,5 @@ public class ChatService {
     private String getRoomId(Long mid) {
         String roomid = Long.toString(mid);
         return roomid;
-    }
-
-    @Transactional
-    public void sendFile(MultipartFile file, String token, Long mid) throws IOException {
-        Long id = tokenProvider.getIdFromJwt(token);
-        MissionEntity missionEntity = missionRepository.findById(mid).orElseThrow(() -> new NullPointerException("존재하지 않는 mission입니다!"));
-        String roomid = getRoomId(mid);
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
-        ChatMessage message;
-
-        MissionFileRpDto r = s3service.missionFileUpload(file, mid, id);
-        if (chatRoom.isEmpty()) {
-            ChatRoom inner_chatroom = createChatRoom(roomid, missionEntity);
-            chatRoomRepository.save(inner_chatroom);
-            message = ChatMessage.builder()
-                    .sender(id)
-                    .sentTime(LocalDateTime.now())
-                    .chatRoom(inner_chatroom)
-                    .file_id(r.getFileUuid())
-                    .build();
-        } else {
-            message = ChatMessage.builder()
-                    .sender(id)
-                    .sentTime(LocalDateTime.now())
-                    .chatRoom(chatRoom.get())
-                    .file_id(r.getFileUuid())
-                    .build();
-        }
-        ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
-        kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
     }
 }

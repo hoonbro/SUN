@@ -22,10 +22,9 @@ public class ChatMessageResponseDto {
     private String nickname;
     private LocalDateTime sentTime;
     private String room_id;
-    private String fileName;
-    private String auth;
 
     public static ChatMessageResponseDto of(MemberRepository memberRepository, ChatMessage chatMessage) {
+//        MemberRepository memberRepository;
         MemberEntity memberEntity = memberRepository.getById(chatMessage.getSender());
         return ChatMessageResponseDto.builder()
                 .content(chatMessage.getContent())
@@ -34,8 +33,24 @@ public class ChatMessageResponseDto {
                 .sender_id(memberEntity.getId())
                 .sentTime(chatMessage.getSentTime())
                 .room_id(chatMessage.getChatRoom().getId())
-                .fileName(chatMessage.getFile_id())
-                .auth(memberEntity.getAuth())
                 .build();
+//        return ChatMessageResponseDto.builder()
+//                .room_id(chatMessage.getChatRoom().getId())
+//                .content(chatMessage.getContent())
+//                .nickname(chatMessage.getSender().getName())
+//                .pic_uri(chatMessage.getSender().getProfileImage())
+//                .sender_id(chatMessage.getSender().getId())
+//                .sentTime(chatMessage.getSentTime())
+//                .build();
     }
+
+//    @Builder
+//    public ChatMessageResponseDto(String content, Long sender_id, String pic_uri, String nickname, LocalDateTime sentTime, String room_id) {
+//        this.content = content;
+//        this.sender_id = sender_id;
+//        this.pic_uri = pic_uri;
+//        this.nickname = nickname;
+//        this.sentTime = sentTime;
+//        this.room_id = room_id;
+//    }
 }
