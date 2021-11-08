@@ -46,6 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/calendar/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("/mission/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("/file/**").hasAnyRole("TEACHER","STUDENT")
+//                .antMatchers("/notification/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("**/messages/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("**/message/**").hasAnyRole("TEACHER","STUDENT")
                 .antMatchers("**/chat/**").hasAnyRole("TEACHER","STUDENT")
