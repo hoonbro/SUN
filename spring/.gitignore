@@ -5,6 +5,8 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+**/application.properties
+
 
 ### STS ###
 .apt_generated
@@ -17,6 +19,8 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+
+
 
 ### IntelliJ IDEA ###
 .idea

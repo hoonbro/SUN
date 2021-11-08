@@ -5,6 +5,7 @@ import com.sun.tingle.calendar.db.entity.ShareCalendarEntity;
 import com.sun.tingle.calendar.db.repo.CalendarRepository;
 import com.sun.tingle.calendar.db.repo.ShareCalendarRepository;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
+import com.sun.tingle.file.service.S3service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,14 +21,14 @@ public class CalendarServiceImpl implements CalendarService{
 
     @Autowired
     ShareCalendarRepository shareCalendarRepository;
+
+    @Autowired
+    S3service s3service;
+
     @Override
     public CalendarRpDto insertCalendar(String calendarCode,String calendarName,long id) {
 
-        CalendarEntity calendarEntity = calendarRepository.findByCalendarName(calendarName);
-        if(calendarEntity != null) {
-            return null;
-        }
-        calendarEntity = new CalendarEntity();
+        CalendarEntity calendarEntity = new CalendarEntity();
         calendarEntity.setCalendarCode(calendarCode);
         calendarEntity.setCalendarName(calendarName);
         calendarEntity.setId(id);
@@ -47,8 +48,12 @@ public class CalendarServiceImpl implements CalendarService{
     }
 
     @Override
-    public CalendarRpDto updateCalendar(String calendarCode,String calendarName) {
+    public CalendarRpDto updateCalendar(String calendarCode,String calendarName,Long id) {
+
         CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(calendarCode);
+        if(calendarEntity.getId() != id) {
+            return null;
+        }
         calendarEntity.setCalendarName(calendarName);
         calendarEntity=calendarRepository.save(calendarEntity);
     //        CalendarRpDto calendarRpDto = buildCalendar(calendarEntity);
@@ -57,8 +62,14 @@ public class CalendarServiceImpl implements CalendarService{
     }
 
     @Override
-    public void deleteCalendar(String calendarCode) {
+    public int deleteCalendar(String calendarCode,Long id) {
+        CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(calendarCode);
+        if(calendarEntity.getId() != id) { // 등록한 사람아닐 때 권한 x
+            return 1;
+        }
         calendarRepository.deleteById(calendarCode);
+        s3service.s3CalendarDelete(calendarCode);
+        return 2;
     }
 
 
@@ -143,5 +154,21 @@ public class CalendarServiceImpl implements CalendarService{
             list2.add(calendarRpDto);
         }
         return list2;
+    }
+
+    @Override
+    public String getRandomSentence() {
+        String randomValue = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+        int len = randomValue.length();
+        StringBuilder sb = new StringBuilder();
+
+        for(int i=0; i<10; i++) {
+            int idx = (int)(len * Math.random());
+
+            sb.append(randomValue.charAt(idx));
+        }
+
+
+        return sb.toString();
     }
 }

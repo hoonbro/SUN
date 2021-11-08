@@ -1,14 +1,24 @@
 package com.sun.tingle.mission.service;
 
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.calendar.db.repo.CalendarRepository;
+import com.sun.tingle.file.db.entity.TeacherFileEntity;
+import com.sun.tingle.file.db.repo.TeacherFileRepository;
+import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
 import com.sun.tingle.mission.responsedto.MissionRpDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -16,44 +26,69 @@ public class MissionServiceImpl implements MissionService {
     @Autowired
     MissionRepository missionRepository;
 
+    @Autowired
+    TeacherFileRepository teacherFileRepository;
+    @Autowired
+    CalendarRepository calendarRepository;
 
+    @Autowired
+    S3service s3service;
 
     @Override
-    public MissionRpDto insertMission(MissionRqDto missionRqDto) {
-        MissionEntity missionEntity = missionRepository.findByMissionName(missionRqDto.getMissionName());
-        if(missionEntity != null) { // 이미 같은 미션 이름 있을 때
+    public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException, ParseException {
+        CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(missionRqDto.getCalendarCode());
+        if(calendarEntity.getId() != missionRqDto.getId()) {
             return null;
         }
 
-        missionEntity = new MissionEntity();
-        missionEntity.setMissionName(missionRqDto.getMissionName());
-        missionEntity.setStartDate(missionRqDto.getStartDate());
-        missionEntity.setEndDate(missionRqDto.getEndDate());
+
+
+        MissionEntity missionEntity = new MissionEntity();
+        missionEntity.setTitle(missionRqDto.getTitle());
+        missionEntity.setStartDate(stringToDate(missionRqDto.getStart().split("T")[0]));
+        missionEntity.setStartTime(missionRqDto.getStart().split("T")[1]);
+        missionEntity.setEndDate(stringToDate(missionRqDto.getEnd().split("T")[0]));
+        missionEntity.setEndTime(missionRqDto.getEnd().split("T")[1]);
         missionEntity.setCalendarCode(missionRqDto.getCalendarCode());
+        missionEntity.setId(missionRqDto.getId());
         List<String> list = missionRqDto.getTag();
         StringBuilder sb = new StringBuilder();
-        int size = list.size();
-
+        int size = (list !=null) ? list.size():0;
+        System.out.println(missionEntity.toString());
         for(int i=0; i<size; i++) {
-            sb.append("#").append(list.get(i));
+            String temp = list.get(i);
+            sb.append("&@&").append(temp); // 있는 그대로 넣기
         }
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
 
-        MissionRpDto missionRpDto = new MissionRpDto();
-        String[] tagArr = missionEntity.getTag().split("#");
+
+        String[] tagArr = missionEntity.getTag().split("&@&");
+        System.out.println(tagArr.toString());
         list = new ArrayList<>();
         size = tagArr.length;
         for(int i=1; i<size; i++) {
             list.add(tagArr[i]);
+            System.out.println(tagArr[i]);
         }
 
+        if(teacherFile != null) {
+            s3service.teacherFileUploads(teacherFile,missionEntity.getMissionId(),missionEntity.getId());
+        }
+        MissionRpDto missionRpDto = new MissionRpDto();
+
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
-                .tag(list).missionName(missionEntity.getMissionName())
+                .tag(list).title(missionEntity.getTitle())
                 .calendarCode(missionEntity.getCalendarCode())
-                .startDate(missionEntity.getStartDate())
-                .endDate(missionEntity.getEndDate())
+                .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
+                .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
+                .id(missionEntity.getId())
+//                .teacherFileList(missionEntity.getTeacherFileList()) 따로 조회
+//                .missionFileList(missionEntity.getMissionFileList()) 따로 조회
                 .build();
+
+
+
 
         return missionRpDto;
     }
@@ -62,7 +97,7 @@ public class MissionServiceImpl implements MissionService {
     public MissionRpDto selectMission(Long missionId) {
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
         MissionRpDto missionRpDto = new MissionRpDto();
-        String[] tagArr = missionEntity.getTag().split("#");
+        String[] tagArr = missionEntity.getTag().split("&@&");
         List<String> list = new ArrayList<>();
         int size = tagArr.length;
         for(int i=1; i<size; i++) {
@@ -70,11 +105,13 @@ public class MissionServiceImpl implements MissionService {
         }
 
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
-                .tag(list).missionName(missionEntity.getMissionName())
+                .tag(list).title(missionEntity.getTitle())
                 .calendarCode(missionEntity.getCalendarCode())
-                .startDate(missionEntity.getStartDate())
-                .endDate(missionEntity.getEndDate())
-                .build();
+                .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
+                .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
+                .id(missionEntity.getId())
+                 .missionFileList(missionEntity.getMissionFileList()).
+                teacherFileList(missionEntity.getTeacherFileList()).build();
 
 
 
@@ -83,43 +120,74 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto) {
+    public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException, ParseException {
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
-        if(missionEntity == null) {
+        if(missionEntity == null) { //미션이 없을 때
             return null;
         }
 
+        MissionRpDto missionRpDto = new MissionRpDto();
+        if(missionEntity.getId() != missionRqDto.getId()) { // 권한 없을 때
+            return missionRpDto;
+        }
+
+        List<TeacherFileEntity> list2 = teacherFileRepository.findByMissionId(missionId);
+        int file_size = (list2 != null) ? list2.size():0;
+
+        for(int i=0; i<file_size; i++) { // 업데이트전 db 파일 삭제
+             Long fileId = list2.get(i).getFileId();
+             teacherFileRepository.deleteById(fileId);
+             s3service.deleteTeacherFile(list2.get(i).fileUuid,list2.get(i).getId());
+        }
+
+        if(teacherFile != null) {
+            s3service.teacherFileUploads(teacherFile,missionId,missionRqDto.getId());
+        }
+
+
+
+
         List<String> list = missionRqDto.getTag();
-        int size = list.size();
+        int size = (list != null) ? list.size():0;
         StringBuilder sb = new StringBuilder();
 
         for(int i=0; i<size; i++) {
-            sb.append("#").append(list.get(i));
-        }
-        missionEntity = new MissionEntity();
 
-        missionEntity = missionEntity.builder().missionId(missionId).missionName(missionRqDto.getMissionName())
-                .startDate(missionRqDto.getStartDate())
-                .endDate(missionRqDto.getEndDate())
-                .tag(sb.toString()).calendarCode(missionRqDto.getCalendarCode())
-                .build();
+            sb.append("&@&").append(list.get(i));
+        }
+
+        missionEntity = new MissionEntity(missionId,missionRqDto.getTitle(),stringToDate(missionRqDto.getStart().split("T")[0]),
+                        missionRqDto.getStart().split("T")[1],
+                stringToDate(missionRqDto.getEnd().split("T")[0]),missionRqDto.getEnd().split("T")[1],
+                sb.toString(),missionRqDto.getCalendarCode(),missionRqDto.getId());
+
 
         missionEntity = missionRepository.save(missionEntity);
 
-        MissionRpDto missionRpDto = new MissionRpDto();
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
-                .missionName(missionEntity.getMissionName())
-                .startDate(missionEntity.getStartDate())
-                .endDate(missionEntity.getEndDate())
+                .title(missionEntity.getTitle())
+                .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
+                .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
                 .tag(missionRqDto.getTag()).
-                calendarCode(missionEntity.getCalendarCode()).build();
+                id(missionEntity.getId()).
+                calendarCode(missionEntity.getCalendarCode()).
+//                missionFileList(missionEntity.getMissionFileList()).
+//                teacherFileList(missionEntity.getTeacherFileList()).
+                build();
 
         return missionRpDto;
     }
 
     @Override
-    public void deleteMission(Long missionId) {
-        missionRepository.deleteById(missionId);
+    public int deleteMission(Long missionId,Long id) {
+        int result = 0;
+        MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
+        if(missionEntity.getId() == id) {
+            s3service.s3MissionDelete(missionId);
+            missionRepository.deleteById(missionId);
+            result = 1;
+        }
+        return result;
     }
 
     @Override
@@ -127,6 +195,19 @@ public class MissionServiceImpl implements MissionService {
         List<MissionEntity> list = missionRepository.findByCalendarCode(calendarCode);
         if(list == null) {
             return null;
+        }
+        List<MissionRpDto> list2 = builderMissionList(list);
+
+        return list2;
+    }
+
+    @Override
+    public List<MissionRpDto> selectDateMissionList(String missionDate) throws ParseException {
+        Date mDate = stringToDate(missionDate);
+
+        List<MissionEntity> list = missionRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(mDate,mDate);
+        if(list == null || list.size() ==0) {
+            System.out.println("널이야?");
         }
         List<MissionRpDto> list2 = builderMissionList(list);
 
@@ -142,21 +223,40 @@ public class MissionServiceImpl implements MissionService {
         List<String> tags = null;
         for(int i=0; i<size; i++) {
             m = list.get(i);
-            String[] temp = m.getTag().split("#");
+            String[] temp = m.getTag().split("&@&");
             tags = new ArrayList<>();
             for(int j=0;j<temp.length;j++) {
                 tags.add(temp[j]);
             }
             missionRpDto = missionRpDto.builder().calendarCode(m.getCalendarCode())
                     .missionId(m.getMissionId())
-                    .missionName(m.getMissionName())
-                    .endDate(m.getEndDate())
-                    .startDate(m.getStartDate())
+                    .title(m.getTitle())
+                    .end(dateToString(m.getEndDate())+"T"+m.getEndTime())
+                    .start(dateToString(m.getStartDate())+"T"+m.getStartTime())
                     .tag(tags)
+                    .id(m.getId())
+                    .missionFileList(m.getMissionFileList())
+                    .teacherFileList(m.getTeacherFileList())
                     .build();
             list2.add(missionRpDto);
         }
 
         return list2;
     }
+
+
+    public Date stringToDate(String dateA) throws ParseException {
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date sToDate = transFormat.parse(dateA);
+        return sToDate;
+
+    }
+
+    public String dateToString(Date d) {
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dToString = transFormat.format(d);
+        return dToString;
+
+    }
+
 }
