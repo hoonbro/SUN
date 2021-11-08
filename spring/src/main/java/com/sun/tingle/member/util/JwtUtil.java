@@ -4,6 +4,7 @@ import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.auth.UserAuthDetail;
 import com.sun.tingle.member.db.entity.MemberEntity;
+import com.sun.tingle.member.db.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,16 @@ import java.util.Date;
 @Slf4j
 @Component
 public class JwtUtil{
-    private static String SECRET_KEY;
-    public static long EXPIRE_TIME;
-    public static long REFRESH_TIME;
-    MemberService memberService;
+    private final String SECRET_KEY;
+    public final long EXPIRE_TIME;
+    public final long REFRESH_TIME;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    public JwtUtil(@Value("${jwt.secret}") String SECRET_KEY, @Value("${jwt.expiration}") long EXPIRE_TIME, @Value("${jwt.refresh}") long REFRESH_TIME, MemberService memberService) {
+    public JwtUtil(@Value("${jwt.secret}") String SECRET_KEY, @Value("${jwt.expiration}") long EXPIRE_TIME, @Value("${jwt.refresh}") long REFRESH_TIME, MemberRepository memberRepository) {
         this.SECRET_KEY = SECRET_KEY;
         this.EXPIRE_TIME = EXPIRE_TIME;
         this.REFRESH_TIME = REFRESH_TIME;
-        this.memberService = memberService;
+        this.memberRepository = memberRepository;
 
     }
 
@@ -80,14 +80,14 @@ public class JwtUtil{
 //        return getClaims(jwt).getBody().get("name", String.class);
 //    }
 
-    public static boolean validateToken(String jwt){
+    public boolean validateToken(String jwt){
         return getClaims(jwt) != null;
     }
 
     // 인증 성공시 SecurityContextHolder에 저장할 Authentication 객체 생성
     public Authentication getAuthentication(String token){
         Long id = this.getIdFromJwt(token);
-        MemberEntity memberEntity = memberService.getMemberById(id).get();
+        MemberEntity memberEntity = memberRepository.findById(id).get();
         if(memberEntity != null) {
             UserAuthDetail userAuthDetail = new UserAuthDetail(memberEntity);
             UsernamePasswordAuthenticationToken jwtAuthentication = new UsernamePasswordAuthenticationToken(id,
@@ -101,7 +101,7 @@ public class JwtUtil{
     //claims : 속성 정보(?), 권한 집합
     //JWT는 속성 정보 (Claim)를 JSON 데이터 구조로 표현한 토큰
     //Jwt토큰 유효성 검증 메서드
-    private static Jws<Claims> getClaims(String jwt){
+    private Jws<Claims> getClaims(String jwt){
         try{
             return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwt);
         }catch (SignatureException ex) { // 기존 서명을 확인하지 못했을 때
