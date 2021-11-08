@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState, useRef, useReducer } from "react"
 import { useRouteMatch } from "react-router"
 import Header from "../components/Header"
 import ChatController from "../components/ys/event/ChatController"
@@ -13,36 +13,61 @@ import { useAuthState } from "../context"
 
 export const ChatContext = React.createContext({})
 
+const chatReducer = (state, action) => {
+  switch (action.type) {
+    case "HISTORY":
+      return {
+        chatList: [...action.payload.reverse(), ...state.chatList],
+        status: "history",
+      }
+    case "NEW_MESSAGE":
+      return {
+        chatList: [...state.chatList, action.payload],
+        status: "new_message",
+      }
+  }
+}
+
 const EventDetail = () => {
   const auth = useAuthState()
+
   const { eventId } = useRouteMatch().params
 
   const [missionId, setMissionId] = useState(null)
   const [roomId, setRoomId] = useState(null)
 
-  const [chatList, setChatList] = useState([])
+  const [chatState, dispatch] = useReducer(chatReducer, {
+    chatList: [],
+    status: null,
+  })
   const [lastPage, setLastPage] = useState(null)
-
-  const [newChatList, setNewChatList] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
+  const sizePerPage = 15
 
   useEffect(() => {
     const getChatInfo = async () => {
-      console.log(eventId)
       const roomInfo = await ChatAPI.getChatRoomInfo(eventId)
       setMissionId(roomInfo.mission_id)
       setRoomId(roomInfo.room_id)
-      console.log(roomInfo.room_id)
 
-      const chatHistoryData = await ChatAPI.getHistory(roomInfo.room_id)
-      console.log(chatHistoryData)
-      setLastPage(chatHistoryData.totalPages - 1)
-      setChatList([...chatHistoryData.content.reverse()])
-
+      getHistory(roomInfo.room_id)
       connect(roomInfo.room_id)
     }
     getChatInfo()
     return disconnect()
   }, [])
+
+  const getHistory = async (roomId) => {
+    const chatHistoryData = await ChatAPI.getHistory(
+      roomId,
+      currentPage,
+      sizePerPage
+    )
+    setCurrentPage((prev) => prev + 1)
+    console.log(chatHistoryData)
+    setLastPage(chatHistoryData.totalPages)
+    dispatch({ type: "HISTORY", payload: chatHistoryData.content })
+  }
 
   const client = useRef({})
 
@@ -71,12 +96,26 @@ const EventDetail = () => {
 
   const subscribe = (roomId) => {
     client.current.subscribe(`/room/${roomId}`, (res) => {
-      setChatList((prev) => [...prev, JSON.parse(res.body)])
+      console.log(JSON.parse(res.body))
+      dispatch({ type: "NEW_MESSAGE", payload: JSON.parse(res.body) })
     })
   }
 
   return (
-    <ChatContext.Provider value={{ auth, missionId, chatList, client }}>
+    <ChatContext.Provider
+      value={{
+        auth,
+        missionId,
+        roomId,
+        chatList: chatState.chatList,
+        chatStatus: chatState.status,
+        client,
+        getHistory,
+        lastPage,
+        currentPage,
+        sizePerPage,
+      }}
+    >
       <div className="h-full flex flex-col">
         <Header
           pageTitle="(임시) Mom Loves Spot 읽기"

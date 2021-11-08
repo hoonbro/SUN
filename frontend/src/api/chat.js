@@ -2,27 +2,17 @@ import client from "./client"
 
 const getChatRoomInfo = async (missionId) => {
   try {
-    const res = await client.get(`/messages/mission/${missionId}`, {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("currentUser")).token.accessToken
-        }`,
-      },
-    })
+    const res = await client.get(`/messages/mission/${missionId}`)
     return res.data
   } catch (error) {
     console.log(error.response)
   }
 }
 
-const getHistory = async (roomId) => {
+const getHistory = async (roomId, currentPage, sizePerPage) => {
   try {
     const res = await client.get(`/messages/chatroom/${roomId}`, {
-      headers: {
-        Authorization: `Bearer ${
-          JSON.parse(localStorage.getItem("currentUser")).token.accessToken
-        }`,
-      },
+      params: { page: currentPage, size: sizePerPage },
     })
     return res.data
   } catch (error) {

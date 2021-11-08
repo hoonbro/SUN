@@ -1,9 +1,10 @@
-import React from "react"
+import React, { useContext } from "react"
+import { ChatContext } from "../../../pages/EventDetail"
 
 const ChatItem = ({ chatItem, exChatItem = null }) => {
-  const myName = "홍길동"
-  const isMe = myName === chatItem.nickname
+  const { id: myId } = useContext(ChatContext)["auth"]["user"]
 
+  const isMe = myId === Number(chatItem.sender_id)
   const isContinue = exChatItem && chatItem.nickname === exChatItem.nickname
 
   const contentBorderColor =
@@ -24,7 +25,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
           <img
             src={
               chatItem.pic_uri ||
-              require("../../../assets/images/test-profile-img.png")
+              require("../../../assets/images/test-profile-img.png").default
             }
             alt="사진"
             className="rounded-full w-10 h-10"
@@ -34,7 +35,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
               {chatItem.nickname}{" "}
               {chatItem.auth === "ROLE_TEACHER" && <span>선생님</span>}
             </p>
-            <p className="text-gray-500 text-sm">어제, 오후 06:01</p>
+            <p className="text-gray-500 text-sm">{chatItem.sentTime}</p>
           </div>
         </div>
       )}
