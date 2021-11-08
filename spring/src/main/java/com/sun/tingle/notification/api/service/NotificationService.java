@@ -1,12 +1,12 @@
 package com.sun.tingle.notification.api.service;
 
 import com.sun.tingle.member.api.dto.TokenInfo;
-import com.sun.tingle.member.api.dto.response.InviteResDto;
+import com.sun.tingle.mission.db.entity.MissionEntity;
+import com.sun.tingle.mission.db.repo.MissionRepository;
 import com.sun.tingle.notification.db.entity.NotificationEntity;
 import com.sun.tingle.notification.db.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jgroups.blocks.cs.Client;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -24,8 +24,9 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    private final MissionRepository missionRepository;
+
     public SseEmitter subscribe(Long userId) {
-        log.info("구독 됐다");
         //lastEventId를 구분하기 위해 id+밀리초
         String id = userId + "_" + System.currentTimeMillis();
 
@@ -43,12 +44,22 @@ public class NotificationService {
         return emitter;
     }
 
+    public SseEmitter subscribe2(String calendarCode) {
+        String calendarCode2 = calendarCode + "_" + System.currentTimeMillis();
+        // EventStream 생성 후 10분 경과시 제거
+        // 클라이언트는 연결 종료 인지 후 EventStream 자동 재생성 요청
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        CLIENTS.put(calendarCode2, emitter);
+        emitter.onTimeout(() -> CLIENTS.remove(calendarCode2));
+        emitter.onCompletion(() -> CLIENTS.remove(calendarCode2));
+        // 503 에러를 방지하기 위한 더미 이벤트 전송
+        sendToClient(emitter, calendarCode, "EventStream Created. [calendarCode=" + calendarCode + "]");
+
+        return emitter;
+    }
+
     public void sendInvite(TokenInfo sender, String calendarCode, Long inviteeId) {
 //        SseEmitter sseEmitter = CLIENTS.get(inviteeId);
-        InviteResDto inviteResDto = InviteResDto.builder()
-                .calenderCode(calendarCode)
-                .senderName(sender.getName())
-                .build();
 
         //디비 저장
         Date now = new Date();
@@ -61,17 +72,38 @@ public class NotificationService {
                 .sendTime(now)
                 .build();
 
-        notificationRepository.save(notificationEntity);
+        notificationEntity = notificationRepository.save(notificationEntity);
 
         for(Map.Entry<String, SseEmitter> entry : CLIENTS.entrySet()){
             if(entry.getKey().contains(String.valueOf(inviteeId))){
                 log.info(entry.getKey() + " " + entry.getValue());
-                sendToClient(entry.getValue(), String.valueOf(inviteeId), inviteResDto);
+                sendToClient(entry.getValue(), String.valueOf(inviteeId), notificationEntity);
             }
         }
 
 
 //        sendToClient(sseEmitter, String.valueOf(inviteeId), calendarCode);
+    }
+
+    public void sendNotifyChange(TokenInfo sender,String calendarCode,String type, Long missionId) {
+        Date now = new Date();
+        MissionEntity m = missionRepository.findByMissionId(missionId);
+        NotificationEntity notificationEntity = NotificationEntity.builder()
+                .type(type)
+                .calendarCode(calendarCode)
+                .senderId(sender.getId())
+                .sendDate(now)
+                .sendTime(now)
+                .missionEntity(m)
+                .build();
+
+        notificationEntity = notificationRepository.save(notificationEntity);
+        for(Map.Entry<String, SseEmitter> entry : CLIENTS.entrySet()){
+            if(entry.getKey().contains(calendarCode)){
+                log.info(entry.getKey() + " " + entry.getValue());
+                sendToClient(entry.getValue(), calendarCode, notificationEntity);
+            }
+        }
     }
 
     private void sendToClient(SseEmitter emitter, String id, Object data) {
@@ -88,7 +120,20 @@ public class NotificationService {
                 deadIds.add(id);
                 log.warn("disconnected id : {}", id);
         }
-
         deadIds.forEach(CLIENTS::remove);
+    }
+
+    public NotificationEntity getNotification(Long id){
+        return notificationRepository.findById(id).orElseThrow(NoSuchElementException::new);
+    }
+
+    public List<NotificationEntity> getNotifications(Long id){
+        return notificationRepository.findALLByReceiverId(id).orElseThrow(NoSuchElementException::new);
+    }
+
+    public void deleteNotification(Long notificationId){
+        notificationRepository.delete(
+                notificationRepository.findById(notificationId).orElseThrow(NoSuchElementException::new)
+        );
     }
 }
