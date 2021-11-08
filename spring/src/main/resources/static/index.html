@@ -21,7 +21,7 @@
     <pre id="messages"></pre>
     <script>
       // const id = 12;
-      const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjM0ODMwMX0.cqapgDbtEGqr2fZTclVsNjwlwKu-AEjCejQlyfvlE8U"
+      const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6NCwiZW1haWwiOiIxMjIyMkBuYXZlci5jb20iLCJuYW1lIjoibWoiLCJleHAiOjE2MzYzNTU1Mjl9.xRpEapqplQ1KQ-0AAWUtfhPuYr30rrGOCiLbdDFk3zY"
       document.querySelector("#connect").addEventListener("click", () => {
         const eventSource = new EventSource(`/api/notification/subscribe/${document.querySelector("#connectId").value}`);
 
@@ -96,7 +96,7 @@
                     'Authorization' : token
                   },
                   method: "POST",
-                  body: JSON.stringify({calendarCode: "xmnZop2x6p", type: `${document.querySelector("#issueInput").value}`,missionId:1})
+                  body: JSON.stringify({calendarCode: "xmnZop2x6p", type: `${document.querySelector("#issueInput").value}`,missionId:25})
 
                 })
       });
