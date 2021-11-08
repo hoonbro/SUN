@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
     public Optional<List<NotificationEntity>> findALLByReceiverId(Long receiverId);
+    public List<NotificationEntity> findByMissionId(Long missionId);
 
 }

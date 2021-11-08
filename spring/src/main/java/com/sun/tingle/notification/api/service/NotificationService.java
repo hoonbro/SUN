@@ -71,15 +71,16 @@ public class NotificationService {
 //        sendToClient(sseEmitter, String.valueOf(inviteeId), calendarCode);
     }
 
-    public void sendNotifyChange(TokenInfo sender,String calendarCode,String type, Long missionId) {
+    public void sendNotifyChange(Long id,String calendarCode,String type, Long missionId) {
         Date now = new Date();
         MissionEntity m = missionRepository.findByMissionId(missionId);
         NotificationEntity notificationEntity = NotificationEntity.builder()
                 .type(type)
                 .calendarCode(calendarCode)
-                .senderId(sender.getId())
+                .senderId(id)
                 .sendDate(now)
                 .sendTime(now)
+                .isCheck(false)
                 .missionEntity(m)
                 .build();
 

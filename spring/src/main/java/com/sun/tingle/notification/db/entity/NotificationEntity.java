@@ -9,14 +9,15 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
+//@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicUpdate
-@DynamicInsert
+//@DynamicUpdate
+//@DynamicInsert
 @Builder
 @Getter
+@Setter
 @Table(name = "notification")
 public class NotificationEntity {
     @Id
@@ -42,6 +43,7 @@ public class NotificationEntity {
     @Temporal(TemporalType.DATE)
     Date sendDate;
 
-    @ManyToOne @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
     private MissionEntity missionEntity;
 }
