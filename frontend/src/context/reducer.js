@@ -110,6 +110,12 @@ export const AuthReducer = (initialState, action) => {
         token: null,
       }
     }
+    case "UPDATE_PROFILE": {
+      return {
+        ...initialState,
+        user: action.payload,
+      }
+    }
     default: {
       throw new Error(`핸들링되지 않은 에러 ${action.type}`)
     }

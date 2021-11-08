@@ -1,4 +1,27 @@
 import client from "../api/client"
+import memberAPI from "../api/member"
+
+export const updateProfile = async (dispatch, formData) => {
+  try {
+    const profileRes = await memberAPI.updateProfile(formData)
+    const user = { ...profileRes }
+    const token = JSON.parse(localStorage.getItem("currentUser"))?.token
+    dispatch({
+      type: "UPDATE_PROFILE",
+      payload: { ...profileRes },
+    })
+    localStorage.setItem(
+      "currentUser",
+      JSON.stringify({
+        user,
+        token,
+      })
+    )
+    return user
+  } catch (error) {
+    alert("업데이트 에러")
+  }
+}
 
 export const loginUser = async (dispatch, payload) => {
   try {

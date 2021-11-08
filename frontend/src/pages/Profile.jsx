@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useHistory } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
 import { useAuthState } from "../context"
 import Header from "../components/Header"
@@ -8,6 +8,7 @@ import client from "../api/client"
 const Profile = () => {
   const params = useParams()
   const authDetails = useAuthState()
+  const history = useHistory()
   const [loading, setLoading] = useState(true)
   const [profileUser, setProfileUser] = useState(null)
 
@@ -39,7 +40,9 @@ const Profile = () => {
     inputEl.current.click()
   }
 
-  const profileImage = useMemo(() => {})
+  const profileImage = useMemo(() => {
+    return `https://d101s.s3.ap-northeast-2.amazonaws.com/${profileUser?.profileImage}`
+  }, [profileUser])
 
   useEffect(() => {
     async function fetchProfileUser() {
@@ -53,7 +56,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-full bg-gray-50 flex flex-col">
-      <Header pageTitle="프로필" to="/" />
+      <Header pageTitle="프로필" handleGoBack={() => history.goBack()} />
       <div className="py-10 h-full flex-1">
         <div className="container max-w-xl bg-white p-6 grid gap-6 select-none xs:rounded-xl xs:shadow-lg">
           <div className="flex gap-4">
@@ -65,7 +68,9 @@ const Profile = () => {
                 <MdAddPhotoAlternate size={24} />
               </button>
               <img
-                src="https://picsum.photos/seed/picsum/200/200"
+                src={
+                  profileImage || "https://picsum.photos/seed/picsum/200/200"
+                }
                 className="object-cover h-full w-full"
                 alt=""
               />
