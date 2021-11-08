@@ -37,7 +37,6 @@ const EventForm = ({ onSubmit = (f) => f }) => {
   }
 
   const handleChangeFileInput = (e) => {
-    console.log(e)
     const { files } = e.target
     if (!files.length) return
     const newFiles = {}

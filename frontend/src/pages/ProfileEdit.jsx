@@ -1,6 +1,4 @@
-import { useCallback, useEffect } from "react"
 import { Link, useHistory } from "react-router-dom"
-import memberAPI from "../api/member"
 import Button from "../components/Button"
 import Header from "../components/Header"
 import LabelInput from "../components/LabelInput"
@@ -39,7 +37,6 @@ const ProfileEdit = () => {
       phone: phone.value,
       email: email.value,
     })
-    console.log(res)
     if (res) {
       history.replace(`/profile/${authState.user.id}`)
     }

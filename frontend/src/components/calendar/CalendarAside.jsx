@@ -37,7 +37,6 @@ const CalendarListItem = ({
 const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
   const { calendarCode } = useParams()
   const calendarState = useCalendarState()
-  console.log(calendarCode)
 
   return (
     <>

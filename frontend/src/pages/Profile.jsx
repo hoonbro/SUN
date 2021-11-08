@@ -13,7 +13,6 @@ const Profile = () => {
   const [profileUser, setProfileUser] = useState(null)
 
   const handleChangeFile = useCallback(async (e) => {
-    console.log(e)
     const files = e.target.files || e.dataTransfer.files
     if (!files.length) {
       return

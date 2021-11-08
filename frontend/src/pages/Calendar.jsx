@@ -3,7 +3,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
 import moment from "moment"
 import "moment/locale/ko"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Link, useRouteMatch, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { MdClose, MdSwapHoriz, MdAdd } from "react-icons/md"
 import Modal from "../components/modal/Modal"
 import EventListItem from "../components/EventListItem"
@@ -14,8 +14,8 @@ import CalendarAside from "../components/calendar/CalendarAside"
 import client from "../api/client"
 import {
   getAllCalendar,
+  setCurrentCalendar,
   useCalendarDispatch,
-  useCalendarState,
 } from "../context"
 
 const DragAndDropCalendar = withDragAndDrop(Calendar)
@@ -119,8 +119,6 @@ const MyCalendar = () => {
 
   const handleSelectSlot = (slotInfo) => {
     setSelectedDate(slotInfo.slots[0])
-    console.log(slotInfo)
-    console.log(moment(slotInfo.slots[0]).format("YYYY-MM-DD"))
     setModalOpen(true)
   }
 
@@ -166,7 +164,6 @@ const MyCalendar = () => {
       const res = await client.get(`mission/${calendarCode}`)
       setEvents([...res.data])
     } catch (error) {
-      console.log("getEvents")
       console.log(error)
     }
   }, [calendarCode])
@@ -180,7 +177,8 @@ const MyCalendar = () => {
     setModalOpen(false)
     setAsideOpen(false)
     asyncEffect()
-  }, [getCalendarInfo, getEvents, calendarDispatch])
+    setCurrentCalendar(calendarDispatch, calendarCode)
+  }, [getCalendarInfo, getEvents, calendarDispatch, calendarCode])
 
   return (
     <div className="relative flex flex-col h-full pb-10">

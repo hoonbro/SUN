@@ -8,7 +8,6 @@ import useInputs from "../hooks/useInputs"
 
 const CalendarCreate = () => {
   const history = useHistory()
-  console.log(history)
   const calendarDispatch = useCalendarDispatch()
   const [fields, handleChange] = useInputs({
     calendar: {
@@ -25,7 +24,6 @@ const CalendarCreate = () => {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault()
-      console.log(fields.calendar.value)
       if (fields.calendar.value.length === 0) {
         alert("캘린더 이름을 입력해야 합니다")
         return

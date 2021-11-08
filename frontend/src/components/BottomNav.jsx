@@ -11,8 +11,6 @@ const BottomNav = () => {
     history.push("/login")
   }
 
-  console.log(auth)
-
   return (
     <>
       {auth.token?.accessToken && (

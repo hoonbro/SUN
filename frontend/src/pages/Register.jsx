@@ -182,14 +182,10 @@ const Register = () => {
       email: email.value,
       auth: teacherOrStudent,
     }
-    console.log(reqForm)
     try {
-      // const res = await client.post(`/members`, reqForm)
-      const res = await auth.register(reqForm)
-      console.log(res)
+      await auth.register(reqForm)
       history.push({ pathname: "/login" })
     } catch (error) {
-      console.log(error.response)
       const { status } = error.response
       switch (status) {
         case 409: {

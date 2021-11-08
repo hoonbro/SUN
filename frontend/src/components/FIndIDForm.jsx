@@ -21,7 +21,6 @@ const FindIDForm = () => {
 
   const handleSubmit = (e, email) => {
     e.preventDefault()
-    console.log(email)
   }
 
   return (

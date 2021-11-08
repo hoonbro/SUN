@@ -10,7 +10,6 @@ const CalendarEdit = () => {
   const history = useHistory()
   const { calendarCode } = useParams()
   const calendarDispatch = useCalendarDispatch()
-  console.log(calendarCode)
   const [fields, handleChange] = useInputs({
     calendar: {
       value: "",
@@ -26,12 +25,10 @@ const CalendarEdit = () => {
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault()
-      console.log(fields.calendar.value)
       const calendarRes = await calendarAPI.editCalendar({
         calendarCode,
         calendarName: fields.calendar.value,
       })
-      console.log(calendarRes)
       editCalendar(calendarDispatch, calendarRes)
       history.push("/calendars/setting")
     },

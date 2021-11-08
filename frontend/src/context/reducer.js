@@ -20,11 +20,8 @@ export const calendarInitialState = {
 }
 
 export const CalendarReducer = (initialState, action) => {
-  console.log(initialState)
-  console.log(action)
   switch (action.type) {
     case "SET_CALENDAR": {
-      console.log(action)
       return {
         ...initialState,
         ...action.payload,
@@ -77,9 +74,6 @@ export const AuthReducer = (initialState, action) => {
       }
     }
     case "TOKEN_REFRESH": {
-      console.group("TOKEN_REFRESH")
-      console.log(action.payload)
-      console.groupEnd()
       return {
         ...initialState,
         token: {

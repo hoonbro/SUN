@@ -81,7 +81,6 @@ export const silentRefresh = async (dispatch, refreshToken) => {
     return
   }
   try {
-    console.log(refreshToken)
     const res = await client.get("/auth/reissue", {
       headers: {
         refreshToken,
@@ -143,4 +142,9 @@ export const setCurrentCalendar = (dispatch, currentCalendarCode) => {
     type: "SET_CURRENT_CALENDAR",
     payload: currentCalendarCode,
   })
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"))
+  localStorage.setItem(
+    "currentUser",
+    JSON.stringify({ ...currentUser, currentCalendarCode })
+  )
 }
