@@ -5,19 +5,26 @@
     <title>Title</title>
   </head>
   <body>
+
     <input id = "connectId"/>
     <button id="connect">연결</button>
 
     <input id="input" />
     <button id="send">send</button>
 
+
+    <input id = "connectCalendarCode"/>
+    <button id = "connectCalendar">캘린더 연결</button>
+
+    <input id = "issueInput" />
+    <button id = "issueSend">미션 이슈 변경(수정,삭제,생성)</button>
     <pre id="messages"></pre>
     <script>
       // const id = 12;
-      let eventSource = null;
 
       document.querySelector("#connect").addEventListener("click", () => {
-        eventSource = new EventSource(`/api/notification/subscribe/` + `${document.querySelector("#connectId").value}`);
+        const eventSource = new EventSource(`/api/notification/subscribe/${document.querySelector("#connectId").value}`);
+
         eventSource.onopen = (e) => {
           console.log(e);
         };
@@ -47,10 +54,49 @@
                   headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization' : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjA3NDk0OX0.tDj6Pzfi-MFq4A_KRtKczoa17lEtaHndEgJ3sxYAUx0"
+                    'Authorization' : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjM0MDM5NX0.iifQAeCQjHwPBbo3abNiGvkV7AzOUHCgDm7nvZfFQJc"
                   },
                   method: "POST",
                   body: JSON.stringify({calendarCode: `${Math.random()}`, inviteeEmail: `${document.querySelector("#input").value}`})
+
+                })
+      });
+
+      //////////////////////////////////////// 캘린더별 알림////////////////////////
+      document.querySelector("#connectCalendar").addEventListener("click", () => {
+        eventSource = new EventSource(`/api/notification/subscribe/calendar/` + `${document.querySelector("#connectCalendarCode").value}`);
+        eventSource.onopen = (e) => {
+          console.log(e);
+        };
+
+        eventSource.onerror = (e) => {
+          console.log(e);
+        };
+
+        eventSource.onmessage = (e) => {
+          console.log(e.data);
+          // document.querySelector("#messages").appendChild(document.createTextNode(e.data + "\n"));
+        };
+
+        eventSource.addEventListener(`${document.querySelector("#connectCalendarCode").value}` , function (event) {
+          console.log(event);
+        })
+
+      });
+
+
+      // 이슈변경 사항 전송
+      document.querySelector("#issueSend").addEventListener("click", () => {
+
+        fetch("/api/calendar/notifyChange",
+                {
+                  headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization' : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjM0MDM5NX0.iifQAeCQjHwPBbo3abNiGvkV7AzOUHCgDm7nvZfFQJc"
+                  },
+                  method: "POST",
+                  body: JSON.stringify({calendarCode: "xmnZop2x6p", type: `${document.querySelector("#issueInput").value}`,missionId:1})
 
                 })
       });
