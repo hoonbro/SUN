@@ -1,6 +1,5 @@
 package com.sun.tingle.member.api.service;
 
-import com.sun.tingle.calendar.db.entity.CalendarEntity;
 import com.sun.tingle.calendar.db.repo.CalendarRepository;
 import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.file.service.S3service;
@@ -11,9 +10,8 @@ import com.sun.tingle.member.db.repository.MemberRepository;
 import com.sun.tingle.member.db.repository.TokenRepository;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.member.util.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,32 +23,15 @@ import java.util.Optional;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
-    @Autowired
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    TokenRepository tokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    CalendarRepository calendarRepository;
+    private final S3service s3service;
 
-    @Autowired
-    CalendarService calendarService;
-
-    @Lazy
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    S3service s3service;
-
-    @Lazy
-    @Autowired
-    JwtUtil jwtUtil;
-
-    @Autowired
-    RedisUtil redisUtil;
+    private final RedisUtil redisUtil;
 
     @Override
     public MemberResDto getMemberInfo(Long id) {

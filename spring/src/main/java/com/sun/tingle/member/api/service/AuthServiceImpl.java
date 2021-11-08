@@ -11,6 +11,7 @@ import com.sun.tingle.member.db.repository.MemberRepository;
 import com.sun.tingle.member.db.repository.TokenRepository;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.member.util.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -24,27 +25,19 @@ import java.util.Map;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService{
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    MemberRepository memberRepository;
+    private final MemberRepository memberRepository;
 
-    @Autowired
-    TokenRepository tokenRepository;
+    private final MemberService memberService;
 
-    @Autowired
-    MemberService memberService;
+    private final CalendarService calendarService;
 
-    @Autowired
-    CalendarService calendarService;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    JwtUtil jwtUtil;
-
-    @Autowired
-    RedisUtil redisUtil;
+    private final RedisUtil redisUtil;
 
     @Override
     @Transactional
