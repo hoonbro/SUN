@@ -26,9 +26,9 @@ public class NotificationService {
 
     private final MissionRepository missionRepository;
 
-    public SseEmitter subscribe(Long userId) {
+    public SseEmitter subscribe(String Separator) {
         //lastEventId를 구분하기 위해 id+밀리초
-        String id = userId + "_" + System.currentTimeMillis();
+        String id = Separator + "_" + System.currentTimeMillis();
 
         // EventStream 생성 후 10분 경과시 제거
         // 클라이언트는 연결 종료 인지 후 EventStream 자동 재생성 요청
@@ -39,21 +39,7 @@ public class NotificationService {
         emitter.onCompletion(() -> CLIENTS.remove(id));
 
         // 503 에러를 방지하기 위한 더미 이벤트 전송
-        sendToClient(emitter, String.valueOf(userId), "EventStream Created. [userId=" + id + "]");
-
-        return emitter;
-    }
-
-    public SseEmitter subscribe2(String calendarCode) {
-        String calendarCode2 = calendarCode + "_" + System.currentTimeMillis();
-        // EventStream 생성 후 10분 경과시 제거
-        // 클라이언트는 연결 종료 인지 후 EventStream 자동 재생성 요청
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
-        CLIENTS.put(calendarCode2, emitter);
-        emitter.onTimeout(() -> CLIENTS.remove(calendarCode2));
-        emitter.onCompletion(() -> CLIENTS.remove(calendarCode2));
-        // 503 에러를 방지하기 위한 더미 이벤트 전송
-        sendToClient(emitter, calendarCode, "EventStream Created. [calendarCode=" + calendarCode + "]");
+        sendToClient(emitter, String.valueOf(Separator), "EventStream Created. [userId=" + id + "]");
 
         return emitter;
     }

@@ -28,11 +28,11 @@ public class NotificationController {
 
     @GetMapping(value = "/subscribe/{id}")
     public SseEmitter subscribe(@PathVariable Long id) {
-        return notificationService.subscribe(id);
+        return notificationService.subscribe(String.valueOf(id));
     }
 
     @GetMapping(value= "/subscribe/calendar/{calendarCode}")
-    public SseEmitter subscribe2(@PathVariable("calendarCode") String calendarCode){ return notificationService.subscribe2(calendarCode); }
+    public SseEmitter subscribe2(@PathVariable("calendarCode") String calendarCode){ return notificationService.subscribe(calendarCode); }
 
     @GetMapping
     public ResponseEntity<?> getNotifications(HttpServletRequest request) {
