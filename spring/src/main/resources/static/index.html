@@ -21,7 +21,7 @@
     <pre id="messages"></pre>
     <script>
       // const id = 12;
-
+      const token = "Bearer " + "eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjM0ODMwMX0.cqapgDbtEGqr2fZTclVsNjwlwKu-AEjCejQlyfvlE8U"
       document.querySelector("#connect").addEventListener("click", () => {
         const eventSource = new EventSource(`/api/notification/subscribe/${document.querySelector("#connectId").value}`);
 
@@ -54,7 +54,7 @@
                   headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization' : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjM0MDM5NX0.iifQAeCQjHwPBbo3abNiGvkV7AzOUHCgDm7nvZfFQJc"
+                    'Authorization' : token
                   },
                   method: "POST",
                   body: JSON.stringify({calendarCode: `${Math.random()}`, inviteeEmail: `${document.querySelector("#input").value}`})
@@ -64,7 +64,7 @@
 
       //////////////////////////////////////// 캘린더별 알림////////////////////////
       document.querySelector("#connectCalendar").addEventListener("click", () => {
-        eventSource = new EventSource(`/api/notification/subscribe/calendar/` + `${document.querySelector("#connectCalendarCode").value}`);
+        const eventSource = new EventSource(`/api/notification/subscribe/calendar/` + `${document.querySelector("#connectCalendarCode").value}`);
         eventSource.onopen = (e) => {
           console.log(e);
         };
@@ -93,7 +93,7 @@
                   headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json',
-                    'Authorization' : "Bearer eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJ0aW5nbGUiLCJpZCI6MSwiZW1haWwiOiJ3bGduczE1ODhAbmF2ZXIuY29tIiwibmFtZSI6ImppaG9vbiIsImV4cCI6MTYzNjM0MDM5NX0.iifQAeCQjHwPBbo3abNiGvkV7AzOUHCgDm7nvZfFQJc"
+                    'Authorization' : token
                   },
                   method: "POST",
                   body: JSON.stringify({calendarCode: "xmnZop2x6p", type: `${document.querySelector("#issueInput").value}`,missionId:1})

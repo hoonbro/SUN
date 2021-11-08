@@ -1,6 +1,6 @@
 package com.sun.tingle.member.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
@@ -9,9 +9,9 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class RedisUtil {
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
 
     public String getData(String key){
         ValueOperations<String,String> valueOperations = stringRedisTemplate.opsForValue();
