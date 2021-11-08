@@ -44,9 +44,6 @@ public class MissionEntity {
     @Column(name="id")
     Long id;
 
-    @OneToOne(mappedBy = "missionEntity")
-    private NotificationEntity notificationEntity;
-
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
     private List<MissionFileEntity> missionFileList = new ArrayList<>();
 
@@ -63,9 +60,5 @@ public class MissionEntity {
         this.tag = toString;
         this.calendarCode = calendarCode;
         this.id = id;
-
     }
-
-
-
 }

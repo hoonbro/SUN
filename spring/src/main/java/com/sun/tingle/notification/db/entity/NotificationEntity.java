@@ -2,6 +2,8 @@ package com.sun.tingle.notification.db.entity;
 
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -12,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @DynamicUpdate
+@DynamicInsert
 @Builder
 @Getter
 @Table(name = "notification")
@@ -30,13 +33,15 @@ public class NotificationEntity {
 
     private Long receiverId;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean isCheck;
+
     @Temporal(TemporalType.TIME)
     Date sendTime;
 
     @Temporal(TemporalType.DATE)
     Date sendDate;
 
-    @OneToOne
-    @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
+    @ManyToOne @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
     private MissionEntity missionEntity;
 }
