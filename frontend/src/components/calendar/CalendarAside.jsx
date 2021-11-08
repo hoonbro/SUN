@@ -1,9 +1,8 @@
 import { Link, useParams } from "react-router-dom"
 import { FcSettings } from "react-icons/fc"
 import { MdExpandMore, MdExpandLess } from "react-icons/md"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import CalendarAddForm from "./CalendarAddForm"
-import client from "../../api/client"
 import { useCalendarState } from "../../context"
 
 const CalendarListItem = ({
@@ -14,10 +13,10 @@ const CalendarListItem = ({
   const [codeOpen, setCodeOpen] = useState(false)
 
   return (
-    <div
-      className={`grid gap-1 py-2 overflow-hidden transition-all ${
-        codeOpen ? "h-16" : "h-10"
-      }`}
+    <Link
+      to={`/calendars/${calendarCode}`}
+      className={`grid gap-1 py-2 overflow-hidden transition-all
+      ${codeOpen ? "h-16" : "h-10"}`}
     >
       <div className="flex items-center justify-between">
         <button className={`${active && "font-bold text-orange-500"}`}>
@@ -31,7 +30,7 @@ const CalendarListItem = ({
         <span>캘린더코드</span>
         <span className="text-gray-600">{calendarCode}</span>
       </div>
-    </div>
+    </Link>
   )
 }
 
@@ -39,13 +38,6 @@ const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
   const { calendarCode } = useParams()
   const calendarState = useCalendarState()
   console.log(calendarCode)
-  // useEffect(() => {
-  //   async function asyncEffect() {
-  //     const res = await client.get(`calendar/every/calendars`)
-  //     console.log(res.data)
-  //   }
-  //   asyncEffect()
-  // }, [])
 
   return (
     <>
@@ -73,18 +65,10 @@ const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
                 <CalendarListItem
                   {...calendar}
                   key={calendar.calendarCode}
-                  active
+                  active={calendar.calendarCode === calendarCode}
                 />
               )
             )}
-            <CalendarListItem
-              calendarName="죠르디 학생의 캘린더"
-              calendarCode="Dfaqe"
-            />
-            <CalendarListItem
-              calendarName="앙몬드 학생의 캘린더"
-              calendarCode="Dfaqe"
-            />
           </div>
         </section>
         <hr />

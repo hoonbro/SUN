@@ -3,7 +3,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
 import moment from "moment"
 import "moment/locale/ko"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Link, useRouteMatch } from "react-router-dom"
+import { Link, useRouteMatch, useParams } from "react-router-dom"
 import { MdClose, MdSwapHoriz, MdAdd } from "react-icons/md"
 import Modal from "../components/modal/Modal"
 import EventListItem from "../components/EventListItem"
@@ -105,9 +105,8 @@ const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
 }
 
 const MyCalendar = () => {
-  const calendarState = useCalendarState()
   const calendarDispatch = useCalendarDispatch()
-  const { params: routeParams } = useRouteMatch()
+  const { calendarCode } = useParams()
   const [selectedDate, setSelectedDate] = useState(null)
   const [events, setEvents] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
@@ -155,22 +154,22 @@ const MyCalendar = () => {
 
   const getCalendarInfo = useCallback(async () => {
     try {
-      const res = await client.get(`calendar/${routeParams?.calendarCode}`)
+      const res = await client.get(`calendar/${calendarCode}`)
       setCalendarInfo({ ...res.data })
     } catch (error) {
       console.log(error)
     }
-  }, [routeParams])
+  }, [calendarCode])
 
   const getEvents = useCallback(async () => {
     try {
-      const res = await client.get(`mission/${routeParams?.calendarCode}`)
+      const res = await client.get(`mission/${calendarCode}`)
       setEvents([...res.data])
     } catch (error) {
       console.log("getEvents")
       console.log(error)
     }
-  }, [routeParams])
+  }, [calendarCode])
 
   useEffect(() => {
     async function asyncEffect() {
@@ -178,6 +177,8 @@ const MyCalendar = () => {
       await getEvents()
       await getAllCalendar(calendarDispatch)
     }
+    setModalOpen(false)
+    setAsideOpen(false)
     asyncEffect()
   }, [getCalendarInfo, getEvents, calendarDispatch])
 
@@ -207,7 +208,7 @@ const MyCalendar = () => {
       />
       <Link
         className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white"
-        to={`/calendars/${routeParams?.calendarCode}/events/create`}
+        to={`/calendars/${calendarCode}/events/create`}
       >
         <MdAdd size={28} />
       </Link>
