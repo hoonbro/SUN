@@ -2,9 +2,13 @@ package com.sun.tingle.calendar.controller;
 
 
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.calendar.requestdto.NotifyChangeRqDto;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
+import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.util.JwtUtil;
+import com.sun.tingle.notification.api.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
@@ -19,15 +23,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/calendar")
+@RequiredArgsConstructor
 @CrossOrigin("*")
+
 public class CalendarController {
+    private final CalendarService calendarService;
 
-    @Autowired
-    CalendarService calendarService;
+    private final JwtUtil jwtUtil;
 
-    @Lazy
-    @Autowired
-    JwtUtil jwtUtil;
+    private final NotificationService notificationService;
 
     @PostMapping
     public ResponseEntity<CalendarRpDto> insertCalendar(HttpServletRequest request, @RequestBody Map<String,String> map) {
@@ -159,9 +163,12 @@ public class CalendarController {
         return new ResponseEntity<List<CalendarRpDto>>(list,HttpStatus.OK);
     }
 
+    @PostMapping("/notifyChange")
+    public ResponseEntity<Void> testings(HttpServletRequest request,@RequestBody NotifyChangeRqDto notifyChangeRqDto) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
+        notificationService.sendNotifyChange(tokenInfo,notifyChangeRqDto.getCalendarCode(),notifyChangeRqDto.getType(), notifyChangeRqDto.getMissionId());
 
-
-
-
-
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
 }
