@@ -7,6 +7,8 @@ import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
 import com.sun.tingle.mission.responsedto.MissionRpDto;
 import com.sun.tingle.mission.service.MissionService;
+import com.sun.tingle.notification.api.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
@@ -22,18 +24,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/mission")
 @CrossOrigin("*")
 public class MissionController {
-    @Autowired
-    MissionService missionService;
+
+    private final MissionService missionService;
+
+    private final NotificationService notificationService;
 
 
-
-    @Lazy
-    @Autowired
-    JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
 
 
@@ -119,7 +121,7 @@ public class MissionController {
 
 
 
-    @GetMapping("/date/{missionDate}")
+    @GetMapping
     public ResponseEntity<List<MissionRpDto>> selectDateMissionList(@PathVariable("missionDate") String missionDate) throws ParseException {
 
         List<MissionRpDto> list = missionService.selectDateMissionList(missionDate);

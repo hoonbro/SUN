@@ -10,6 +10,10 @@ import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
 import com.sun.tingle.mission.responsedto.MissionRpDto;
+import com.sun.tingle.notification.api.service.NotificationService;
+import com.sun.tingle.notification.db.entity.NotificationEntity;
+import com.sun.tingle.notification.db.repository.NotificationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@RequiredArgsConstructor
 @Service
 public class MissionServiceImpl implements MissionService {
     @Autowired
@@ -32,7 +37,11 @@ public class MissionServiceImpl implements MissionService {
     CalendarRepository calendarRepository;
 
     @Autowired
+    NotificationRepository notificationRepository;
+    @Autowired
     S3service s3service;
+
+    private final NotificationService notificationService;
 
     @Override
     public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException, ParseException {
@@ -54,7 +63,6 @@ public class MissionServiceImpl implements MissionService {
         List<String> list = missionRqDto.getTag();
         StringBuilder sb = new StringBuilder();
         int size = (list !=null) ? list.size():0;
-        System.out.println(missionEntity.toString());
         for(int i=0; i<size; i++) {
             String temp = list.get(i);
             sb.append("&@&").append(temp); // 있는 그대로 넣기
@@ -62,9 +70,11 @@ public class MissionServiceImpl implements MissionService {
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
 
+        notificationService.sendNotifyChange(missionRqDto.getId(),missionEntity.getCalendarCode(),"mission_create",missionEntity.getMissionId());
+
+
 
         String[] tagArr = missionEntity.getTag().split("&@&");
-        System.out.println(tagArr.toString());
         list = new ArrayList<>();
         size = tagArr.length;
         for(int i=1; i<size; i++) {
@@ -163,6 +173,7 @@ public class MissionServiceImpl implements MissionService {
 
 
         missionEntity = missionRepository.save(missionEntity);
+        notificationService.sendNotifyChange(missionRqDto.getId(),missionEntity.getCalendarCode(),"mission_update",missionEntity.getMissionId());
 
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
                 .title(missionEntity.getTitle())
@@ -184,8 +195,22 @@ public class MissionServiceImpl implements MissionService {
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
         if(missionEntity.getId() == id) {
             s3service.s3MissionDelete(missionId);
-            missionRepository.deleteById(missionId);
+//            missionRepository.deleteById(missionId);
             result = 1;
+
+            List<NotificationEntity> notiList = notificationRepository.findByMissionId(missionId);
+
+            for(int i=0; i<notiList.size(); i++) {
+                NotificationEntity no = notiList.get(i);
+                no.setMissionEntity(null);
+                notificationRepository.save(no);
+            }
+
+
+
+            missionRepository.delete(missionEntity);
+
+            notificationService.sendNotifyChange(id,missionEntity.getCalendarCode(),"mission_delete",missionEntity.getMissionId());
         }
         return result;
     }

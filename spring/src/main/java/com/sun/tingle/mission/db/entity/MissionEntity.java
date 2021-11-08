@@ -15,7 +15,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@Data
+//@Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,6 +43,9 @@ public class MissionEntity {
 
     @Column(name="id")
     Long id;
+
+    @OneToMany(mappedBy = "missionEntity",cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<NotificationEntity> notificationList = new ArrayList<>();
 
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
     private List<MissionFileEntity> missionFileList = new ArrayList<>();
