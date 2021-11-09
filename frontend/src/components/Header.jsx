@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom"
 import { IoIosArrowBack } from "react-icons/io"
+import { useContext, useEffect } from "react"
+import { ChatContext } from "../pages/EventDetail.jsx"
 
 const Header = ({
   pageTitle = "페이지 이름",
