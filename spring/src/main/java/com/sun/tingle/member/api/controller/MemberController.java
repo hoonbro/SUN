@@ -33,8 +33,11 @@ public class MemberController {
 
     private final JwtUtil jwtUtil;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<MemberResDto> getMemberInfo(@PathVariable Long id){
+    @GetMapping
+    public ResponseEntity<MemberResDto> getMemberInfo(HttpServletRequest request){
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+
         HttpStatus httpStatus = HttpStatus.OK;
         MemberResDto memberResDto;
         try {
@@ -49,12 +52,15 @@ public class MemberController {
     }
 
     @PutMapping
-    public ResponseEntity<MemberResDto> updateMemberInfo(@RequestBody MemberReqDto memberReqDto){
+    public ResponseEntity<MemberResDto> updateMemberInfo(HttpServletRequest request, @RequestBody MemberReqDto memberReqDto){
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+
         HttpStatus httpStatus = HttpStatus.CREATED;
         MemberResDto memberResDto;
 
         try{
-            memberResDto = memberService.updateMemberInfo(memberReqDto);
+            memberResDto = memberService.updateMemberInfo(id, memberReqDto);
             log.info("회원정보 수정 성공");
         }catch(Exception e){
             httpStatus = HttpStatus.NOT_FOUND;
@@ -65,8 +71,10 @@ public class MemberController {
         return new ResponseEntity<MemberResDto>(memberResDto, httpStatus);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMemberInfo(@PathVariable Long id){
+    @DeleteMapping
+    public ResponseEntity<Void> deleteMemberInfo(HttpServletRequest request){
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         HttpStatus httpStatus = HttpStatus.NO_CONTENT;
 
         try{
@@ -98,9 +106,9 @@ public class MemberController {
         String refreshToken =request.getHeader("refreshToken");
         try {
             memberService.logout(refreshToken);
-            log.info("로그아웃 완료");
+            log.info("로그아웃 성공");
         }catch(Exception e){
-            log.info("존재하지 않는 refresh 토큰");
+            log.info("존재하지 않는 refresh 토큰, 로그아웃 할 필요 없음");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -109,8 +117,8 @@ public class MemberController {
     @PutMapping("/change-password")
     public ResponseEntity<Void> changePassword(HttpServletRequest request, @RequestBody MemberReqDto memberReqDto){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+
         memberService.changePassword(id, memberReqDto.getPassword());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -118,12 +126,16 @@ public class MemberController {
     @PostMapping("/invite")
     public ResponseEntity<?> invite(HttpServletRequest request, @RequestBody InviteReqDto inviteReqDto){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        log.info("토큰" + token);
         TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
 
         MemberEntity memberEntity = memberService.getMemberByEmail(inviteReqDto.getInviteeEmail());
 
-        notificationService.sendInvite(tokenInfo, inviteReqDto.getCalendarCode(), memberEntity.getId());
+        try {
+            notificationService.sendInvite(tokenInfo, inviteReqDto.getCalendarCode(), memberEntity.getId());
+        }catch(Exception e){
+            log.error("초대 알림 중복");
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
