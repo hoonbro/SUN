@@ -15,5 +15,5 @@ public interface MissionService {
     public MissionRpDto updateMission(Long missionId, MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException, ParseException;
     public int deleteMission(Long missionId,Long id);
     public List<MissionRpDto> selectMissionList(String calendarCode);
-    public List<MissionRpDto> selectDateMissionList(String missionDate) throws ParseException;
+    public List<MissionRpDto> selectDateMissionList(String missionDate,String calendarCode) throws ParseException;
 }
