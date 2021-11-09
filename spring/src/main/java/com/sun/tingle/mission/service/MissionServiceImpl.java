@@ -148,6 +148,9 @@ public class MissionServiceImpl implements MissionService {
 
 
         List<String> list = missionRqDto.getTag();
+        if(list == null) {
+            list = new ArrayList<>();
+        }
         int size = (list != null) ? list.size():0;
         StringBuilder sb = new StringBuilder();
 
@@ -168,7 +171,7 @@ public class MissionServiceImpl implements MissionService {
                 .title(missionEntity.getTitle())
                 .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
                 .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
-                .tag(missionRqDto.getTag()).
+                .tag(list).
                 id(missionEntity.getId()).
                 calendarCode(missionEntity.getCalendarCode()).
 //                missionFileList(missionEntity.getMissionFileList()).
@@ -224,6 +227,9 @@ public class MissionServiceImpl implements MissionService {
             String[] temp = m.getTag().split("&@&");
             tags = new ArrayList<>();
             for(int j=0;j<temp.length;j++) {
+                if(temp[j].equals("")) {
+                    continue;
+                }
                 tags.add(temp[j]);
             }
             missionRpDto = missionRpDto.builder().calendarCode(m.getCalendarCode())
