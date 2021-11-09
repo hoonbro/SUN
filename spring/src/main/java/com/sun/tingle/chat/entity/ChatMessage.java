@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Entity(name = "chat_message")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ChatMessage {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)

@@ -46,6 +46,9 @@ public class ChatController {
     @MessageMapping("/mission/{mid}/file")
     @SendTo("/room/{id}")
     public void sendFile(@RequestParam("file") MultipartFile file, @DestinationVariable("mid") Long mid, @Header("Authorization") String token) throws Exception {
+        System.out.println("hereeee222222");
+        System.out.println(file);
+        System.out.println(file.getName());
         chatService.sendFile(file, token, mid);
     }
 }
