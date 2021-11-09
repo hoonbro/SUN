@@ -96,6 +96,8 @@ const EventDetail = () => {
 
   const subscribe = (roomId) => {
     client.current.subscribe(`/room/${roomId}`, (res) => {
+      console.log(res)
+      console.log(res.body)
       console.log(JSON.parse(res.body))
       dispatch({ type: "NEW_MESSAGE", payload: JSON.parse(res.body) })
     })

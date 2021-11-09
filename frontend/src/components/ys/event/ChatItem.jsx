@@ -1,20 +1,40 @@
-import React, { useContext } from "react"
+import React, { useContext, useLayoutEffect, useState } from "react"
 import { ChatContext } from "../../../pages/EventDetail"
+import moment from "moment"
 
 const ChatItem = ({ chatItem, exChatItem = null }) => {
   const { id: myId } = useContext(ChatContext)["auth"]["user"]
-
   const isMe = myId === Number(chatItem.sender_id)
-  const isContinue = exChatItem && chatItem.nickname === exChatItem.nickname
+
+  const timeMoment = moment(chatItem.sentTime)
+  const exTimeMoment = exChatItem && moment(exChatItem.sentTime)
+
+  // 년 월 일 시 분 까지 같은지 + sender가 같은지
+  const isContinue =
+    exChatItem &&
+    exTimeMoment.isSame(timeMoment, "d") &&
+    exTimeMoment.hour() === timeMoment.hour() &&
+    exTimeMoment.minute() === timeMoment.minute() &&
+    chatItem.nickname === exChatItem.nickname
 
   const contentBorderColor =
     chatItem.auth === "ROLE_TEACHER"
       ? " border-orange-400 "
       : " border-blue-500 "
 
-  const contentRoundedNone = isMe
+  const contentLeftRight = isMe
     ? " rounded-tr-none self-end"
     : " rounded-tl-none self-start"
+
+  const [sentTime, setSentTime] = useState(null)
+
+  useLayoutEffect(() => {
+    if (moment().isSame(timeMoment, "d")) {
+      setSentTime(timeMoment.format("LT"))
+    } else {
+      setSentTime(timeMoment.format("LLL"))
+    }
+  })
 
   return (
     <div className="flex flex-col gap-1">
@@ -35,7 +55,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
               {chatItem.nickname}{" "}
               {chatItem.auth === "ROLE_TEACHER" && <span>선생님</span>}
             </p>
-            <p className="text-gray-500 text-sm">{chatItem.sentTime}</p>
+            <p className="text-gray-500 text-sm">{sentTime}</p>
           </div>
         </div>
       )}
@@ -43,7 +63,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
         className={
           "border-2 rounded-xl py-1 px-2 mx-12" +
           contentBorderColor +
-          contentRoundedNone
+          contentLeftRight
         }
       >
         {chatItem.content}
