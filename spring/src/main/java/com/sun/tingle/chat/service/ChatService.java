@@ -26,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 import java.io.File;
 import java.io.IOException;
@@ -153,6 +154,7 @@ public class ChatService {
                     .file_id(r.getFileUuid())
                     .build();
         }
+
         ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
         kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
     }
