@@ -41,8 +41,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberResDto updateMemberInfo(MemberReqDto memberReqDto) {
-        MemberEntity memberEntity = getMemberById(memberReqDto.getId()).orElseThrow(NoSuchElementException::new);
+    public MemberResDto updateMemberInfo(Long id, MemberReqDto memberReqDto) {
+        MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
         memberEntity.setName(memberReqDto.getName());
         memberEntity.setEmail(memberReqDto.getEmail());
         memberEntity.setPhone(memberReqDto.getPhone());
