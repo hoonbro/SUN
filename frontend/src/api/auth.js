@@ -22,7 +22,6 @@ const checkDuplicateIdOREmail = async ({ memberIdOrEmail, type }) => {
 const login = async (data) => {
   try {
     const res = await client.post("/auth/login", data)
-    console.log(res)
     return Promise.resolve(res.data)
   } catch (error) {
     return Promise.reject(error.response)

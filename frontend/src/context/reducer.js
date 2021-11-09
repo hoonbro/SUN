@@ -13,6 +13,49 @@ export const authInitialState = {
   errorMessage: "",
 }
 
+export const calendarInitialState = {
+  myCalendar: [],
+  shareCalendar: [],
+  currentCalendarCode: "",
+}
+
+export const CalendarReducer = (initialState, action) => {
+  switch (action.type) {
+    case "SET_CALENDAR": {
+      return {
+        ...initialState,
+        ...action.payload,
+      }
+    }
+    case "ADD_CALENDAR": {
+      return {
+        ...initialState,
+        myCalendar: [...initialState.myCalendar, { ...action.payload }],
+      }
+    }
+    case "EDIT_CALENDAR": {
+      const calendar = { ...action.payload }
+      const myCalendar = initialState.myCalendar.map((c) => {
+        if (c.calendarCode === calendar.calendarCode) {
+          return calendar
+        }
+        return c
+      })
+      return {
+        ...initialState,
+        myCalendar,
+      }
+    }
+    case "SET_CURRENT_CALENDAR": {
+      const currentCalendarCode = action.payload
+      return {
+        ...initialState,
+        currentCalendarCode,
+      }
+    }
+  }
+}
+
 export const AuthReducer = (initialState, action) => {
   switch (action.type) {
     case "REQUEST_LOGIN": {
@@ -31,9 +74,6 @@ export const AuthReducer = (initialState, action) => {
       }
     }
     case "TOKEN_REFRESH": {
-      console.group("TOKEN_REFRESH")
-      console.log(action.payload)
-      console.groupEnd()
       return {
         ...initialState,
         token: {
@@ -62,6 +102,12 @@ export const AuthReducer = (initialState, action) => {
         ...initialState,
         user: null,
         token: null,
+      }
+    }
+    case "UPDATE_PROFILE": {
+      return {
+        ...initialState,
+        user: action.payload,
       }
     }
     default: {

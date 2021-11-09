@@ -10,7 +10,7 @@ const Header = ({
   handleGoBack,
 }) => {
   return (
-    <header className="sticky z-10 left-0 top-0 py-4 mb-10 grid gap-2 bg-white shadow">
+    <header className="sticky z-10 left-0 top-0 py-4 grid gap-2 bg-white shadow">
       {to && (
         <Link
           to={to}

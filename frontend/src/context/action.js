@@ -1,4 +1,27 @@
 import client from "../api/client"
+import memberAPI from "../api/member"
+
+export const updateProfile = async (dispatch, formData) => {
+  try {
+    const profileRes = await memberAPI.updateProfile(formData)
+    const user = { ...profileRes }
+    const token = JSON.parse(localStorage.getItem("currentUser"))?.token
+    dispatch({
+      type: "UPDATE_PROFILE",
+      payload: { ...profileRes },
+    })
+    localStorage.setItem(
+      "currentUser",
+      JSON.stringify({
+        user,
+        token,
+      })
+    )
+    return user
+  } catch (error) {
+    alert("업데이트 에러")
+  }
+}
 
 export const loginUser = async (dispatch, payload) => {
   try {
@@ -52,15 +75,15 @@ export const logout = async (dispatch, refreshToken) => {
   }
 }
 
-export const silentRefresh = async (dispatch, payload) => {
-  if (!payload) {
+export const silentRefresh = async (dispatch, refreshToken) => {
+  if (!refreshToken) {
+    localStorage.removeItem("currentUser")
     return
   }
   try {
-    console.log(payload)
     const res = await client.get("/auth/reissue", {
       headers: {
-        refreshToken: payload.refreshToken,
+        refreshToken,
       },
     })
     dispatch({
@@ -75,7 +98,7 @@ export const silentRefresh = async (dispatch, payload) => {
         ...user,
         token: {
           accessToken: res.data?.data?.accessToken,
-          refreshToken: payload.refreshToken,
+          refreshToken,
         },
       })
     )
@@ -86,4 +109,42 @@ export const silentRefresh = async (dispatch, payload) => {
     })
     localStorage.removeItem("currentUser")
   }
+}
+
+export const getAllCalendar = async (dispatch) => {
+  try {
+    const res = await client.get("/calendar/every/calendars")
+    dispatch({
+      type: "SET_CALENDAR",
+      payload: res.data,
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export const addCalendar = (dispatch, newCalendar) => {
+  dispatch({
+    type: "ADD_CALENDAR",
+    payload: newCalendar,
+  })
+}
+
+export const editCalendar = (dispatch, newCalendar) => {
+  dispatch({
+    type: "EDIT_CALENDAR",
+    payload: newCalendar,
+  })
+}
+
+export const setCurrentCalendar = (dispatch, currentCalendarCode) => {
+  dispatch({
+    type: "SET_CURRENT_CALENDAR",
+    payload: currentCalendarCode,
+  })
+  const currentUser = JSON.parse(localStorage.getItem("currentUser"))
+  localStorage.setItem(
+    "currentUser",
+    JSON.stringify({ ...currentUser, currentCalendarCode })
+  )
 }

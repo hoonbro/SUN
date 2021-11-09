@@ -3,7 +3,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
 import moment from "moment"
 import "moment/locale/ko"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Link, useRouteMatch } from "react-router-dom"
+import { Link, useParams, useHistory } from "react-router-dom"
 import { MdClose, MdSwapHoriz, MdAdd } from "react-icons/md"
 import Modal from "../components/modal/Modal"
 import EventListItem from "../components/EventListItem"
@@ -12,19 +12,14 @@ import "../static/calendar.css"
 import "react-big-calendar/lib/addons/dragAndDrop/styles.scss"
 import CalendarAside from "../components/calendar/CalendarAside"
 import client from "../api/client"
+import {
+  getAllCalendar,
+  setCurrentCalendar,
+  useCalendarDispatch,
+} from "../context"
 
 const DragAndDropCalendar = withDragAndDrop(Calendar)
 const localizer = momentLocalizer(moment)
-
-const DUMMY_EVENTS = [
-  {
-    title: "하나",
-    allDay: false,
-    start: new Date(2021, 9, 6, 10, 0),
-    end: new Date(2021, 9, 9, 10, 0),
-    id: "10",
-  },
-]
 
 const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
   const events = [
@@ -110,9 +105,11 @@ const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
 }
 
 const MyCalendar = () => {
-  const { params: routeParams } = useRouteMatch()
+  const history = useHistory()
+  const calendarDispatch = useCalendarDispatch()
+  const { calendarCode } = useParams()
   const [selectedDate, setSelectedDate] = useState(null)
-  const [events, setEvents] = useState(DUMMY_EVENTS)
+  const [events, setEvents] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
   const [asideOpen, setAsideOpen] = useState(false)
   const [calendarInfo, setCalendarInfo] = useState({
@@ -123,8 +120,6 @@ const MyCalendar = () => {
 
   const handleSelectSlot = (slotInfo) => {
     setSelectedDate(slotInfo.slots[0])
-    console.log(slotInfo)
-    console.log(moment(slotInfo.slots[0]).format("YYYY-MM-DD"))
     setModalOpen(true)
   }
 
@@ -156,32 +151,40 @@ const MyCalendar = () => {
     )
   }
 
+  const handleSelectEvent = (e) => {
+    console.log(e)
+    history.push(`/calendars/${e.calendarCode}/events/${e.missionId}`)
+  }
+
   const getCalendarInfo = useCallback(async () => {
     try {
-      const res = await client.get(`calendar/${routeParams?.calendarCode}`)
+      const res = await client.get(`calendar/${calendarCode}`)
       setCalendarInfo({ ...res.data })
     } catch (error) {
       console.log(error)
     }
-  }, [routeParams])
+  }, [calendarCode])
 
   const getEvents = useCallback(async () => {
     try {
-      const res = await client.get(`mission/${routeParams?.calendarCode}`)
+      const res = await client.get(`mission/${calendarCode}`)
       setEvents([...res.data])
     } catch (error) {
-      console.log("getEvents")
       console.log(error)
     }
-  }, [routeParams])
+  }, [calendarCode])
 
   useEffect(() => {
     async function asyncEffect() {
       await getCalendarInfo()
       await getEvents()
+      await getAllCalendar(calendarDispatch)
     }
+    setModalOpen(false)
+    setAsideOpen(false)
     asyncEffect()
-  }, [getCalendarInfo, getEvents])
+    setCurrentCalendar(calendarDispatch, calendarCode)
+  }, [getCalendarInfo, getEvents, calendarDispatch, calendarCode])
 
   return (
     <div className="relative flex flex-col h-full pb-10">
@@ -205,11 +208,11 @@ const MyCalendar = () => {
         onEventDrop={handleDropEvent}
         onEventResize={handleResizeEvent}
         onSelectSlot={handleSelectSlot}
-        onSelectEvent={(e) => console.log(e)}
+        onSelectEvent={handleSelectEvent}
       />
       <Link
         className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white"
-        to={`/calendars/${routeParams?.calendarCode}/events/create`}
+        to={`/calendars/${calendarCode}/events/create`}
       >
         <MdAdd size={28} />
       </Link>

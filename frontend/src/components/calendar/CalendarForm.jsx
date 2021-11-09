@@ -2,7 +2,7 @@ import LabelInput from "../LabelInput"
 
 const CalendarForm = ({
   calendar,
-  canSubmit = false.valueOf,
+  canSubmit = false,
   mode = "create",
   onChange = (f) => f,
   onSubmit = (f) => f,
@@ -17,7 +17,9 @@ const CalendarForm = ({
         onChange={onChange}
       />
       <button
-        className="flex justify-self-end py-2 px-6 bg-gray-300 text-white font-bold rounded"
+        className={`flex justify-self-end py-2 px-6
+        ${canSubmit ? "bg-orange-400" : "bg-gray-300"}
+        text-white font-bold rounded`}
         disabled={!canSubmit}
       >
         {mode === "create" ? "추가" : "수정"}

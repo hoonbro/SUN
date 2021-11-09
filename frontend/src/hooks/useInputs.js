@@ -3,7 +3,6 @@ import { useCallback, useReducer } from "react"
 function reducer(state, action) {
   switch (action.type) {
     case "CHANGE_INPUTS": {
-      // console.log(state)
       return {
         ...state,
         [action.name]: {
@@ -13,13 +12,6 @@ function reducer(state, action) {
       }
     }
     case "CHANGE_ERRORS": {
-      console.log({
-        ...state,
-        [action.name]: {
-          ...state[action.name],
-          errors: action.errors,
-        },
-      })
       return {
         ...state,
         [action.name]: {
@@ -68,10 +60,6 @@ const useInputs = (initialForm) => {
     },
     [validate]
   )
-
-  // useMemo(() => {
-  //   console.log(state)
-  // }, [state])
 
   return [state, handleChange]
 }

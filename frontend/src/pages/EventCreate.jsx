@@ -13,12 +13,11 @@ const EventCreate = () => {
 
   const handleCreate = async (formData) => {
     try {
-      const res = await client.post(`mission`, formData, {
+      await client.post(`mission`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       })
-      console.log(res.data)
       const ok = window.confirm("과제가 생성되었어요! 지금 보러 갈까요?")
       if (ok) {
         alert("과제 상세 페이지로 이동")
@@ -45,12 +44,14 @@ const EventCreate = () => {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-full">
       <Header pageTitle="과제 등록" handleGoBack={handleGoBack} />
-      <div className="container max-w-xl">
-        <EventForm onSubmit={handleCreate} />
+      <div className="py-10">
+        <div className="container max-w-xl">
+          <EventForm onSubmit={handleCreate} />
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 
