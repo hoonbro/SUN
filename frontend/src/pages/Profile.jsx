@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { Link, useParams, useHistory } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
-import { useAuthState } from "../context"
+import { logout, useAuthDispatch, useAuthState } from "../context"
 import Header from "../components/Header"
 import client from "../api/client"
+import memberAPI from "../api/member"
 
 const Profile = () => {
   const params = useParams()
-  const authDetails = useAuthState()
+  const authState = useAuthState()
+  const authDispatch = useAuthDispatch()
   const history = useHistory()
   const [loading, setLoading] = useState(true)
   const [profileUser, setProfileUser] = useState(null)
@@ -43,6 +45,21 @@ const Profile = () => {
     return `https://d101s.s3.ap-northeast-2.amazonaws.com/${profileUser?.profileImage}`
   }, [profileUser])
 
+  const handleWithdrawal = useCallback(async () => {
+    const ok = window.confirm("정말 회원탈퇴를 결정하신건가요?")
+    if (!ok) {
+      alert("다행이에요! ㅠㅠ")
+      return
+    }
+    try {
+      await memberAPI.withdraw()
+      await logout(authDispatch, authState.token.refreshToken)
+      history.push("/login")
+    } catch (error) {
+      alert("회원 탈퇴 실패!")
+    }
+  }, [authDispatch, authState, history])
+
   useEffect(() => {
     async function fetchProfileUser() {
       const res = await client.get(`members/${params.userId}`)
@@ -66,13 +83,15 @@ const Profile = () => {
               >
                 <MdAddPhotoAlternate size={24} />
               </button>
-              <img
-                src={
-                  profileImage || "https://picsum.photos/seed/picsum/200/200"
-                }
-                className="object-cover h-full w-full"
-                alt=""
-              />
+              {!!profileUser && (
+                <img
+                  src={
+                    profileImage || "https://picsum.photos/seed/picsum/200/200"
+                  }
+                  className="object-cover h-full w-full"
+                  alt=""
+                />
+              )}
             </div>
             <div className="grid gap-2 content-start">
               <p className="font-medium">{loading ? "" : profileUser.name}</p>
@@ -99,10 +118,18 @@ const Profile = () => {
                 : "학생"}
             </p>
           </div>
-          {+params.userId === +authDetails?.user?.id && (
-            <Link to="/profile/edit" className="text-blue-400 justify-self-end">
-              프로필 수정
-            </Link>
+          {+params.userId === +authState?.user?.id && (
+            <div className="flex justify-end gap-2">
+              <Link
+                to="/profile/edit"
+                className="text-blue-400 justify-self-end"
+              >
+                프로필 수정
+              </Link>
+              <button onClick={handleWithdrawal} className="text-red-500">
+                회원 탈퇴
+              </button>
+            </div>
           )}
         </div>
         <input

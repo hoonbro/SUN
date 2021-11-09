@@ -68,12 +68,18 @@ const EventsModal = ({
           </div>
         </div>
         <div
-          className="bg-purple-100 flex items-center justify-center relative"
-          style={{ paddingTop: "50%" }}
+          className="relative bg-gray-100 flex items-center justify-center overflow-hidden"
+          style={{ paddingTop: "30%" }}
         >
           <img
-            className="absolute inset-0 w-full h-full object-cover object-top"
-            src="https://edu.ssafy.com/data/upload_files/namo/images/000032/20211013100610824_BCUVZUPR.png"
+            className="absolute filter blur-sm inset-0 object-cover"
+            style={{ width: "120%", height: "120%" }}
+            src="https://img.kr.news.samsung.com/kr/wp-content/uploads/2021/05/%EC%82%BC%EC%84%B1-%EC%B2%AD%EB%85%84-%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4-%EC%95%84%EC%B9%B4%EB%8D%B0%EB%AF%B8-1-210512.jpg"
+            alt=""
+          />
+          <img
+            className="absolute inset-0 w-full h-full object-contain"
+            src="https://img.kr.news.samsung.com/kr/wp-content/uploads/2021/05/%EC%82%BC%EC%84%B1-%EC%B2%AD%EB%85%84-%EC%86%8C%ED%94%84%ED%8A%B8%EC%9B%A8%EC%96%B4-%EC%95%84%EC%B9%B4%EB%8D%B0%EB%AF%B8-1-210512.jpg"
             alt=""
           />
         </div>
