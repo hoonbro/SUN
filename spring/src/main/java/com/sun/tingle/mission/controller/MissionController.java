@@ -67,7 +67,7 @@ public class MissionController {
 
 
     @PutMapping("{missionId}")
-    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("teacherFile") MultipartFile[] teacherFile, @RequestParam("tag") List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
+    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam(value="teacherFile",required = false) MultipartFile[] teacherFile, @RequestParam(value="tag",required = false) List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         MissionRqDto missionRqDto = new MissionRqDto();
