@@ -202,13 +202,11 @@ public class MissionServiceImpl implements MissionService {
     }
 
     @Override
-    public List<MissionRpDto> selectDateMissionList(String missionDate) throws ParseException {
+    public List<MissionRpDto> selectDateMissionList(String missionDate,String calendarCode) throws ParseException {
         Date mDate = stringToDate(missionDate);
 
-        List<MissionEntity> list = missionRepository.findByStartDateLessThanEqualAndEndDateGreaterThanEqual(mDate,mDate);
-        if(list == null || list.size() ==0) {
-            System.out.println("널이야?");
-        }
+        List<MissionEntity> list = missionRepository.findByCalendarCodeAndStartDateLessThanEqualAndEndDateGreaterThanEqual(calendarCode,mDate,mDate);
+
         List<MissionRpDto> list2 = builderMissionList(list);
 
         return list2;
