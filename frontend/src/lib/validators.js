@@ -23,7 +23,7 @@ export const passwordValidator = (value) => {
   }
   if (!regex.test(value)) {
     res.valid = false
-    res.message = "문자, 숫자, 특수문자를 포함하여 8자 이상으로 입력하세요1"
+    res.message = "문자, 숫자, 특수문자를 포함하여 8자 이상으로 입력하세요"
   }
   return res
 }

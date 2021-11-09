@@ -28,9 +28,45 @@ const login = async (data) => {
   }
 }
 
+const findId = async (email) => {
+  try {
+    await client.post("auth/find-id", { email })
+  } catch (error) {
+    return Promise.reject(error.response)
+  }
+}
+
+const sendPasswordResetCode = async (email) => {
+  try {
+    await client.post("auth/send-password-code", { email })
+  } catch (error) {
+    return Promise.reject(error.response)
+  }
+}
+
+const authPasswordResetCode = async ({ email, code }) => {
+  try {
+    await client.post("auth/validate-password-code", { email, code })
+  } catch (error) {
+    return Promise.reject(error.response)
+  }
+}
+
+const resetPassword = async ({ email, password }) => {
+  try {
+    await client.put("auth/reset-password", { email, password })
+  } catch (error) {
+    return Promise.reject(error.response)
+  }
+}
+
 const auth = {
   register,
   checkDuplicateIdOREmail,
   login,
+  findId,
+  sendPasswordResetCode,
+  authPasswordResetCode,
+  resetPassword,
 }
 export default auth

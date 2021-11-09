@@ -15,12 +15,9 @@ const editCalendar = async ({ calendarCode, calendarName }) => {
   return res.data
 }
 
-const getMissionList = async ({ missionDate, calendarCode }) => {
+const getMissionList = async (params) => {
   const res = await client.get(`mission`, {
-    params: {
-      missionDate,
-      calendarCode,
-    },
+    params,
   })
   return res.data
 }

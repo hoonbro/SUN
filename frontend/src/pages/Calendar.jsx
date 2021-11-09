@@ -17,75 +17,53 @@ import {
   setCurrentCalendar,
   useCalendarDispatch,
 } from "../context"
+import calendarAPI from "../api/calendar"
 
 const DragAndDropCalendar = withDragAndDrop(Calendar)
 const localizer = momentLocalizer(moment)
 
-const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
-  const events = [
-    {
-      id: 1,
-      title: "Mom Loves Spot 읽기",
-      tags: ["Reading", "Listening"],
-    },
-    {
-      id: 2,
-      title: "Little Bear 흘려듣기",
-      tags: ["Reading", "Listening"],
-    },
-    {
-      id: 3,
-      title: "Mom Loves Spot 읽기",
-      tags: ["Reading", "Listening"],
-    },
-    {
-      id: 4,
-      title: "Little Bear 흘려듣기",
-      tags: ["Reading", "Listening"],
-    },
-    {
-      id: 5,
-      title: "Mom Loves Spot 읽기",
-      tags: ["Reading", "Listening"],
-    },
-    {
-      id: 6,
-      title: "Little Bear 흘려듣기",
-      tags: ["Reading", "Listening"],
-    },
-    {
-      id: 7,
-      title: "Mom Loves Spot 읽기",
-      tags: ["Reading", "Listening"],
-    },
-    {
-      id: 8,
-      title: "Little Bear 흘려듣기",
-      tags: ["Reading", "Listening"],
-    },
-  ]
+const EventsModal = ({
+  date = new Date(),
+  onClose = (f) => f,
+  calendarCode = "",
+}) => {
+  const [events, setEvents] = useState([])
 
   const selectedDate = useMemo(
     () => moment(date).format("YYYY년 MM월 DD일 dddd"),
     [date]
   )
 
+  useEffect(() => {
+    async function asyncEffect() {
+      const eventsRes = await calendarAPI.getMissionList({
+        missionDate: moment(date).format("YYYY-MM-DD"),
+        calendarCode,
+      })
+      setEvents(eventsRes)
+    }
+    asyncEffect()
+    return () => {
+      setEvents([])
+    }
+  }, [calendarCode, date])
+
   return (
     <Modal onClose={onClose}>
       <div className="flex flex-col h-full">
-        <header className="flex items-center justify-between py-4 px-4">
-          <h4>{selectedDate}</h4>
+        <header className="flex items-center justify-between p-6">
+          <h4 className="select-none">{selectedDate}</h4>
           <button onClick={onClose}>
             <MdClose size="20" />
           </button>
         </header>
-        <div className="px-6 py-2 bg-orange-200">
-          <p className="font-medium">과제</p>
+        <div className="px-6 py-2 bg-orange-50">
+          <p className="font-medium select-none">과제</p>
         </div>
-        <div className="overflow-auto flex-1 py-2">
+        <div className="overflow-auto flex-1 py-4">
           <div className="grid">
             {events.map((event) => (
-              <EventListItem key={event.id} {...event} />
+              <EventListItem key={event.missionId} {...event} />
             ))}
           </div>
         </div>
@@ -118,38 +96,38 @@ const MyCalendar = () => {
     id: -1,
   })
 
-  const handleSelectSlot = (slotInfo) => {
+  const handleSelectSlot = useCallback((slotInfo) => {
     setSelectedDate(slotInfo.slots[0])
     setModalOpen(true)
-  }
+  }, [])
 
-  const handleModalClose = () => {
+  const handleModalClose = useCallback(() => {
     setModalOpen(false)
-  }
+  }, [])
 
-  const handleDropEvent = ({ event, start, end }) => {
-    setEvents(
-      events.map((existingEvent) => {
+  const handleDropEvent = useCallback(({ event, start, end }) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((existingEvent) => {
         return event.id === existingEvent.id
           ? { ...existingEvent, start, end }
           : existingEvent
       })
     )
-  }
+  }, [])
 
-  const handleResizeEvent = ({ event, start, end }) => {
+  const handleResizeEvent = useCallback(({ event, start, end }) => {
     if (start >= end) {
       alert("종료 날짜는 시작날짜보다 늦어야 합니다")
       return
     }
-    setEvents(
-      events.map((existingEvent) => {
+    setEvents((prevEvents) =>
+      prevEvents.map((existingEvent) => {
         return event.id === existingEvent.id
           ? { ...existingEvent, start, end }
           : existingEvent
       })
     )
-  }
+  }, [])
 
   const handleSelectEvent = (e) => {
     console.log(e)
@@ -167,8 +145,8 @@ const MyCalendar = () => {
 
   const getEvents = useCallback(async () => {
     try {
-      const res = await client.get(`mission/${calendarCode}`)
-      setEvents([...res.data])
+      const res = await calendarAPI.getMissionList({ calendarCode })
+      setEvents([...res])
     } catch (error) {
       console.log(error)
     }
@@ -217,7 +195,11 @@ const MyCalendar = () => {
         <MdAdd size={28} />
       </Link>
       {modalOpen && (
-        <EventsModal date={selectedDate} onClose={handleModalClose} />
+        <EventsModal
+          date={selectedDate}
+          onClose={handleModalClose}
+          calendarCode={calendarCode}
+        />
       )}
       <CalendarAside asideOpen={asideOpen} setAsideOpen={setAsideOpen} />
     </div>

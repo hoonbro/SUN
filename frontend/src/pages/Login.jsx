@@ -42,7 +42,8 @@ const Login = () => {
     return isAllFill
   }, [isAllFill])
 
-  const handleLogin = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault()
     const reqForm = {
       memberId: memberId.value,
       password: password.value,
@@ -62,15 +63,13 @@ const Login = () => {
     <div className="h-full flex items-center justify-center xs:bg-gray-50">
       <div className="grid gap-10 container max-w-lg px-6 py-10 xs:bg-white xs:shadow-lg xs:rounded-xl">
         <Welcome />
-        <div className="grid gap-6">
+        <form className="grid gap-6" onSubmit={handleLogin}>
           <InputFormField field={memberId} setField={setMemberId} />
           <InputFormField field={password} setField={setPassword} />
-        </div>
-        {authState.errorMessage}
+          {authState.errorMessage}
+          <SubmitButton disabled={!canSubmit}>로그인</SubmitButton>
+        </form>
         <div className="grid gap-4">
-          <SubmitButton disabled={!canSubmit} handleButtonClick={handleLogin}>
-            로그인
-          </SubmitButton>
           <div className="grid gap-2">
             <Link
               className="font-bold text-sm text-gray-700 text-center"

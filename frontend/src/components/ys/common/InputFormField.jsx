@@ -8,6 +8,11 @@ const InputFormField = ({ field, setField, handleBlur }) => {
     setField({ ...field, value: e.target.value })
   }
 
+  const handleToggleType = (e) => {
+    e.preventDefault()
+    setInputType((prev) => (prev === "text" ? "password" : "text"))
+  }
+
   return (
     <div className="form-field">
       <label htmlFor={field.key}>{field.label}</label>
@@ -25,9 +30,7 @@ const InputFormField = ({ field, setField, handleBlur }) => {
           {field.type === "password" && (
             <div
               className="absolute top-2.5 right-2 cursor-pointer"
-              onClick={() =>
-                setInputType((prev) => (prev === "text" ? "password" : "text"))
-              }
+              onClick={handleToggleType}
             >
               <VscSymbolString size="24px" />
             </div>
