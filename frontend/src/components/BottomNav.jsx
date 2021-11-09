@@ -1,23 +1,29 @@
 import { Link, useHistory } from "react-router-dom"
 import { FcCalendar, FcReadingEbook } from "react-icons/fc"
-import { logout, useAuthDispatch, useAuthState } from "../context"
+import {
+  logout,
+  useAuthDispatch,
+  useAuthState,
+  useCalendarState,
+} from "../context"
 
 const BottomNav = () => {
   const history = useHistory()
-  const auth = useAuthState()
+  const authState = useAuthState()
+  const calendarState = useCalendarState()
   const dispatch = useAuthDispatch()
   const handleLogout = async () => {
-    await logout(dispatch, auth.token.refreshToken)
+    await logout(dispatch, authState.token.refreshToken)
     history.push("/login")
   }
 
   return (
     <>
-      {auth.token?.accessToken && (
+      {authState.token?.accessToken && (
         <nav className="sticky bottom-0 left-0 w-full px-6 py-2 flex items-center justify-between border border-t border-gray-200 rounded-t-xl bg-white">
           <Link
             key="캘린더"
-            to={`/calendars/${auth?.user.defaultCalendar}`}
+            to={`/calendars/${calendarState.currentCalendarCode}`}
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
             <FcCalendar size="24px" />
@@ -29,7 +35,7 @@ const BottomNav = () => {
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
             <FcCalendar size="24px" />
-            <span className="text-xs">캘린더</span>
+            <span className="text-xs">알림</span>
           </Link>
           <Link
             key="캘린더3"
@@ -37,11 +43,11 @@ const BottomNav = () => {
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
             <FcCalendar size="24px" />
-            <span className="text-xs">캘린더</span>
+            <span className="text-xs">채팅</span>
           </Link>
           <Link
             key="프로필"
-            to={`/profile/${auth.user.id}`}
+            to={`/profile/${authState.user.id}`}
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
             <FcReadingEbook size="24px" />

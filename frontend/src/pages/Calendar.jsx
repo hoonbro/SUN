@@ -3,7 +3,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
 import moment from "moment"
 import "moment/locale/ko"
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useHistory } from "react-router-dom"
 import { MdClose, MdSwapHoriz, MdAdd } from "react-icons/md"
 import Modal from "../components/modal/Modal"
 import EventListItem from "../components/EventListItem"
@@ -105,6 +105,7 @@ const EventsModal = ({ date = new Date(), onClose = (f) => f }) => {
 }
 
 const MyCalendar = () => {
+  const history = useHistory()
   const calendarDispatch = useCalendarDispatch()
   const { calendarCode } = useParams()
   const [selectedDate, setSelectedDate] = useState(null)
@@ -148,6 +149,11 @@ const MyCalendar = () => {
           : existingEvent
       })
     )
+  }
+
+  const handleSelectEvent = (e) => {
+    console.log(e)
+    history.push(`/calendars/${e.calendarCode}/events/${e.missionId}`)
   }
 
   const getCalendarInfo = useCallback(async () => {
@@ -202,7 +208,7 @@ const MyCalendar = () => {
         onEventDrop={handleDropEvent}
         onEventResize={handleResizeEvent}
         onSelectSlot={handleSelectSlot}
-        onSelectEvent={(e) => console.log(e)}
+        onSelectEvent={handleSelectEvent}
       />
       <Link
         className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white"

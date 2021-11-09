@@ -44,12 +44,14 @@ const EventCreate = () => {
   }
 
   return (
-    <>
+    <div className="flex flex-col min-h-full">
       <Header pageTitle="과제 등록" handleGoBack={handleGoBack} />
-      <div className="container max-w-xl">
-        <EventForm onSubmit={handleCreate} />
+      <div className="py-10">
+        <div className="container max-w-xl">
+          <EventForm onSubmit={handleCreate} />
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 
