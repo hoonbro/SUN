@@ -14,6 +14,7 @@ import com.sun.tingle.member.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +39,9 @@ public class AuthServiceImpl implements AuthService{
     private final JwtUtil jwtUtil;
 
     private final RedisUtil redisUtil;
+
+    @Value("${jwt.refresh}")
+    private long RefreshTime;
 
     @Override
     @Transactional
@@ -72,7 +76,7 @@ public class AuthServiceImpl implements AuthService{
         String refreshToken = jwtUtil.createRefreshToken(memberEntity.getId(), memberEntity.getEmail(), memberEntity.getName());
 
         // redis에 refreshToken 저장
-        redisUtil.setDataExpire(refreshToken, String.valueOf(memberEntity.getId()), jwtUtil.REFRESH_TIME);
+        redisUtil.setDataExpire(refreshToken, String.valueOf(memberEntity.getId()), RefreshTime);
 
         MemberResDto memberResDto = memberService.entity2Dto(memberEntity);
 
