@@ -24,7 +24,7 @@ public class ShareCalendarEntity {
     private String calendarCode;
 
     @Column(name="id")
-    private long id;
+    private Long id;
 
 
 
