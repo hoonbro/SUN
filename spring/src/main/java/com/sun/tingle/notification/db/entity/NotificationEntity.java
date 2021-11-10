@@ -9,14 +9,11 @@ import org.hibernate.annotations.DynamicUpdate;
 import javax.persistence.*;
 import java.util.Date;
 
-@Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@DynamicUpdate
-@DynamicInsert
+@Data
 @Builder
-@Getter
 @Table(name = "notification")
 public class NotificationEntity {
     @Id
@@ -36,12 +33,12 @@ public class NotificationEntity {
     @Column(columnDefinition = "boolean default false")
     private Boolean isCheck;
 
-    @Temporal(TemporalType.TIME)
-    Date sendTime;
-
     @Temporal(TemporalType.DATE)
     Date sendDate;
 
+    @Temporal(TemporalType.TIME)
+    Date sendTime;
+
     @ManyToOne @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
-    private MissionEntity missionEntity;
+    private MissionEntity mission;
 }
