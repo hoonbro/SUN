@@ -2,6 +2,7 @@ package com.sun.tingle.chat.dto;
 
 import com.sun.tingle.chat.entity.ChatMessage;
 import com.sun.tingle.file.db.entity.MissionFileEntity;
+import com.sun.tingle.file.db.repo.MissionFileRepository;
 import com.sun.tingle.file.responsedto.MissionFileRpDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
@@ -11,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Data
@@ -38,7 +40,33 @@ public class ChatMessageResponseDto {
                 .sender_id(memberEntity.getId())
                 .sentTime(chatMessage.getSentTime())
                 .room_id(chatMessage.getChatRoom().getId())
-                .fileName(chatMessage.getFile_id())
+                .auth(memberEntity.getAuth())
+                .build();
+    }
+    public static ChatMessageResponseDto of(MemberRepository memberRepository, ChatMessage chatMessage, MissionFileRepository missionFileRepository) {
+        MemberEntity memberEntity = memberRepository.getById(chatMessage.getSender());
+        if (chatMessage.getFile_id() != null) {
+            Optional<MissionFileEntity> missionFileEntity = missionFileRepository.findById(chatMessage.getFile_id());
+            return ChatMessageResponseDto.builder()
+                    .content(chatMessage.getContent())
+                    .nickname(memberEntity.getName())
+                    .pic_uri(memberEntity.getProfileImage())
+                    .sender_id(memberEntity.getId())
+                    .sentTime(chatMessage.getSentTime())
+                    .room_id(chatMessage.getChatRoom().getId())
+                    .auth(memberEntity.getAuth())
+                    .fileType(missionFileEntity.get().getType())
+                    .fileUuid(missionFileEntity.get().getFileUuid())
+                    .fileName(missionFileEntity.get().getFileName())
+                    .build();
+        }
+        return ChatMessageResponseDto.builder()
+                .content(chatMessage.getContent())
+                .nickname(memberEntity.getName())
+                .pic_uri(memberEntity.getProfileImage())
+                .sender_id(memberEntity.getId())
+                .sentTime(chatMessage.getSentTime())
+                .room_id(chatMessage.getChatRoom().getId())
                 .auth(memberEntity.getAuth())
                 .build();
     }
@@ -53,7 +81,8 @@ public class ChatMessageResponseDto {
                 .sentTime(chatMessage.getSentTime())
                 .room_id(chatMessage.getChatRoom().getId())
                 .fileName(missionFile.getFileName())
-                .fileUuid(chatMessage.getFile_id())
+                .fileUuid(missionFile.getFileUuid())
+                .fileType(missionFile.getType())
 //                .fileUuid(missionFile.getFileUuid())
 //                .fileType(missionFile.getFileType())
                 .auth(memberEntity.getAuth())

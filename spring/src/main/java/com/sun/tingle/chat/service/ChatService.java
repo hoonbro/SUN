@@ -53,6 +53,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MissionRepository missionRepository;
+    private final MissionFileRepository missionFileRepository;
 
     @Autowired
     MemberRepository memberRepository;
@@ -75,7 +76,6 @@ public class ChatService {
         } else {
             message = chatMessageRequestDto.toChatMessage(userid, chatRoom.get());
         }
-
         ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
         chatMessageRepository.save(message);
         kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
@@ -94,7 +94,7 @@ public class ChatService {
         MemberEntity member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new NullPointerException("잘못된 토큰입니다."));
         ChatRoom chatRoom = chatRoomRepository.findById(roomid).orElseThrow(() -> new NullPointerException("존재하지 않는 채팅방입니다!"));
         Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoom(chatRoom, pageable);
-        return chatMessages.map(m -> ChatMessageResponseDto.of(memberRepository, m));
+        return chatMessages.map(m -> ChatMessageResponseDto.of(memberRepository, m, missionFileRepository));
     }
 
     @Transactional
@@ -104,7 +104,6 @@ public class ChatService {
         String roomid = getRoomId(mid);
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
         if (chatRoom.isEmpty()) {
-
             ChatRoom inner_chatroom = createChatRoom(roomid, missionEntity);
             chatRoomRepository.save(inner_chatroom);
             return MemberChatRoomResponseDto.of(inner_chatroom, missionEntity);
@@ -136,17 +135,19 @@ public class ChatService {
                     .sender(id)
                     .sentTime(LocalDateTime.now())
                     .chatRoom(inner_chatroom)
-                    .file_id(r.getFileUuid())
+                    .file_id(r.getFileId())
+//                    .content("file")
                     .build();
         } else {
             message = ChatMessage.builder()
                     .sender(id)
                     .sentTime(LocalDateTime.now())
                     .chatRoom(chatRoom.get())
-                    .file_id(r.getFileUuid())
+                    .file_id(r.getFileId())
+//                    .content("file")
                     .build();
         }
-
+        chatMessageRepository.save(message);
         ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message, r);
         kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
     }

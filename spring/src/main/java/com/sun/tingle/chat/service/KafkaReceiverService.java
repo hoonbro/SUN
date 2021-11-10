@@ -38,11 +38,14 @@ public class KafkaReceiverService {
         msg.put("room_id", message.getRoom_id());
         msg.put("auth", message.getAuth());
         msg.put("fileName", message.getFileName());
+        msg.put("fileType", message.getFileType());
+        msg.put("fileUuid", message.getFileUuid());
         msg.put("sender_id", Long.toString(message.getSender_id()));
 
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(msg);
 
+//        this.template.convertAndSend("/user/" + message.getSender_id(), json);
         this.template.convertAndSend("/room/" + message.getRoom_id(), json);
     }
 }
