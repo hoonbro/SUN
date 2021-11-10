@@ -26,7 +26,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -58,8 +60,9 @@ public class ChatService {
     private static String BOOT_TOPIC = "kafka-chat";
 
     @Transactional
-    public void sendMessage(ChatMessageRequestDto chatMessageRequestDto, String token, Long mid) {
+    public void sendMessage(ChatMessageRequestDto chatMessageRequestDto, String token, Long mid) throws IOException {
         Long userid = tokenProvider.getIdFromJwt(token);
+
         MissionEntity missionEntity = missionRepository.findById(mid).orElseThrow(() -> new NullPointerException("존재하지 않는 mission입니다!"));
         String roomid = getRoomId(mid);
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
@@ -68,9 +71,19 @@ public class ChatService {
         if (chatRoom.isEmpty()) {
             ChatRoom inner_chatroom = createChatRoom(roomid, missionEntity);
             chatRoomRepository.save(inner_chatroom);
-            message = chatMessageRequestDto.toChatMessage(userid, inner_chatroom);
+//            if (chatMessageRequestDto.getFile().isEmpty()) {
+                message = chatMessageRequestDto.toChatMessage(userid, inner_chatroom);
+//            } else {
+//                MissionFileRpDto r = s3service.missionFileUpload(chatMessageRequestDto.getFile(), mid, userid);
+//                message = chatMessageRequestDto.toChatMessageFile(userid, inner_chatroom, r.getFileUuid());
+//            }
         } else {
-            message = chatMessageRequestDto.toChatMessage(userid, chatRoom.get());
+//            if (chatMessageRequestDto.getFile().isEmpty()) {
+                message = chatMessageRequestDto.toChatMessage(userid, chatRoom.get());
+//            } else {
+//                MissionFileRpDto r = s3service.missionFileUpload(chatMessageRequestDto.getFile(), mid, userid);
+//                message = chatMessageRequestDto.toChatMessageFile(userid, chatRoom.get(), r.getFileUuid());
+//            }
         }
 
         ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
@@ -116,8 +129,10 @@ public class ChatService {
     }
 
     @Transactional
-    public void sendFile(MultipartFile file, String token, Long mid) throws IOException {
-        Long id = tokenProvider.getIdFromJwt(token);
+    public void sendFile(MultipartFile file, Long mid) throws IOException {
+        MemberEntity member = memberRepository.findById(SecurityUtil.getCurrentMemberId()).orElseThrow(() -> new NullPointerException("잘못된 토큰입니다."));
+        Long id = member.getId();
+//        Long id = tokenProvider.getIdFromJwt(token);
         MissionEntity missionEntity = missionRepository.findById(mid).orElseThrow(() -> new NullPointerException("존재하지 않는 mission입니다!"));
         String roomid = getRoomId(mid);
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(roomid);
@@ -141,6 +156,7 @@ public class ChatService {
                     .file_id(r.getFileUuid())
                     .build();
         }
+
         ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
         kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
     }

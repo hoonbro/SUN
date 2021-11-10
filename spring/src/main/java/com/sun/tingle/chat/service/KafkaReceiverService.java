@@ -32,9 +32,12 @@ public class KafkaReceiverService {
         LOGGER.info("message='{}'", message);
         HashMap<String, String> msg = new HashMap<>();
         msg.put("sentTime", message.getSentTime().format(DateTimeFormatter.ISO_DATE_TIME));
-        msg.put("name", message.getNickname());
+        msg.put("nickname", message.getNickname());
         msg.put("content", message.getContent());
         msg.put("pic_uri", message.getPic_uri());
+        msg.put("room_id", message.getRoom_id());
+        msg.put("auth", message.getAuth());
+        msg.put("fileName", message.getFileName());
         msg.put("sender_id", Long.toString(message.getSender_id()));
 
         ObjectMapper mapper = new ObjectMapper();

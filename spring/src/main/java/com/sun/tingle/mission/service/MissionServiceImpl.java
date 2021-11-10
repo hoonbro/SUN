@@ -176,8 +176,8 @@ public class MissionServiceImpl implements MissionService {
                 .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
                 .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
                 .tag(list).
-                        id(missionEntity.getId()).
-                        calendarCode(missionEntity.getCalendarCode()).
+                id(missionEntity.getId()).
+                calendarCode(missionEntity.getCalendarCode()).
 //                missionFileList(missionEntity.getMissionFileList()).
 //                teacherFileList(missionEntity.getTeacherFileList()).
         build();
