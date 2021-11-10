@@ -12,7 +12,7 @@ public interface MemberService {
 
     MemberResDto getMemberInfo(Long id);
 
-    MemberResDto updateMemberInfo(MemberReqDto memberReqDto);
+    MemberResDto updateMemberInfo(Long id, MemberReqDto memberReqDto);
 
     void deleteMemberInfo(Long id);
 

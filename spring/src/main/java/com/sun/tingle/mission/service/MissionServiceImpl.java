@@ -10,6 +10,7 @@ import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
 import com.sun.tingle.mission.requestdto.MissionRqDto;
 import com.sun.tingle.mission.responsedto.MissionRpDto;
+import com.sun.tingle.notification.api.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,6 +31,9 @@ public class MissionServiceImpl implements MissionService {
     TeacherFileRepository teacherFileRepository;
     @Autowired
     CalendarRepository calendarRepository;
+
+    @Autowired
+    NotificationService notificationService;
 
     @Autowired
     S3service s3service;
@@ -54,7 +58,6 @@ public class MissionServiceImpl implements MissionService {
         List<String> list = missionRqDto.getTag();
         StringBuilder sb = new StringBuilder();
         int size = (list !=null) ? list.size():0;
-        System.out.println(missionEntity.toString());
         for(int i=0; i<size; i++) {
             String temp = list.get(i);
             sb.append("&@&").append(temp); // 있는 그대로 넣기
@@ -62,9 +65,9 @@ public class MissionServiceImpl implements MissionService {
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
 
+        notificationService.sendNotifyChange(missionRqDto.getId(),missionEntity.getCalendarCode(),"mission_create",missionEntity.getMissionId());
 
         String[] tagArr = missionEntity.getTag().split("&@&");
-        System.out.println(tagArr.toString());
         list = new ArrayList<>();
         size = tagArr.length;
         for(int i=1; i<size; i++) {
@@ -110,8 +113,8 @@ public class MissionServiceImpl implements MissionService {
                 .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
                 .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
                 .id(missionEntity.getId())
-                 .missionFileList(missionEntity.getMissionFileList()).
-                teacherFileList(missionEntity.getTeacherFileList()).build();
+                .missionFileList(missionEntity.getMissionFileList()).
+                        teacherFileList(missionEntity.getTeacherFileList()).build();
 
 
 
@@ -135,9 +138,9 @@ public class MissionServiceImpl implements MissionService {
         int file_size = (list2 != null) ? list2.size():0;
 
         for(int i=0; i<file_size; i++) { // 업데이트전 db 파일 삭제
-             Long fileId = list2.get(i).getFileId();
-             teacherFileRepository.deleteById(fileId);
-             s3service.deleteTeacherFile(list2.get(i).fileUuid,list2.get(i).getId());
+            Long fileId = list2.get(i).getFileId();
+            teacherFileRepository.deleteById(fileId);
+            s3service.deleteTeacherFile(list2.get(i).fileUuid,list2.get(i).getId());
         }
 
         if(teacherFile != null) {
@@ -160,12 +163,13 @@ public class MissionServiceImpl implements MissionService {
         }
 
         missionEntity = new MissionEntity(missionId,missionRqDto.getTitle(),stringToDate(missionRqDto.getStart().split("T")[0]),
-                        missionRqDto.getStart().split("T")[1],
+                missionRqDto.getStart().split("T")[1],
                 stringToDate(missionRqDto.getEnd().split("T")[0]),missionRqDto.getEnd().split("T")[1],
                 sb.toString(),missionRqDto.getCalendarCode(),missionRqDto.getId());
 
 
         missionEntity = missionRepository.save(missionEntity);
+        notificationService.sendNotifyChange(missionRqDto.getId(),missionEntity.getCalendarCode(),"mission_update",missionEntity.getMissionId());
 
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
                 .title(missionEntity.getTitle())
@@ -176,7 +180,7 @@ public class MissionServiceImpl implements MissionService {
                 calendarCode(missionEntity.getCalendarCode()).
 //                missionFileList(missionEntity.getMissionFileList()).
 //                teacherFileList(missionEntity.getTeacherFileList()).
-                build();
+        build();
 
         return missionRpDto;
     }

@@ -45,7 +45,7 @@ public class MissionController {
 
         MissionRqDto missionRqDto = new MissionRqDto();
         missionRqDto = missionRqDto.builder().id(id).tag(tag).calendarCode(calendarCode).
-                        start(start).end(end).title(title).build();
+                start(start).end(end).title(title).build();
 
         MissionRpDto missionRpDto = missionService.insertMission(missionRqDto,teacherFile);
 
