@@ -1,5 +1,7 @@
 package com.sun.tingle.notification.db.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -12,7 +14,8 @@ import java.util.Date;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Data
+@Getter
+@Setter
 @Builder
 @Table(name = "notification")
 public class NotificationEntity {
@@ -39,6 +42,11 @@ public class NotificationEntity {
     @Temporal(TemporalType.TIME)
     Date sendTime;
 
-    @ManyToOne @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
     private MissionEntity mission;
+
+    @Transient
+    private MemberResDto sender;
 }
