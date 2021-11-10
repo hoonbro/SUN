@@ -157,7 +157,7 @@ public class ChatService {
                     .build();
         }
 
-        ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
+        ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message, r);
         kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
     }
 }

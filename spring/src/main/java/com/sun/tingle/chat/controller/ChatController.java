@@ -46,10 +46,7 @@ public class ChatController {
 //    @MessageMapping("/mission/{mid}/file")
     @PostMapping("/mission/{mid}/file")
     @SendTo("/room/{id}")
-    public void sendFile(@RequestParam("file") MultipartFile file, @DestinationVariable("mid") Long mid) throws Exception {
-        System.out.println("hereeee222222");
-        System.out.println(file);
-        System.out.println(file.getName());
+    public void sendFile(@RequestParam("file") MultipartFile file, @PathVariable("mid") Long mid) throws Exception {
         chatService.sendFile(file, mid);
     }
 }
