@@ -3,11 +3,14 @@ package com.sun.tingle.chat.dto;
 
 import com.sun.tingle.chat.entity.ChatRoom;
 import com.sun.tingle.mission.db.entity.MissionEntity;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @Data
+@NoArgsConstructor
 public class MemberChatRoomResponseDto {
     private String room_id;
     private Long mission_id;
