@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MissionFileRpDto {
-//    Long fileId;
+    Long fileId;
     String fileUuid;
     String fileName;
     String type;
