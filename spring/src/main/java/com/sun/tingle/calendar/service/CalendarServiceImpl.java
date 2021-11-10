@@ -171,4 +171,12 @@ public class CalendarServiceImpl implements CalendarService{
 
         return sb.toString();
     }
+
+    @Override
+    public List<Long> getMembersByCalendarCode(String calendarCode) {
+        List<Long> list = calendarRepository.findIdByCalendarCode(calendarCode);
+        List<Long> list2 = shareCalendarRepository.findIdByCalendarCode(calendarCode);
+        list.addAll(list2);
+        return list;
+    }
 }

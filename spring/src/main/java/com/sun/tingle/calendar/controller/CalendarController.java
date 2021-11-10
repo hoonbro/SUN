@@ -106,7 +106,8 @@ public class CalendarController {
         else if(flag == -2) { // 이미 공유 달력에 등록되어 있을 때
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CONFLICT);
         }
-            //공유 성공했을 때
+        //공유 성공했을 때
+        notificationService.sendNotifyChange(id, calendarCode, "calendar_in", null);
         return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
@@ -115,6 +116,7 @@ public class CalendarController {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         try {
+            notificationService.sendNotifyChange(id, calendarCode, "calendar_out", null);
             calendarService.deleteShareCalendar(calendarCode,id);
             return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 떄
         }
