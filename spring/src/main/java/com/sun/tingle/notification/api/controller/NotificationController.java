@@ -50,15 +50,24 @@ public class NotificationController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> getNotifications(HttpServletRequest request, @PathVariable Long id) {
+    @PutMapping("/{notificationId}")
+    public ResponseEntity<?> checkNotification(HttpServletRequest request, @PathVariable Long notificationId){
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
 
-        NotificationEntity notificationEntity = notificationService.getNotification(id);
+        notificationService.checkNotification(notificationId, tokenInfo.getId());
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<?> getNotifications(HttpServletRequest request, @PathVariable Long notificationId) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
+
+        NotificationEntity notificationEntity = notificationService.getNotification(notificationId);
         if(notificationEntity.getReceiverId() == tokenInfo.getId()) {
             try {
-                notificationService.deleteNotification(id);
+                notificationService.deleteNotification(notificationId);
                 return new ResponseEntity<>(HttpStatus.NO_CONTENT);
             }catch(NoSuchElementException e){
                 log.error("해당 알림 없음");
