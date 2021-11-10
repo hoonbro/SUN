@@ -98,10 +98,11 @@ public class S3service {
     //채팅에 올라온 파일 업로드할 때
     public MissionFileRpDto missionFileUpload(MultipartFile file,Long missionId, Long id) throws IOException {
         String fileName = file.getOriginalFilename();
+        String type = file.getContentType();
         String calendarCode = missionRepository.findByMissionId(missionId).getCalendarCode();
         String uuid = s3folderIncludingUpload(file,calendarCode,missionId);
         MissionFileEntity mEntity = new MissionFileEntity();
-            mEntity = mEntity.builder().fileUuid(uuid).fileName(fileName).missionId(missionId).id(id).
+            mEntity = mEntity.builder().fileUuid(uuid).fileName(fileName).missionId(missionId).id(id).type(type).
                             build();
 
             mEntity = missionFileRepository.save(mEntity);
@@ -183,7 +184,7 @@ public class S3service {
         MissionFileRpDto mDto = new MissionFileRpDto();
 
         mDto = mDto.builder().fileName(mEntity.getFileName())
-                        .fileUuid(mEntity.getFileUuid()).
+                        .fileUuid(mEntity.getFileUuid()).type(mEntity.getType()).
                 build();
 
         return mDto;

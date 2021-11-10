@@ -12,5 +12,6 @@ public class MissionFileRpDto {
 //    Long fileId;
     String fileUuid;
     String fileName;
+    String type;
 //    Long missionId;
 }
