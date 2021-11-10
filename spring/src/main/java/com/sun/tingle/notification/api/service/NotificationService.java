@@ -3,9 +3,13 @@ package com.sun.tingle.notification.api.service;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.member.api.dto.TokenInfo;
+import com.sun.tingle.member.api.dto.response.MemberResDto;
+import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
+import com.sun.tingle.notification.db.entity.NotificationCheckEntity;
 import com.sun.tingle.notification.db.entity.NotificationEntity;
+import com.sun.tingle.notification.db.repository.NotificationCheckRepository;
 import com.sun.tingle.notification.db.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +30,13 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+    private final NotificationCheckRepository notificationCheckRepository;
+
     private final MissionRepository missionRepository;
 
     private final CalendarService calendarService;
+
+    private final MemberService memberService;
 
     public SseEmitter subscribe(String Separator) {
         //lastEventId를 구분하기 위해 id+밀리초
@@ -48,7 +56,7 @@ public class NotificationService {
         return emitter;
     }
 
-    public void sendInvite(TokenInfo sender, String calendarCode, Long inviteeId) throws Exception {
+    public void sendInvite(TokenInfo sender, String calendarCode, String type, Long inviteeId) throws Exception {
 //        SseEmitter sseEmitter = CLIENTS.get(inviteeId);
 
         NotificationEntity inviteConflict = notificationRepository.findByCalendarCodeAndReceiverId(calendarCode, inviteeId);
@@ -58,9 +66,10 @@ public class NotificationService {
         //디비 저장
         Date now = new Date();
         NotificationEntity notificationEntity = NotificationEntity.builder()
-                .type("invite")
+                .type(type)
                 .calendarCode(calendarCode)
                 .senderId(sender.getId())
+                .sender(memberService.getMemberInfo(sender.getId()))
                 .receiverId(inviteeId)
                 .sendDate(now)
                 .sendTime(now)
@@ -87,13 +96,25 @@ public class NotificationService {
                 .type(type)
                 .calendarCode(calendarCode)
                 .senderId(id)
+                .sender(memberService.getMemberInfo(id))
                 .sendDate(now)
                 .sendTime(now)
-                .isCheck(false)
                 .mission(m)
                 .build();
-
         notificationEntity = notificationRepository.save(notificationEntity);
+
+        //캘린더 구독하고 있는 모든 사람들을 알림체크 테이블이 넣음
+        List<Long> list = calendarService.getMembersByCalendarCode(calendarCode);
+        for(Long n : list){
+            NotificationCheckEntity notificationCheckEntity = NotificationCheckEntity.builder()
+                    .notificationId(notificationEntity.getId())
+                    .memberId(n)
+                    .isCheck(false)
+                    .build();
+
+            notificationCheckRepository.save(notificationCheckEntity);
+        }
+
         for(Map.Entry<String, SseEmitter> entry : CLIENTS.entrySet()){
             if(entry.getKey().contains(calendarCode)){
                 sendToClient(entry.getValue(), entry.getKey(), calendarCode, notificationEntity);
@@ -148,6 +169,11 @@ public class NotificationService {
                 return o1.getSendDate().compareTo(o2.getSendDate());
             }
         });
+        for(NotificationEntity n : list){
+            n.setIsCheck(notificationCheckRepository.findByNotificationIdAndMemberId(n.getId(), id).getIsCheck());
+            n.setSender(memberService.getMemberInfo(n.getSenderId()));
+        }
+
         return list;
     }
 
@@ -155,5 +181,11 @@ public class NotificationService {
         notificationRepository.delete(
                 notificationRepository.findById(notificationId).orElseThrow(NoSuchElementException::new)
         );
+    }
+
+    public void checkNotification(Long notificationId, Long id){
+        NotificationCheckEntity notificationCheckEntity = notificationCheckRepository.findByNotificationIdAndMemberId(notificationId, id);
+        notificationCheckEntity.setIsCheck(true);
+        notificationCheckRepository.save(notificationCheckEntity);
     }
 }
