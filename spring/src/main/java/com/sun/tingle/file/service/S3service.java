@@ -184,7 +184,7 @@ public class S3service {
         MissionFileRpDto mDto = new MissionFileRpDto();
 
         mDto = mDto.builder().fileName(mEntity.getFileName())
-                        .fileUuid(mEntity.getFileUuid()).type(mEntity.getType()).
+                        .fileUuid(mEntity.getFileUuid()).type(mEntity.getType()).fileId(mEntity.getFileId()).
                 build();
 
         return mDto;
