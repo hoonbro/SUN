@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
 @Data
 @Entity
 @NoArgsConstructor
@@ -43,6 +41,9 @@ public class MissionEntity {
 
     @Column(name="id")
     Long id;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "mission")
+    private List<NotificationEntity> notificationList;
 
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
     private List<MissionFileEntity> missionFileList = new ArrayList<>();

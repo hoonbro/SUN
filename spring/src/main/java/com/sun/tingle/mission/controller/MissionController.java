@@ -45,7 +45,7 @@ public class MissionController {
 
         MissionRqDto missionRqDto = new MissionRqDto();
         missionRqDto = missionRqDto.builder().id(id).tag(tag).calendarCode(calendarCode).
-                        start(start).end(end).title(title).build();
+                start(start).end(end).title(title).build();
 
         MissionRpDto missionRpDto = missionService.insertMission(missionRqDto,teacherFile);
 
@@ -56,8 +56,8 @@ public class MissionController {
         return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
     }
 
-    @GetMapping
-    public ResponseEntity<MissionRpDto> selectMission(@RequestParam("missionId") Long missionId) {
+    @GetMapping("{missionId}")
+    public ResponseEntity<MissionRpDto> selectMission(@PathVariable("missionId") Long missionId) {
         MissionRpDto missionRpDto = missionService.selectMission(missionId);
         if(missionRpDto == null) {
             return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.NO_CONTENT);
@@ -67,7 +67,7 @@ public class MissionController {
 
 
     @PutMapping("{missionId}")
-    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam("teacherFile") MultipartFile[] teacherFile, @RequestParam("tag") List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
+    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam(value="teacherFile",required = false) MultipartFile[] teacherFile, @RequestParam(value="tag",required = false) List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         MissionRqDto missionRqDto = new MissionRqDto();
@@ -103,30 +103,49 @@ public class MissionController {
 
     }
 
-    @GetMapping("{calendarCode}")
-    public ResponseEntity<List<MissionRpDto>> selectMissionList(@PathVariable("calendarCode") String calendarCode) {
 
-        List<MissionRpDto> list = missionService.selectMissionList(calendarCode);
 
-        if(list.size() ==0) {
-            return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.NO_CONTENT);
+
+    @GetMapping
+    public ResponseEntity<List<MissionRpDto>> calendarOrDateMissionList(@RequestParam("calendarCode") String calendarCode,@RequestParam(value = "missionDate",required = false) String missionDate) throws ParseException {
+        if(missionDate ==null) {
+            List<MissionRpDto> list = missionService.selectMissionList(calendarCode);
+            if(list.size() ==0) {
+                return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.OK);
         }
-
-        return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.OK);
-
-
+        else {
+            List<MissionRpDto> list2 = missionService.selectDateMissionList(missionDate,calendarCode);
+            if(list2 == null) {
+                return new ResponseEntity<List<MissionRpDto>>(list2,HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<List<MissionRpDto>>(list2,HttpStatus.OK);
+        }
     }
 
-
-
-    @GetMapping("/date/{missionDate}")
-    public ResponseEntity<List<MissionRpDto>> selectDateMissionList(@PathVariable("missionDate") String missionDate) throws ParseException {
-
-        List<MissionRpDto> list = missionService.selectDateMissionList(missionDate);
-        if(list == null) {
-            return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.NO_CONTENT);
-        }
-        return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.OK);
-    }
+//    @GetMapping("{calendarCode}")
+//    public ResponseEntity<List<MissionRpDto>> selectMissionList(@PathVariable("calendarCode") String calendarCode) {
+//
+//        List<MissionRpDto> list = missionService.selectMissionList(calendarCode);
+//
+//        if(list.size() ==0) {
+//            return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.NO_CONTENT);
+//        }
+//
+//        return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.OK);
+//
+//
+//    }
+//
+//    @GetMapping
+//        public ResponseEntity<List<MissionRpDto>> selectDateMissionList(@RequestParam("missionDate") String missionDate,@RequestParam("calendarCode") String calendarCode) throws ParseException {
+//
+//            List<MissionRpDto> list = missionService.selectDateMissionList(missionDate,calendarCode);
+//            if(list == null) {
+//                return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.NO_CONTENT);
+//            }
+//            return new ResponseEntity<List<MissionRpDto>>(list,HttpStatus.OK);
+//    }
 
 }
