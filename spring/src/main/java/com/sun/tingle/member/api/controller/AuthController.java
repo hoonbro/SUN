@@ -10,6 +10,7 @@ import com.sun.tingle.member.api.service.EmailService;
 import com.sun.tingle.member.api.service.MemberService;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,19 +27,16 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 @CrossOrigin("*")
 public class AuthController {
-    @Autowired
-    PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    AuthService authService;
+    private final AuthService authService;
 
-    @Autowired
-    MemberService memberService;
+    private final MemberService memberService;
 
-    @Autowired
-    EmailService emailService;
+    private final EmailService emailService;
 
     @PostMapping
     public ResponseEntity<MemberResDto> signUp(@RequestBody MemberReqDto member){
