@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ChatMessageRequestDto {
     private String content;
-    private MultipartFile file;
 
     public ChatMessage toChatMessage(Long sender, ChatRoom inner_chatroom) {
         return ChatMessage.builder()
@@ -26,12 +25,11 @@ public class ChatMessageRequestDto {
                 .chatRoom(inner_chatroom)
                 .build();
     }
-    public ChatMessage toChatMessageFile(Long sender, ChatRoom inner_chatroom, String r) {
+    public ChatMessage toChatMessageFile(Long sender, ChatRoom inner_chatroom) {
         return ChatMessage.builder()
                 .sender(sender)
                 .sentTime(LocalDateTime.now())
                 .chatRoom(inner_chatroom)
-                .file_id(r)
                 .build();
     }
 }

@@ -53,8 +53,9 @@ public class ChatMessageResponseDto {
                 .sentTime(chatMessage.getSentTime())
                 .room_id(chatMessage.getChatRoom().getId())
                 .fileName(missionFile.getFileName())
-                .fileUuid(missionFile.getFileUuid())
-                .fileType(missionFile.getFileType())
+                .fileUuid(chatMessage.getFile_id())
+//                .fileUuid(missionFile.getFileUuid())
+//                .fileType(missionFile.getFileType())
                 .auth(memberEntity.getAuth())
                 .build();
     }

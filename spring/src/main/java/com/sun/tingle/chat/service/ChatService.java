@@ -71,19 +71,9 @@ public class ChatService {
         if (chatRoom.isEmpty()) {
             ChatRoom inner_chatroom = createChatRoom(roomid, missionEntity);
             chatRoomRepository.save(inner_chatroom);
-//            if (chatMessageRequestDto.getFile().isEmpty()) {
-                message = chatMessageRequestDto.toChatMessage(userid, inner_chatroom);
-//            } else {
-//                MissionFileRpDto r = s3service.missionFileUpload(chatMessageRequestDto.getFile(), mid, userid);
-//                message = chatMessageRequestDto.toChatMessageFile(userid, inner_chatroom, r.getFileUuid());
-//            }
+            message = chatMessageRequestDto.toChatMessage(userid, inner_chatroom);
         } else {
-//            if (chatMessageRequestDto.getFile().isEmpty()) {
-                message = chatMessageRequestDto.toChatMessage(userid, chatRoom.get());
-//            } else {
-//                MissionFileRpDto r = s3service.missionFileUpload(chatMessageRequestDto.getFile(), mid, userid);
-//                message = chatMessageRequestDto.toChatMessageFile(userid, chatRoom.get(), r.getFileUuid());
-//            }
+            message = chatMessageRequestDto.toChatMessage(userid, chatRoom.get());
         }
 
         ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message);
