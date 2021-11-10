@@ -131,7 +131,7 @@ public class MemberController {
         MemberEntity memberEntity = memberService.getMemberByEmail(inviteReqDto.getInviteeEmail());
 
         try {
-            notificationService.sendInvite(tokenInfo, inviteReqDto.getCalendarCode(), memberEntity.getId());
+            notificationService.sendInvite(tokenInfo, inviteReqDto.getCalendarCode(), "invite", memberEntity.getId());
         }catch(Exception e){
             log.error("초대 알림 중복");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
