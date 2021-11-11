@@ -73,6 +73,7 @@ public class NotificationService {
                 .receiverId(inviteeId)
                 .sendDate(now)
                 .sendTime(now)
+                .isCheck(false)
                 .build();
 
         notificationEntity = notificationRepository.save(notificationEntity);
@@ -99,6 +100,7 @@ public class NotificationService {
                 .sender(memberService.getMemberInfo(id))
                 .sendDate(now)
                 .sendTime(now)
+                .isCheck(false)
                 .mission(m)
                 .build();
         notificationEntity = notificationRepository.save(notificationEntity);
@@ -152,6 +154,7 @@ public class NotificationService {
             List<NotificationEntity> calendarCodeList = notificationRepository.findAllByCalendarCode(calendarRpDto.getCalendarCode());
             list.addAll(calendarCodeList);
         }
+        log.info("내 캘린더 알림 조회");
 
         //공유 캘린더 관련 알림
         List<CalendarRpDto> shareCalendarList = calendarService.getShareCalendarList(id);
@@ -159,6 +162,7 @@ public class NotificationService {
             List<NotificationEntity> calendarCodeList = notificationRepository.findAllByCalendarCode(calendarRpDto.getCalendarCode());
             list.addAll(calendarCodeList);
         }
+        log.info("공유 캘린더 알림 조회");
 
         Collections.sort(list, new Comparator<NotificationEntity>() {
             @Override
@@ -169,10 +173,12 @@ public class NotificationService {
                 return o1.getSendDate().compareTo(o2.getSendDate());
             }
         });
+        log.info("날짜순 정렬");
         for(NotificationEntity n : list){
             n.setIsCheck(notificationCheckRepository.findByNotificationIdAndMemberId(n.getId(), id).getIsCheck());
             n.setSender(memberService.getMemberInfo(n.getSenderId()));
         }
+        log.info("사용자에 맞게 알림 체크 여부 판단");
 
         return list;
     }
