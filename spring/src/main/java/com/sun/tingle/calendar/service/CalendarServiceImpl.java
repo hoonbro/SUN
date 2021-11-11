@@ -81,6 +81,10 @@ public class CalendarServiceImpl implements CalendarService{
             map.put("flag",-1);
             return map;
         }
+        else if(calendarRpDto.getId() == id) { // 본인이 등록한 캘린더를 공유하려고 할때
+            map.put("flag",-3);
+            return map;
+        }
         ShareCalendarEntity shareCalendarEntity2 = new ShareCalendarEntity();
         shareCalendarEntity2.setCalendarCode(calendarCode);
         shareCalendarEntity2.setId(id);
