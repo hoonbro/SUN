@@ -3,6 +3,7 @@ package com.sun.tingle.calendar.controller;
 
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
 import com.sun.tingle.calendar.requestdto.NotifyChangeRqDto;
+import com.sun.tingle.calendar.requestdto.ShareCalendarRqDto;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.member.api.dto.TokenInfo;
@@ -92,11 +93,15 @@ public class CalendarController {
 
 
     @PostMapping("/share")
-    public ResponseEntity<CalendarRpDto> insertShareCalendar(HttpServletRequest request,@RequestBody Map<String,String> map) {
-        String calendarCode = map.get("calendarCode");
+    public ResponseEntity<CalendarRpDto> insertShareCalendar(HttpServletRequest request, @RequestBody ShareCalendarRqDto shareCalendarRqDto) {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-        Map<String,Object> map2 = calendarService.insertShareCalendar(calendarCode,id);
+
+        // 알림 삭제
+        if(shareCalendarRqDto.getNotificationId() != null)
+            notificationService.deleteNotification(shareCalendarRqDto.getNotificationId());
+
+        Map<String,Object> map2 = calendarService.insertShareCalendar(shareCalendarRqDto.getCalendarCode(),id);
         int flag = (Integer)map2.get("flag");
         CalendarRpDto calendarRpDto = (CalendarRpDto)map2.get("calendarRpDto");
         if(flag == -1) { // 애초에 등록 안된 달력일
@@ -107,7 +112,7 @@ public class CalendarController {
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CONFLICT);
         }
         //공유 성공했을 때
-        notificationService.sendNotifyChange(id, calendarCode, "calendar_in", null);
+        notificationService.sendNotifyChange(id, shareCalendarRqDto.getCalendarCode(), "calendar_in", null);
         return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
