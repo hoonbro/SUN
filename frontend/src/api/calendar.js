@@ -5,6 +5,16 @@ const createCalendar = async (calendarName) => {
   return res.data
 }
 
+const addShareCalendar = async (calendarCode) => {
+  const res = await client.post(`calendar/share`, { calendarCode })
+  return res.data
+}
+
+const getAllCalendarList = async () => {
+  const res = await client.get("/calendar/every/calendars")
+  return res.data
+}
+
 const getCalendar = async (calendarCode) => {
   const res = await client.get(`calendar/${calendarCode}`)
   return res.data
@@ -15,20 +25,29 @@ const editCalendar = async ({ calendarCode, calendarName }) => {
   return res.data
 }
 
-const getMissionList = async ({ missionDate, calendarCode }) => {
+const deleteMyCalendar = async (calendarCode) => {
+  await client.delete(`calendar/${calendarCode}`)
+}
+
+const deleteShareCalendar = async (calendarCode) => {
+  await client.delete(`calendar/share/${calendarCode}`)
+}
+
+const getMissionList = async (params) => {
   const res = await client.get(`mission`, {
-    params: {
-      missionDate,
-      calendarCode,
-    },
+    params,
   })
   return res.data
 }
 
 const calendarAPI = {
   createCalendar,
+  addShareCalendar,
+  getAllCalendarList,
   getCalendar,
   editCalendar,
+  deleteMyCalendar,
+  deleteShareCalendar,
   getMissionList,
 }
 

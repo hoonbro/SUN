@@ -10,9 +10,19 @@ const getProfile = async (userPk) => {
   return res.data
 }
 
+const changePassword = async (password) => {
+  await client.put(`members/change-password`, { password })
+}
+
+const withdraw = async () => {
+  await client.delete(`members`)
+}
+
 const memberAPI = {
   updateProfile,
   getProfile,
+  changePassword,
+  withdraw,
 }
 
 export default memberAPI

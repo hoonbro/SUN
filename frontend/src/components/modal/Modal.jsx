@@ -25,9 +25,9 @@ const Modal = ({ onClose = (f) => f, maskClosable = true, children }) => {
         onClick={maskClosable ? onMaskClick : null}
       >
         <div
-          className="w-full bg-white rounded-md flex flex-col"
+          className="w-full bg-white rounded-md flex flex-col max-w-3xl"
           tabIndex="0"
-          style={{ height: "90vh", maxWidth: "420px" }}
+          style={{ height: "90vh" }}
         >
           {children}
         </div>

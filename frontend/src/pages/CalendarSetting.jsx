@@ -2,11 +2,42 @@ import Header from "../components/Header"
 import Divider from "../components/Divider"
 import { Link } from "react-router-dom"
 import CalendarAddForm from "../components/calendar/CalendarAddForm"
-import { useCalendarState } from "../context"
+import { getAllCalendar, useCalendarState } from "../context"
 import InfoMessageWrapper from "../components/InfoMessageWrapper"
+import { useCallback } from "react"
+import calendarAPI from "../api/calendar"
 
 const CalendarSetting = () => {
   const calendarState = useCalendarState()
+
+  const handleDeleteMyCalendar = useCallback(async (calendarCode) => {
+    try {
+      const ok = window.confirm("삭제하시겠습니까?")
+      if (!ok) {
+        return
+      }
+      await calendarAPI.deleteMyCalendar(calendarCode)
+      alert("삭제되었습니다")
+      await getAllCalendar()
+    } catch (error) {
+      alert("삭제 실패")
+    }
+  }, [])
+
+  const handleDeleteShareCalendar = useCallback(async (calendarCode) => {
+    try {
+      const ok = window.confirm("공유 캘린더를 삭제하시겠습니까?")
+      if (!ok) {
+        return
+      }
+      await calendarAPI.deleteShareCalendar(calendarCode)
+      alert("공유 캘린더가 삭제되었습니다")
+      await getAllCalendar()
+    } catch (error) {
+      alert("삭제 실패")
+    }
+  }, [])
+
   return (
     <div className="bg-gray-50 min-h-full">
       <Header
@@ -29,12 +60,20 @@ const CalendarSetting = () => {
                 <div className="grid gap-2" key={c.calendarCode}>
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{c.calendarName}</span>
-                    <Link
-                      to={`/calendars/${c.calendarCode}/edit`}
-                      className="flex text-sm text-gray-600"
-                    >
-                      수정
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/calendars/${c.calendarCode}/edit`}
+                        className="flex text-sm text-gray-600"
+                      >
+                        수정
+                      </Link>
+                      <button
+                        onClick={() => handleDeleteMyCalendar(c.calendarCode)}
+                        className="flex text-sm text-red-500"
+                      >
+                        삭제
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">캘린더 코드</span>
@@ -56,12 +95,22 @@ const CalendarSetting = () => {
                 <div className="grid gap-2" key={c.id}>
                   <div className="flex items-center justify-between">
                     <span className="font-medium">{c.calendarName}</span>
-                    <Link
-                      to={`/calendars/1/edit`}
-                      className="flex text-sm text-gray-600"
-                    >
-                      수정
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        to={`/calendars/1/edit`}
+                        className="flex text-sm text-gray-600"
+                      >
+                        수정
+                      </Link>
+                      <button
+                        onClick={() =>
+                          handleDeleteShareCalendar(c.calendarCode)
+                        }
+                        className="flex text-sm text-red-500"
+                      >
+                        삭제
+                      </button>
+                    </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-600">캘린더 코드</span>

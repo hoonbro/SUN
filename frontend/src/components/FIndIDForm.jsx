@@ -1,4 +1,5 @@
 import { useMemo } from "react"
+import auth from "../api/auth"
 import useInputs from "../hooks/useInputs"
 import { emailValidator } from "../lib/validators"
 import Button from "./Button"
@@ -19,8 +20,14 @@ const FindIDForm = () => {
     return email.value.length && Object.keys(email.errors).length === 0
   }, [email])
 
-  const handleSubmit = (e, email) => {
+  const handleSubmit = async (e, email) => {
     e.preventDefault()
+    try {
+      await auth.findId(email)
+      alert("이메일로 아이디를 전송했습니다")
+    } catch (error) {
+      alert("존재하지 않는 이메일입니다")
+    }
   }
 
   return (

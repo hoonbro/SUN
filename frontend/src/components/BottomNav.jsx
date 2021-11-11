@@ -1,5 +1,11 @@
 import { Link, useHistory } from "react-router-dom"
-import { FcCalendar, FcReadingEbook } from "react-icons/fc"
+import {
+  IoCalendar,
+  IoNotifications,
+  IoChatboxEllipses,
+  IoLogOut,
+  IoPersonCircle,
+} from "react-icons/io5"
 import {
   logout,
   useAuthDispatch,
@@ -26,15 +32,15 @@ const BottomNav = () => {
             to={`/calendars/${calendarState.currentCalendarCode}`}
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
-            <FcCalendar size="24px" />
+            <IoCalendar size="24px" />
             <span className="text-xs">캘린더</span>
           </Link>
           <Link
             key="캘린더2"
-            to="/"
+            to="/notifications"
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
-            <FcCalendar size="24px" />
+            <IoNotifications size="24px" />
             <span className="text-xs">알림</span>
           </Link>
           <Link
@@ -42,7 +48,7 @@ const BottomNav = () => {
             to="/"
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
-            <FcCalendar size="24px" />
+            <IoChatboxEllipses size="24px" />
             <span className="text-xs">채팅</span>
           </Link>
           <Link
@@ -50,7 +56,7 @@ const BottomNav = () => {
             to={`/profile/${authState.user.id}`}
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
           >
-            <FcReadingEbook size="24px" />
+            <IoPersonCircle size="24px" />
             <span className="text-xs">프로필</span>
           </Link>
           <button
@@ -58,7 +64,7 @@ const BottomNav = () => {
             className={`flex flex-col gap-1 items-center w-14 text-gray-400 `}
             onClick={handleLogout}
           >
-            <FcCalendar size="24px" />
+            <IoLogOut size="24px" />
             <span className="text-xs">로그아웃</span>
           </button>
         </nav>

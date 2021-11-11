@@ -196,54 +196,56 @@ const Register = () => {
   }
 
   return (
-    <div className="bg-gray-50 pb-20">
+    <div className="bg-gray-50 min-h-full flex flex-col">
       <Header pageTitle="회원가입" to="/login" backPageTitle="로그인" />
-      <div className="container max-w-lg bg-white px-6 py-6 xs:rounded-xl xs:shadow-lg">
-        <div className=" grid gap-10">
-          <div className="grid gap-4">
-            <InputFormField
-              field={memberId}
-              setField={setMemberId}
-              handleBlur={handleBlur}
-            />
-            <InputFormField
-              field={password}
-              setField={setPassword}
-              handleBlur={handleBlur}
-            />
-            <InputFormField
-              field={passwordConfirm}
-              setField={setPasswordConfirm}
-              handleBlur={handleBlur}
-            />
-            <InputFormField
-              field={name}
-              setField={setName}
-              handleBlur={handleBlur}
-            />
-            <InputFormField
-              field={phone}
-              setField={setPhone}
-              handleBlur={handleBlur}
-            />
-            <InputFormField
-              field={email}
-              setField={setEmail}
-              handleBlur={handleBlur}
-            />
+      <div className="flex-1 h-full py-10">
+        <div className="container max-w-lg bg-white px-6 py-6 xs:rounded-xl xs:shadow-lg">
+          <div className=" grid gap-10">
+            <div className="grid gap-4">
+              <InputFormField
+                field={memberId}
+                setField={setMemberId}
+                handleBlur={handleBlur}
+              />
+              <InputFormField
+                field={password}
+                setField={setPassword}
+                handleBlur={handleBlur}
+              />
+              <InputFormField
+                field={passwordConfirm}
+                setField={setPasswordConfirm}
+                handleBlur={handleBlur}
+              />
+              <InputFormField
+                field={name}
+                setField={setName}
+                handleBlur={handleBlur}
+              />
+              <InputFormField
+                field={phone}
+                setField={setPhone}
+                handleBlur={handleBlur}
+              />
+              <InputFormField
+                field={email}
+                setField={setEmail}
+                handleBlur={handleBlur}
+              />
 
-            <RadioFormField
-              radioDiv={radioDiv}
-              value={teacherOrStudent}
-              setValue={setTeacherOrStudent}
-            />
+              <RadioFormField
+                radioDiv={radioDiv}
+                value={teacherOrStudent}
+                setValue={setTeacherOrStudent}
+              />
+            </div>
+            <SubmitButton
+              disabled={!canSubmit}
+              handleButtonClick={handleButtonClick}
+            >
+              회원 가입
+            </SubmitButton>
           </div>
-          <SubmitButton
-            disabled={!canSubmit}
-            handleButtonClick={handleButtonClick}
-          >
-            회원 가입
-          </SubmitButton>
         </div>
       </div>
     </div>

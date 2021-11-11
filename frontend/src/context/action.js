@@ -1,3 +1,4 @@
+import calendarAPI from "../api/calendar"
 import client from "../api/client"
 import memberAPI from "../api/member"
 
@@ -113,10 +114,10 @@ export const silentRefresh = async (dispatch, refreshToken) => {
 
 export const getAllCalendar = async (dispatch) => {
   try {
-    const res = await client.get("/calendar/every/calendars")
+    const calendarListRes = await calendarAPI.getAllCalendarList()
     dispatch({
       type: "SET_CALENDAR",
-      payload: res.data,
+      payload: calendarListRes,
     })
   } catch (error) {
     console.log(error)

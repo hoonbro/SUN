@@ -6,6 +6,7 @@ import ProfileEdit from "../pages/ProfileEdit"
 import ChangePassword from "../pages/ChangePassword"
 import CalendarLayout from "../layouts/CalendarLayout"
 import FindAuth from "../pages/FindAuth"
+import NotiCenter from "../pages/NotiCenter"
 
 const routes = [
   {
@@ -31,6 +32,11 @@ const routes = [
   {
     path: "/calendars",
     component: CalendarLayout,
+    requiresAuth: true,
+  },
+  {
+    path: "/notifications",
+    component: NotiCenter,
     requiresAuth: true,
   },
   {
