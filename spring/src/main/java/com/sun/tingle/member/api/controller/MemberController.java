@@ -33,11 +33,8 @@ public class MemberController {
 
     private final JwtUtil jwtUtil;
 
-    @GetMapping
-    public ResponseEntity<MemberResDto> getMemberInfo(HttpServletRequest request){
-        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-
+    @GetMapping("/{id}")
+    public ResponseEntity<MemberResDto> getMemberInfo(@PathVariable Long id){
         HttpStatus httpStatus = HttpStatus.OK;
         MemberResDto memberResDto;
         try {
