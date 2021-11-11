@@ -15,6 +15,7 @@ public interface CalendarRepository extends JpaRepository<CalendarEntity,String>
     public CalendarEntity findByCalendarCode(String calendarCode);
     public CalendarEntity findByCalendarName(String calendarName);
     public List<CalendarEntity> findById(long id);
+
     @Query("select c.id from CalendarEntity c where c.calendarCode =?1")
     List<Long> findIdByCalendarCode(String calendarCode);
 
