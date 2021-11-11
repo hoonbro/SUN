@@ -70,7 +70,9 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
       >
         {/* svg 파일 안보임 */}
         {chatItem.fileName && chatItem.fileType.includes("image") && (
-          <img src={chatItem.fileUri} className="w-28 h-28" />
+          <a href={chatItem.fileUri}>
+            <img src={chatItem.fileUri} className="w-28 h-28" />
+          </a>
         )}
         {chatItem.fileName && !chatItem.fileType.includes("image") && (
           <a

@@ -3,7 +3,7 @@ import client from "./client"
 const getChatRoomInfo = async (missionId) => {
   try {
     const res = await client.get(`/messages/mission/${missionId}`)
-    console.log(res.data)
+    // console.log(res.data)
     return res.data
   } catch (error) {
     console.log(error.response)
@@ -22,7 +22,7 @@ const getHistory = async (roomId, currentPage, sizePerPage) => {
 }
 
 const sendFile = async (missionId, formData) => {
-  console.log(formData.get("file"))
+  // console.log(formData.get("file"))
   try {
     await client.post(`/messages/mission/${missionId}/file`, formData, {
       headers: {
@@ -34,4 +34,14 @@ const sendFile = async (missionId, formData) => {
   }
 }
 
-export default { getChatRoomInfo, getHistory, sendFile }
+const getMissionInfo = async (missionId) => {
+  try {
+    const res = await client.get(`/mission/${missionId}`)
+    // console.log(res.data)
+    return res.data
+  } catch (error) {
+    console.log(error.response)
+  }
+}
+
+export default { getChatRoomInfo, getHistory, sendFile, getMissionInfo }

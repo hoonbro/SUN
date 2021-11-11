@@ -1,9 +1,26 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import { MdAttachFile, MdSaveAlt } from "react-icons/md"
 import { RiArrowDropDownLine, RiArrowDropUpLine } from "react-icons/ri"
+import { ChatContext } from "../../../pages/EventDetail"
 
 const EventMaterial = () => {
+  const { teacherFileList } = useContext(ChatContext)
+  console.log(teacherFileList)
+
+  const fileComponentList = teacherFileList.map((fileItem) => (
+    <p
+      className="flex justify-between px-4 py-2 items-center"
+      key={fileItem.fileId}
+    >
+      <span>{fileItem.fileName}</span>
+      <a href={fileItem.fileUri}>
+        <MdSaveAlt className="text-2xl text-gray-500" />
+      </a>
+    </p>
+  ))
+
   const [isShow, setIsShow] = useState(false)
+
   return (
     <section className="py-4 px-4 grid gap-2">
       <div className="flex justify-between items-center">
@@ -26,14 +43,7 @@ const EventMaterial = () => {
       </div>
       {isShow && (
         <div className="border border-gray-400 rounded py-2 grid gap-2">
-          <p className="flex justify-between px-4 py-2 items-center">
-            <span>Spot 색칠공부하기</span>
-            <MdSaveAlt className="text-2xl text-gray-500" />
-          </p>
-          <p className="flex justify-between px-4 py-2 items-center">
-            <span>단어시험</span>
-            <MdSaveAlt className="text-2xl text-gray-500" />
-          </p>
+          {fileComponentList}
         </div>
       )}
     </section>

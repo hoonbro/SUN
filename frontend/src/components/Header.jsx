@@ -6,6 +6,7 @@ const Header = ({
   to,
   backPageTitle = "뒤로가기",
   handleGoBack,
+  children,
 }) => {
   return (
     <header className="sticky z-10 left-0 top-0 py-4 grid gap-2 bg-white shadow">
@@ -28,6 +29,7 @@ const Header = ({
         </button>
       )}
       <h3 className="place-self-center">{pageTitle}</h3>
+      {children}
     </header>
   )
 }
