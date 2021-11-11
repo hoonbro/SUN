@@ -173,8 +173,9 @@ public class NotificationService {
                 return o1.getSendDate().compareTo(o2.getSendDate());
             }
         });
-        log.info("날짜순 정렬");
         for(NotificationEntity n : list){
+            if(n.getType().equals("invite"))
+                continue;
             n.setIsCheck(notificationCheckRepository.findByNotificationIdAndMemberId(n.getId(), id).getIsCheck());
             n.setSender(memberService.getMemberInfo(n.getSenderId()));
         }
