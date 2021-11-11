@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useState } from "react"
+import { useSWRConfig } from "swr"
 import calendarAPI from "../../api/calendar"
-import { addCalendar, useCalendarDispatch } from "../../context"
+// import { addCalendar, useCalendarDispatch } from "../../context"
 
 const CalendarAddForm = () => {
-  const calendarDispatch = useCalendarDispatch()
+  // const calendarDispatch = useCalendarDispatch()
+  const { mutate } = useSWRConfig()
   const [code, setCode] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -20,12 +22,27 @@ const CalendarAddForm = () => {
       try {
         setLoading(true)
         const calendarRes = await calendarAPI.addShareCalendar(code)
-        setLoading(false)
         console.log(calendarRes)
-        // addCalendar(calendarDispatch, calendarRes)
+        // 캘린더 새로 받아오기 실행
+        mutate("/calendar/every/calendars")
       } catch (error) {
-        alert("잘못된 코드입니다")
+        console.log(error.response)
+        switch (error.response?.status) {
+          case 400: {
+            alert("내 캘린더는 추가할 수 없어요")
+            break
+          }
+          case 404: {
+            alert("잘못된 캘린더 코드입니다. 다시 확인해주세요.")
+            break
+          }
+          case 409: {
+            alert("이미 추가된 캘린더입니다.")
+            break
+          }
+        }
       }
+      setLoading(false)
     },
     [code]
   )
