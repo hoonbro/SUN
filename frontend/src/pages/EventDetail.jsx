@@ -30,8 +30,7 @@ const chatReducer = (state, action) => {
 
 const EventDetail = () => {
   const auth = useAuthState()
-
-  const { eventId } = useRouteMatch().params
+  const { calendarCode, eventId } = useRouteMatch().params
 
   const [missionId, setMissionId] = useState(null)
   const [roomId, setRoomId] = useState(null)
@@ -45,6 +44,11 @@ const EventDetail = () => {
   const sizePerPage = 15
 
   useEffect(() => {
+    // if (!("Notification" in window)) {
+    //   alert("데스크톱 알림을 지원하지 않는 브라우저이다.")
+    // }
+    // Notification.requestPermission()
+
     const getChatInfo = async () => {
       const roomInfo = await ChatAPI.getChatRoomInfo(eventId)
       setMissionId(roomInfo.mission_id)
@@ -65,6 +69,17 @@ const EventDetail = () => {
     )
     setCurrentPage((prev) => prev + 1)
     console.log(chatHistoryData)
+    console.log(chatHistoryData.content)
+    chatHistoryData.content = chatHistoryData.content.map((item) => {
+      if (item.fileName) {
+        return {
+          ...item,
+          fileUri: `https://d101s.s3.ap-northeast-2.amazonaws.com/${calendarCode}/${item.room_id}/${item.fileUuid}`,
+        }
+      }
+      return item
+    })
+    console.log(chatHistoryData.content)
     setLastPage(chatHistoryData.totalPages)
     dispatch({ type: "HISTORY", payload: chatHistoryData.content })
   }
@@ -96,10 +111,20 @@ const EventDetail = () => {
 
   const subscribe = (roomId) => {
     client.current.subscribe(`/room/${roomId}`, (res) => {
-      console.log(res)
-      console.log(res.body)
-      console.log(JSON.parse(res.body))
-      dispatch({ type: "NEW_MESSAGE", payload: JSON.parse(res.body) })
+      let resData = JSON.parse(res.body)
+      console.log(resData)
+
+      if (resData.fileName) {
+        resData = {
+          ...resData,
+          fileUri: `https://d101s.s3.ap-northeast-2.amazonaws.com/${calendarCode}/${resData.room_id}/${resData.fileUuid}`,
+        }
+        //   new Notification("새 메세지", { body: "파일" })
+        // } else {
+        //   new Notification("새 메세지", { body: resData.content })
+      }
+      console.log(resData)
+      dispatch({ type: "NEW_MESSAGE", payload: resData })
     })
   }
 
@@ -116,6 +141,7 @@ const EventDetail = () => {
         lastPage,
         currentPage,
         sizePerPage,
+        calendarCode,
       }}
     >
       <div className="h-full flex flex-col">

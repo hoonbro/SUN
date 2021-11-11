@@ -3,6 +3,7 @@ import client from "./client"
 const getChatRoomInfo = async (missionId) => {
   try {
     const res = await client.get(`/messages/mission/${missionId}`)
+    console.log(res.data)
     return res.data
   } catch (error) {
     console.log(error.response)
@@ -20,4 +21,17 @@ const getHistory = async (roomId, currentPage, sizePerPage) => {
   }
 }
 
-export default { getChatRoomInfo, getHistory }
+const sendFile = async (missionId, formData) => {
+  console.log(formData.get("file"))
+  try {
+    await client.post(`/messages/mission/${missionId}/file`, formData, {
+      headers: {
+        "Content-Type": `multipart/form-data`,
+      },
+    })
+  } catch (error) {
+    console.log(error.response)
+  }
+}
+
+export default { getChatRoomInfo, getHistory, sendFile }

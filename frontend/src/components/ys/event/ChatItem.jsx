@@ -1,10 +1,11 @@
 import React, { useContext, useLayoutEffect, useState } from "react"
 import { ChatContext } from "../../../pages/EventDetail"
 import moment from "moment"
+import { BsFileText } from "react-icons/bs"
 
 const ChatItem = ({ chatItem, exChatItem = null }) => {
   const { id: myId } = useContext(ChatContext)["auth"]["user"]
-  const isMe = myId === Number(chatItem.sender_id)
+  const isMe = chatItem && myId === Number(chatItem.sender_id)
 
   const timeMoment = moment(chatItem.sentTime)
   const exTimeMoment = exChatItem && moment(exChatItem.sentTime)
@@ -61,12 +62,34 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
       )}
       <span
         className={
-          "border-2 rounded-xl py-1 px-2 mx-12" +
+          (isMe ? "mr-12 ml-24" : "ml-12 mr-24") +
+          " border-2 rounded-xl py-1 px-2 " +
           contentBorderColor +
           contentLeftRight
         }
       >
-        {chatItem.content}
+        {/* svg 파일 안보임 */}
+        {chatItem.fileName && chatItem.fileType.includes("image") && (
+          <img src={chatItem.fileUri} className="w-28 h-28" />
+        )}
+        {chatItem.fileName && !chatItem.fileType.includes("image") && (
+          <a
+            href={chatItem.fileUri}
+            className=" break-all flex items-center gap-2"
+          >
+            <p
+              className={
+                (chatItem.auth === "ROLE_TEACHER"
+                  ? "bg-orange-200"
+                  : "bg-blue-200") + " p-2 rounded-full"
+              }
+            >
+              <BsFileText className="text-2xl" />
+            </p>
+            {chatItem.fileName}
+          </a>
+        )}
+        {!chatItem.fileName && chatItem.content}
       </span>
     </div>
   )
