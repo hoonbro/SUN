@@ -1,5 +1,5 @@
 import { Calendar, momentLocalizer } from "react-big-calendar"
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
+// import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop"
 import moment from "moment"
 import "moment/locale/ko"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -11,15 +11,15 @@ import EventListItem from "../components/EventListItem"
 import "../static/calendar.css"
 import "react-big-calendar/lib/addons/dragAndDrop/styles.scss"
 import CalendarAside from "../components/calendar/CalendarAside"
-import client from "../api/client"
 import {
   getAllCalendar,
   setCurrentCalendar,
   useCalendarDispatch,
 } from "../context"
 import calendarAPI from "../api/calendar"
+import useSWR from "swr"
+import featcher from "../lib/featcher"
 
-const DragAndDropCalendar = withDragAndDrop(Calendar)
 const localizer = momentLocalizer(moment)
 
 const EventsModal = ({
@@ -40,7 +40,18 @@ const EventsModal = ({
         missionDate: moment(date).format("YYYY-MM-DD"),
         calendarCode,
       })
-      setEvents(eventsRes)
+      setEvents(
+        eventsRes.map((event) => {
+          return {
+            ...event,
+            targetDate: moment(date).format("YYYY-MM-DD"),
+            startDate: moment(event.start).format("YYYY-MM-DD"),
+            startTime: moment(event.start).format("a HH:mm"),
+            endDate: moment(event.end).format("YYYY-MM-DD"),
+            endTime: moment(event.end).format("a HH:mm"),
+          }
+        })
+      )
     }
     asyncEffect()
     return () => {
@@ -51,17 +62,17 @@ const EventsModal = ({
   return (
     <Modal onClose={onClose}>
       <div className="flex flex-col h-full">
-        <header className="flex items-center justify-between p-6">
-          <h4 className="select-none">{selectedDate}</h4>
+        <header className="flex items-center justify-between p-4">
+          <h5 className="select-none font-bold">{selectedDate}</h5>
           <button onClick={onClose}>
             <MdClose size="20" />
           </button>
         </header>
-        <div className="px-6 py-2 bg-orange-50">
+        <div className="px-6 py-2 bg-gray-100">
           <p className="font-medium select-none">과제</p>
         </div>
-        <div className="overflow-auto flex-1 py-4">
-          <div className="grid">
+        <div className="overflow-auto flex-1 py-2">
+          <div className="grid gap-2">
             {events.map((event) => (
               <EventListItem key={event.missionId} {...event} />
             ))}
@@ -92,18 +103,34 @@ const MyCalendar = () => {
   const history = useHistory()
   const calendarDispatch = useCalendarDispatch()
   const { calendarCode } = useParams()
+
+  const { data: calendarData } = useSWR(
+    calendarCode ? `/calendar/${calendarCode}` : null,
+    featcher,
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  )
+
+  const { data: events } = useSWR(
+    calendarCode ? `/mission?calendarCode=${calendarCode}` : null,
+    featcher
+  )
+
   const [selectedDate, setSelectedDate] = useState(null)
-  const [events, setEvents] = useState([])
+  // const [events, setEvents] = useState([])
   const [modalOpen, setModalOpen] = useState(false)
   const [asideOpen, setAsideOpen] = useState(false)
-  const [calendarInfo, setCalendarInfo] = useState({
-    calendarCode: "",
-    calendarName: "",
-    id: -1,
-  })
 
   const handleSelectSlot = useCallback((slotInfo) => {
     setSelectedDate(slotInfo.slots[0])
+    setModalOpen(true)
+  }, [])
+
+  const handleShowMore = useCallback((events, date) => {
+    setSelectedDate(date)
     setModalOpen(true)
   }, [])
 
@@ -111,64 +138,20 @@ const MyCalendar = () => {
     setModalOpen(false)
   }, [])
 
-  const handleDropEvent = useCallback(({ event, start, end }) => {
-    setEvents((prevEvents) =>
-      prevEvents.map((existingEvent) => {
-        return event.id === existingEvent.id
-          ? { ...existingEvent, start, end }
-          : existingEvent
-      })
-    )
-  }, [])
-
-  const handleResizeEvent = useCallback(({ event, start, end }) => {
-    if (start >= end) {
-      alert("종료 날짜는 시작날짜보다 늦어야 합니다")
-      return
-    }
-    setEvents((prevEvents) =>
-      prevEvents.map((existingEvent) => {
-        return event.id === existingEvent.id
-          ? { ...existingEvent, start, end }
-          : existingEvent
-      })
-    )
-  }, [])
-
   const handleSelectEvent = (e) => {
     console.log(e)
     history.push(`/calendars/${e.calendarCode}/events/${e.missionId}`)
   }
 
-  const getCalendarInfo = useCallback(async () => {
-    try {
-      const res = await client.get(`calendar/${calendarCode}`)
-      setCalendarInfo({ ...res.data })
-    } catch (error) {
-      console.log(error)
-    }
-  }, [calendarCode])
-
-  const getEvents = useCallback(async () => {
-    try {
-      const res = await calendarAPI.getMissionList({ calendarCode })
-      setEvents([...res])
-    } catch (error) {
-      console.log(error)
-    }
-  }, [calendarCode])
-
   useEffect(() => {
     async function asyncEffect() {
-      await getCalendarInfo()
-      await getEvents()
       await getAllCalendar(calendarDispatch)
     }
     setModalOpen(false)
     setAsideOpen(false)
     asyncEffect()
     setCurrentCalendar(calendarDispatch, calendarCode)
-  }, [getCalendarInfo, getEvents, calendarDispatch, calendarCode])
+  }, [calendarDispatch, calendarCode])
 
   return (
     <div className="relative flex flex-col h-full pb-10">
@@ -178,22 +161,23 @@ const MyCalendar = () => {
           onClick={() => setAsideOpen(!asideOpen)}
         >
           <MdSwapHoriz size={20} />
-          <span className="font-bold">{calendarInfo.calendarName}</span>
+          <span className="font-bold">{calendarData?.calendarName}</span>
         </button>
       </header>
-      <DragAndDropCalendar
-        className="container flex-auto"
-        selectable
-        localizer={localizer}
-        views={["month"]}
-        defaultDate={new Date()}
-        defaultView="month"
-        events={events}
-        onEventDrop={handleDropEvent}
-        onEventResize={handleResizeEvent}
-        onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleSelectEvent}
-      />
+      {events !== undefined && (
+        <Calendar
+          className="container flex-auto"
+          selectable
+          localizer={localizer}
+          views={["month"]}
+          defaultDate={new Date()}
+          defaultView="month"
+          events={events}
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
+          onShowMore={handleShowMore}
+        />
+      )}
       <Link
         className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white"
         to={`/calendars/${calendarCode}/events/create`}
