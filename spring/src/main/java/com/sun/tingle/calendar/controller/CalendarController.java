@@ -106,10 +106,13 @@ public class CalendarController {
         CalendarRpDto calendarRpDto = (CalendarRpDto)map2.get("calendarRpDto");
         if(flag == -1) { // 애초에 등록 안된 달력일
             // 때
-            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.NO_CONTENT);
+            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.NOT_FOUND);
         }
         else if(flag == -2) { // 이미 공유 달력에 등록되어 있을 때
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CONFLICT);
+        }
+        else if(flag == -3) { // 본인이 만든 캘린더일때는 공유 되면 안됨
+            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.BAD_REQUEST);
         }
         //공유 성공했을 때
         notificationService.sendNotifyChange(id, shareCalendarRqDto.getCalendarCode(), "calendar_in", null);
