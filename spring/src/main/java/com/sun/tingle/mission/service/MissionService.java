@@ -16,4 +16,6 @@ public interface MissionService {
     public int deleteMission(Long missionId,Long id);
     public List<MissionRpDto> selectMissionList(String calendarCode);
     public List<MissionRpDto> selectDateMissionList(String missionDate,String calendarCode) throws ParseException;
+    public List<Long> getMemberMissionList(Long id);
+
 }

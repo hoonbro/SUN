@@ -1,6 +1,8 @@
 package com.sun.tingle.mission.controller;
 
 import com.amazonaws.Response;
+import com.sun.tingle.calendar.responsedto.CalendarRpDto;
+import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.mission.db.entity.MissionEntity;
@@ -123,6 +125,21 @@ public class MissionController {
             return new ResponseEntity<List<MissionRpDto>>(list2,HttpStatus.OK);
         }
     }
+
+
+    @GetMapping("/memberMissionList")
+    public ResponseEntity<List<Long>> getMemberMissionList(HttpServletRequest request) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+
+        List<Long> list = missionService.getMemberMissionList(id);
+
+        return new ResponseEntity<List<Long>>(list,HttpStatus.OK);
+
+    }
+
+
+
 
 //    @GetMapping("{calendarCode}")
 //    public ResponseEntity<List<MissionRpDto>> selectMissionList(@PathVariable("calendarCode") String calendarCode) {

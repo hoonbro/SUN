@@ -3,6 +3,8 @@ package com.sun.tingle.mission.service;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
 import com.sun.tingle.calendar.db.repo.CalendarRepository;
+import com.sun.tingle.calendar.responsedto.CalendarRpDto;
+import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.file.db.entity.TeacherFileEntity;
 import com.sun.tingle.file.db.repo.TeacherFileRepository;
 import com.sun.tingle.file.service.S3service;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +37,9 @@ public class MissionServiceImpl implements MissionService {
 
     @Autowired
     NotificationService notificationService;
+
+    @Autowired
+    CalendarService calendarService;
 
     @Autowired
     S3service s3service;
@@ -217,6 +223,27 @@ public class MissionServiceImpl implements MissionService {
         List<MissionRpDto> list2 = builderMissionList(list);
 
         return list2;
+    }
+
+    @Override
+    public List<Long> getMemberMissionList(Long id) {
+        List<CalendarRpDto> list = calendarService.getMyCalendarList(id);
+        List<CalendarRpDto> list2 = calendarService.getShareCalendarList(id);
+        List<Long> missionList = new ArrayList<>();
+        list.addAll(list2);
+
+        int size = list.size();
+        int size2 = 0;
+        for(int i=0; i<size; i++) {
+            List<MissionEntity> list3 = missionRepository.findByCalendarCode(list.get(i).getCalendarCode());
+            size2 = list3.size();
+            for(int j=0; j<size2; j++) {
+                missionList.add(list3.get(j).getMissionId());
+            }
+        }
+
+        Collections.sort(missionList);
+        return missionList;
     }
 
 
