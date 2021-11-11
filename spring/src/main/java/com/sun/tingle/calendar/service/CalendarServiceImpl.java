@@ -6,6 +6,8 @@ import com.sun.tingle.calendar.db.repo.CalendarRepository;
 import com.sun.tingle.calendar.db.repo.ShareCalendarRepository;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.file.service.S3service;
+import com.sun.tingle.member.db.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,9 @@ public class CalendarServiceImpl implements CalendarService{
 
     @Autowired
     ShareCalendarRepository shareCalendarRepository;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     S3service s3service;
@@ -67,6 +72,13 @@ public class CalendarServiceImpl implements CalendarService{
         if(calendarEntity.getId() != id) { // 등록한 사람아닐 때 권한 x
             return 1;
         }
+
+        String defaultCalendar = memberRepository.findById(id).get().getDefaultCalendar();
+
+        if(defaultCalendar.equals(calendarCode)) {
+            return 3;
+        }
+
         calendarRepository.deleteById(calendarCode);
         s3service.s3CalendarDelete(calendarCode);
         return 2;

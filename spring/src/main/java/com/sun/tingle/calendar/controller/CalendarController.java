@@ -57,6 +57,9 @@ public class CalendarController {
             if(result ==1) { // 캘린더 등록한 사람이 아니라서 권한 없을 때
                 return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
             }
+            else if(result == 3) {
+                return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
+            }
             else {  // 삭제 완료
                 return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
             }
