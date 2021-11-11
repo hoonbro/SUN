@@ -165,7 +165,7 @@ const EventDetail = () => {
         <div className="h-full flex flex-col">
           <Header pageTitle={missionInfo.title} handleGoBack={handleGoBack}>
             {
-              <>
+              <div className="flex flex-col gap-2 items-center">
                 <div className="flex justify-center gap-2">
                   {missionInfo.tag.map((tag) => (
                     <p className="text-gray-500 text-sm" key={tag}>
@@ -173,11 +173,11 @@ const EventDetail = () => {
                     </p>
                   ))}
                 </div>
-                <div className="flex justify-center gap-2 text-sm text-gray-700">
+                <div className="flex justify-center gap-2 text-sm text-gray-700 bg-gray-50 px-2 rounded">
                   <p>{moment(missionInfo.start).format("LL (dd)")}</p>~
                   <p>{moment(missionInfo.end).format("LL (dd)")}</p>
                 </div>
-              </>
+              </div>
             }
           </Header>
           <EventMaterial />
