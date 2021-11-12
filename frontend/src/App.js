@@ -6,7 +6,6 @@ import NoMatchRoute from "./components/NoMatchRoute"
 import {
   useAuthDispatch,
   useCalendarDispatch,
-  getAllCalendar,
   silentRefresh,
   setCurrentCalendar,
 } from "./context"
@@ -24,7 +23,6 @@ function App() {
       if (user) {
         // TODO: authState를 payload로 전달하지 않고 다른 방법으로 token을 전달하기
         await silentRefresh(authDispatch, user.token?.refreshToken)
-        await getAllCalendar(calendarDispatch)
         setCurrentCalendar(calendarDispatch, user.user.defaultCalendar)
       }
       setLoading(false)

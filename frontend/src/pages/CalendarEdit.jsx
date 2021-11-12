@@ -1,50 +1,38 @@
-import { useCallback, useEffect, useMemo } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import calendarAPI from "../api/calendar"
 import CalendarForm from "../components/calendar/CalendarForm"
 import Header from "../components/Header"
-import { editCalendar, useCalendarDispatch } from "../context"
-import useInputs from "../hooks/useInputs"
 
 const CalendarEdit = () => {
   const history = useHistory()
   const { calendarCode } = useParams()
-  const calendarDispatch = useCalendarDispatch()
-  const [fields, handleChange] = useInputs({
-    calendar: {
-      value: "",
-      errors: {},
-      validators: [],
-    },
-  })
+  const [calendarName, setCalendarName] = useState("")
 
   const canSubmit = useMemo(() => {
-    return fields.calendar.value
-  }, [fields])
+    return calendarName
+  }, [calendarName])
+
+  const handleChange = useCallback((e) => {
+    setCalendarName(e.target.value)
+  }, [])
 
   const handleSubmit = useCallback(
     async (e) => {
       e.preventDefault()
-      const calendarRes = await calendarAPI.editCalendar({
+      await calendarAPI.editCalendar({
         calendarCode,
-        calendarName: fields.calendar.value,
+        calendarName,
       })
-      editCalendar(calendarDispatch, calendarRes)
       history.push("/calendars/setting")
     },
-    [fields, history, calendarCode, calendarDispatch]
+    [calendarName, history, calendarCode]
   )
 
   useEffect(() => {
     async function asyncEffect() {
       const calendarRes = await calendarAPI.getCalendar(calendarCode)
-      const e = {
-        target: {
-          name: "calendar",
-          value: calendarRes.calendarName,
-        },
-      }
-      handleChange(e)
+      setCalendarName(calendarRes.calendarName)
     }
     asyncEffect()
   }, [calendarCode])
@@ -60,7 +48,7 @@ const CalendarEdit = () => {
         <div className="container max-w-lg bg-white p-6 xs:rounded-xl xs:shadow-lg">
           <CalendarForm
             mode="edit"
-            calendar={fields.calendar}
+            value={calendarName}
             canSubmit={canSubmit}
             onChange={handleChange}
             onSubmit={handleSubmit}

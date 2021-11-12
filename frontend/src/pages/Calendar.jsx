@@ -11,11 +11,7 @@ import EventListItem from "../components/EventListItem"
 import "../static/calendar.css"
 import "react-big-calendar/lib/addons/dragAndDrop/styles.scss"
 import CalendarAside from "../components/calendar/CalendarAside"
-import {
-  getAllCalendar,
-  setCurrentCalendar,
-  useCalendarDispatch,
-} from "../context"
+import { setCurrentCalendar, useCalendarDispatch } from "../context"
 import calendarAPI from "../api/calendar"
 import useSWR from "swr"
 import featcher from "../lib/featcher"
@@ -144,12 +140,8 @@ const MyCalendar = () => {
   }
 
   useEffect(() => {
-    async function asyncEffect() {
-      await getAllCalendar(calendarDispatch)
-    }
     setModalOpen(false)
     setAsideOpen(false)
-    asyncEffect()
     setCurrentCalendar(calendarDispatch, calendarCode)
   }, [calendarDispatch, calendarCode])
 

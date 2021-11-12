@@ -14,8 +14,6 @@ export const authInitialState = {
 }
 
 export const calendarInitialState = {
-  myCalendar: [],
-  shareCalendar: [],
   currentCalendarCode: "",
 }
 

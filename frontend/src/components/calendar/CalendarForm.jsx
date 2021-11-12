@@ -1,9 +1,9 @@
 import LabelInput from "../LabelInput"
 
 const CalendarForm = ({
-  calendar,
   canSubmit = false,
   mode = "create",
+  value = "",
   onChange = (f) => f,
   onSubmit = (f) => f,
 }) => {
@@ -11,7 +11,7 @@ const CalendarForm = ({
     <form className="grid gap-2" onSubmit={onSubmit}>
       <LabelInput
         label="캘린더 이름"
-        value={calendar.value}
+        value={value}
         name="calendar"
         placeholder="ex) teresoma"
         onChange={onChange}

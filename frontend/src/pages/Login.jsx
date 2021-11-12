@@ -4,7 +4,6 @@ import Welcome from "../components/ys/auth/Welcome"
 import InputFormField from "../components/ys/common/InputFormField"
 import SubmitButton from "../components/ys/common/SubmitButton"
 import {
-  getAllCalendar,
   loginUser,
   setCurrentCalendar,
   useAuthDispatch,
@@ -50,7 +49,6 @@ const Login = () => {
     }
     const user = await loginUser(authDispatch, reqForm)
     if (user) {
-      await getAllCalendar(calendarDispatch)
       history.push(`/calendars/${user.defaultCalendar}`)
       setCurrentCalendar(calendarDispatch, user.defaultCalendar)
       alert("임시: 로그인 성공")
