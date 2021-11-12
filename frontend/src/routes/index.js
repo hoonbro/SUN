@@ -7,6 +7,7 @@ import ChangePassword from "../pages/ChangePassword"
 import CalendarLayout from "../layouts/CalendarLayout"
 import FindAuth from "../pages/FindAuth"
 import NotiCenter from "../pages/NotiCenter"
+import ChatCenter from "../pages/ChatCenter"
 
 const routes = [
   {
@@ -37,6 +38,11 @@ const routes = [
   {
     path: "/notifications",
     component: NotiCenter,
+    requiresAuth: true,
+  },
+  {
+    path: "/chats",
+    component: ChatCenter,
     requiresAuth: true,
   },
   {

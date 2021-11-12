@@ -19,7 +19,7 @@ const EventForm = ({ onSubmit = (f) => f }) => {
       errors: {},
     },
     end: {
-      value: moment().format("YYYY-MM-DDTHH:mm"),
+      value: moment(Date.now() + 3600000).format("YYYY-MM-DDTHH:mm"),
       validators: [],
       errors: {},
     },
