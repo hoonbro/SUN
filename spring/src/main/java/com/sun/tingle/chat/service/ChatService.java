@@ -18,6 +18,7 @@ import com.sun.tingle.member.db.repository.MemberRepository;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
+import com.sun.tingle.mission.service.MissionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -47,7 +48,13 @@ public class ChatService {
     private S3service s3service;
 
     @Autowired
+    private MissionService missionService;
+
+    @Autowired
     private KafkaReceiverService kafkaReceiverService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private final JwtUtil tokenProvider;
     private final ChatMessageRepository chatMessageRepository;
@@ -150,5 +157,16 @@ public class ChatService {
         chatMessageRepository.save(message);
         ChatMessageResponseDto chatMessageResponseDto = ChatMessageResponseDto.of(memberRepository, message, r);
         kafkaSenderService.send(BOOT_TOPIC, chatMessageResponseDto);
+    }
+
+
+    public Page<ChatMessage> getChatAll(Long id, Pageable pageable) {
+        List<Long> missionList = missionService.getMemberMissionList(id);
+        List<String> mList = new ArrayList<>();
+        for (Long mission : missionList) {
+            mList.add(mission.toString());
+        }
+        Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIn(mList, pageable);
+        return chatMessages;
     }
 }
