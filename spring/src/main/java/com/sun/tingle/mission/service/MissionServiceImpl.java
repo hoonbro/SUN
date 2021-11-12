@@ -5,6 +5,9 @@ import com.sun.tingle.calendar.db.entity.CalendarEntity;
 import com.sun.tingle.calendar.db.repo.CalendarRepository;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
+import com.sun.tingle.chat.entity.ChatRoom;
+import com.sun.tingle.chat.repository.ChatRoomRepository;
+import com.sun.tingle.chat.service.ChatService;
 import com.sun.tingle.file.db.entity.TeacherFileEntity;
 import com.sun.tingle.file.db.repo.TeacherFileRepository;
 import com.sun.tingle.file.service.S3service;
@@ -15,6 +18,7 @@ import com.sun.tingle.mission.responsedto.MissionRpDto;
 import com.sun.tingle.notification.api.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -37,6 +41,9 @@ public class MissionServiceImpl implements MissionService {
 
     @Autowired
     NotificationService notificationService;
+
+    @Autowired
+    ChatRoomRepository chatRoomRepository;
 
     @Autowired
     CalendarService calendarService;
@@ -70,6 +77,8 @@ public class MissionServiceImpl implements MissionService {
         }
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
+        ChatRoom inner_chatroom = createChatRoom(missionEntity.getMissionId().toString(), missionEntity);
+        chatRoomRepository.save(inner_chatroom);
 
         notificationService.sendNotifyChange(missionRqDto.getId(),missionEntity.getCalendarCode(),"mission_create",missionEntity.getMissionId());
 
@@ -292,6 +301,14 @@ public class MissionServiceImpl implements MissionService {
         String dToString = transFormat.format(d);
         return dToString;
 
+    }
+
+    @Transactional
+    public ChatRoom createChatRoom(String roomid, MissionEntity mid) {
+        return ChatRoom.builder()
+                .id(roomid)
+                .mission(mid)
+                .build();
     }
 
 }

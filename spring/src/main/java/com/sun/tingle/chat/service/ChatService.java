@@ -20,6 +20,7 @@ import com.sun.tingle.mission.db.entity.MissionEntity;
 import com.sun.tingle.mission.db.repo.MissionRepository;
 import com.sun.tingle.mission.service.MissionService;
 import lombok.RequiredArgsConstructor;
+import org.jgroups.demos.Chat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -162,11 +163,15 @@ public class ChatService {
 
     public Page<ChatMessage> getChatAll(Long id, Pageable pageable) {
         List<Long> missionList = missionService.getMemberMissionList(id);
-        List<String> mList = new ArrayList<>();
+//        MemberEntity member = memberRepository.getById(id);
+        List<ChatRoom> rooms = new ArrayList<>();
         for (Long mission : missionList) {
-            mList.add(mission.toString());
+            Optional<ChatRoom> chatRoom = chatRoomRepository.findById(mission.toString());
+            if (!chatRoom.isEmpty()) {
+                rooms.add(chatRoom.get());
+            }
         }
-        Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIn(mList, pageable);
+        Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomInAndSenderIsNot(rooms, id, pageable);
         return chatMessages;
     }
 }
