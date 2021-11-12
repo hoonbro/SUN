@@ -52,9 +52,9 @@ public class MissionController {
         MissionRpDto missionRpDto = missionService.insertMission(missionRqDto,teacherFile);
 
 
-        if(missionRpDto == null) {
-            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.UNAUTHORIZED);
-        }
+//        if(missionRpDto == null) {
+//            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.UNAUTHORIZED);
+//        }
         return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
     }
 
@@ -80,9 +80,9 @@ public class MissionController {
         if(missionRpDto == null) {
             return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.NO_CONTENT);
         }
-        else if(missionRpDto.getTitle() == null) { // 처리 권한 없을 때
-            return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.UNAUTHORIZED);
-        }
+//        else if(missionRpDto.getTitle() == null) { // 처리 권한 없을 때
+//            return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.UNAUTHORIZED);
+//        }
         return new ResponseEntity<>(missionRpDto, HttpStatus.CREATED);
 
     }
@@ -94,10 +94,10 @@ public class MissionController {
 
         try {
             int result = missionService.deleteMission(missionId,id);
-            if(result == 1) {
-                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 때
-            }
-            return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED); // 등록한 사람 아닐 때 (권한 x)
+//            if(result == 1) {
+            return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 때
+//            }
+//            return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED); // 등록한 사람 아닐 때 (권한 x)
         }
         catch (Exception e) {
             return new ResponseEntity<Void>(HttpStatus.INTERNAL_SERVER_ERROR); //삭제할 미션 없을 때
