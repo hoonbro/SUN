@@ -47,9 +47,9 @@ public class MissionServiceImpl implements MissionService {
     @Override
     public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException, ParseException {
         CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(missionRqDto.getCalendarCode());
-        if(calendarEntity.getId() != missionRqDto.getId()) {
-            return null;
-        }
+//        if(calendarEntity.getId() != missionRqDto.getId()) {
+//            return null;
+//        }
 
 
 
@@ -136,9 +136,9 @@ public class MissionServiceImpl implements MissionService {
         }
 
         MissionRpDto missionRpDto = new MissionRpDto();
-        if(missionEntity.getId() != missionRqDto.getId()) { // 권한 없을 때
-            return missionRpDto;
-        }
+//        if(missionEntity.getId() != missionRqDto.getId()) { // 권한 없을 때
+//            return missionRpDto;
+//        }
 
         List<TeacherFileEntity> list2 = teacherFileRepository.findByMissionId(missionId);
         int file_size = (list2 != null) ? list2.size():0;
@@ -195,11 +195,11 @@ public class MissionServiceImpl implements MissionService {
     public int deleteMission(Long missionId,Long id) {
         int result = 0;
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
-        if(missionEntity.getId() == id) {
+//        if(missionEntity.getId() == id) {
             s3service.s3MissionDelete(missionId);
             missionRepository.deleteById(missionId);
-            result = 1;
-        }
+//            result = 1;
+//        }
         return result;
     }
 
