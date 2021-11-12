@@ -5,12 +5,11 @@ import { ChatContext } from "../../../pages/EventDetail"
 import ChatAPI from "../../../api/chat"
 
 const ChatController = () => {
-  const { auth, missionId, client, calendarCode } = useContext(ChatContext)
+  const { auth, missionId, client } = useContext(ChatContext)
 
   const send = (content) => {
     console.log(missionId)
     console.log({ content })
-    // console.log({ content, calendarCode })
     if (client.current.connected) {
       client.current.publish({
         destination: `/message/mission/${missionId}`,
@@ -48,31 +47,6 @@ const ChatController = () => {
     formData.append("file", content)
 
     await ChatAPI.sendFile(missionId, formData)
-
-    // const fileReader = new FileReader()
-    // fileReader.onload = (e) => {
-    //   console.log({
-    //     name: content.name,
-    //     data: e.target.result,
-    //     calendarCode,
-    //   })
-
-    //   if (client.current.connected) {
-    //     client.current.publish({
-    //       destination: `/message/mission/${missionId}/file`,
-    //       headers: {
-    //         Authorization: auth.token?.accessToken,
-    //         // "Content-Type": "multipart/form-data",
-    //       },
-    //       body: {
-    //         name: content.name,
-    //         data: e.target.result,
-    //         calendarCode,
-    //       },
-    //     })
-    //   }
-    // }
-    // fileReader.readAsArrayBuffer(content)
   }
 
   const fileEl = useRef(null)
@@ -114,7 +88,7 @@ const ChatController = () => {
             type="file"
             ref={imgEl}
             className="hidden"
-            accept="image/*"
+            accept="image/png, image/jpeg"
             multiple
             onChange={(e) => handleImgChange(e)}
           />
