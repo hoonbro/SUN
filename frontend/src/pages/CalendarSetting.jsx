@@ -2,7 +2,7 @@ import Header from "../components/Header"
 import Divider from "../components/Divider"
 import { Link } from "react-router-dom"
 import CalendarAddForm from "../components/calendar/CalendarAddForm"
-// import { getAllCalendar, useCalendarState } from "../context"
+import { useCalendarState } from "../context"
 import InfoMessageWrapper from "../components/InfoMessageWrapper"
 import { useCallback } from "react"
 import calendarAPI from "../api/calendar"
@@ -11,8 +11,8 @@ import useSWR, { useSWRConfig } from "swr"
 import featcher from "../lib/featcher"
 
 const CalendarSetting = () => {
-  // const calendarState = useCalendarState()
-  const { data: calendarState } = useSWR("/calendar/every/calendars", featcher)
+  const calendarState = useCalendarState()
+  const { data: calendarData } = useSWR("/calendar/every/calendars", featcher)
   const { mutate } = useSWRConfig()
 
   const handleDeleteMyCalendar = useCallback(
@@ -60,7 +60,7 @@ const CalendarSetting = () => {
 
   return (
     <div className="bg-gray-50 min-h-full">
-      {calendarState && (
+      {calendarData && (
         <>
           <Header
             pageTitle="캘린더 관리"
@@ -78,7 +78,7 @@ const CalendarSetting = () => {
                   </Link>
                 </header>
                 <div className="grid gap-4">
-                  {calendarState.myCalendar.map((c) => (
+                  {calendarData.myCalendar.map((c) => (
                     <CalendarListItem
                       key={c.calendarCode}
                       {...c}
@@ -93,7 +93,7 @@ const CalendarSetting = () => {
                   <h3>공유 캘린더</h3>
                 </header>
                 <div className="grid gap-4">
-                  {calendarState.shareCalendar.map((c) => (
+                  {calendarData.shareCalendar.map((c) => (
                     <CalendarListItem
                       key={c.calendarCode}
                       myCalenar={false}
@@ -101,7 +101,7 @@ const CalendarSetting = () => {
                       onDelete={handleDeleteShareCalendar}
                     />
                   ))}
-                  {!calendarState.shareCalendar.length && (
+                  {!calendarData.shareCalendar.length && (
                     <InfoMessageWrapper>
                       캘린더가 아직 없어요 😒
                     </InfoMessageWrapper>

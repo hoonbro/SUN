@@ -172,7 +172,7 @@ const MyCalendar = () => {
           views={["month"]}
           defaultDate={new Date()}
           defaultView="month"
-          events={events}
+          events={events || []}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
           onShowMore={handleShowMore}

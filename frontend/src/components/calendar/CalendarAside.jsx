@@ -1,42 +1,13 @@
 import { Link, useParams } from "react-router-dom"
 import { FcSettings } from "react-icons/fc"
-import { MdExpandMore, MdExpandLess } from "react-icons/md"
-import { useState } from "react"
 import CalendarAddForm from "./CalendarAddForm"
-import { useCalendarState } from "../../context"
-
-const CalendarListItem = ({
-  calendarName = "캘린더 이름",
-  calendarCode = "캘린더 코드",
-  active = false,
-}) => {
-  const [codeOpen, setCodeOpen] = useState(false)
-
-  return (
-    <Link
-      to={`/calendars/${calendarCode}`}
-      className={`grid gap-1 py-2 overflow-hidden transition-all
-      ${codeOpen ? "h-16" : "h-10"}`}
-    >
-      <div className="flex items-center justify-between">
-        <button className={`${active && "font-bold text-orange-500"}`}>
-          {calendarName}
-        </button>
-        <button className="flex" onClick={() => setCodeOpen(!codeOpen)}>
-          {codeOpen ? <MdExpandLess size={20} /> : <MdExpandMore size={20} />}
-        </button>
-      </div>
-      <div className="flex items-center justify-between text-sm ">
-        <span>캘린더코드</span>
-        <span className="text-gray-600">{calendarCode}</span>
-      </div>
-    </Link>
-  )
-}
+import useSWR from "swr"
+import featcher from "../../lib/featcher"
+import CalendarAsideListItem from "./CalendarAsideListItem"
 
 const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
   const { calendarCode } = useParams()
-  const calendarState = useCalendarState()
+  const { data: calendarData } = useSWR("/calendar/every/calendars", featcher)
 
   return (
     <>
@@ -58,17 +29,19 @@ const CalendarAside = ({ asideOpen = false, setAsideOpen = (f) => f }) => {
               <FcSettings size={24} />
             </Link>
           </header>
-          <div className="grid gap-2">
-            {[...calendarState.myCalendar, ...calendarState.shareCalendar].map(
-              (calendar) => (
-                <CalendarListItem
-                  {...calendar}
-                  key={calendar.calendarCode}
-                  active={calendar.calendarCode === calendarCode}
-                />
-              )
-            )}
-          </div>
+          {calendarData && (
+            <div className="grid gap-2">
+              {[...calendarData.myCalendar, ...calendarData.shareCalendar].map(
+                (calendar) => (
+                  <CalendarAsideListItem
+                    {...calendar}
+                    key={calendar.calendarCode}
+                    active={calendar.calendarCode === calendarCode}
+                  />
+                )
+              )}
+            </div>
+          )}
         </section>
         <hr />
         <section className="mt-6 grid gap-4">
