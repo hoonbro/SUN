@@ -51,7 +51,7 @@ const Login = () => {
     if (user) {
       history.push(`/calendars/${user.defaultCalendar}`)
       setCurrentCalendar(calendarDispatch, user.defaultCalendar)
-      alert("임시: 로그인 성공")
+      // alert("임시: 로그인 성공")
       return
     }
     alert("로그인 실패")
