@@ -2,6 +2,7 @@ import React, { useContext, useLayoutEffect, useState } from "react"
 import { ChatContext } from "../../../pages/EventDetail"
 import moment from "moment"
 import { BsFileText } from "react-icons/bs"
+import gravatar from "gravatar"
 
 const ChatItem = ({ chatItem, exChatItem = null }) => {
   const { id: myId } = useContext(ChatContext)["auth"]["user"]
@@ -45,8 +46,8 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
         >
           <img
             src={
-              chatItem.pic_uri ||
-              require("../../../assets/images/test-profile-img.png").default
+              chatItem.picUri ||
+              gravatar.url("a@a.com", { d: "retro", size: "48px" })
             }
             alt="사진"
             className="rounded-full w-10 h-10"

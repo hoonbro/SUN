@@ -79,7 +79,9 @@ const Register = () => {
       isNameValid &&
       isPhoneValid &&
       isEmailValid &&
-      isMemberIdValid
+      isMemberIdValid &&
+      !email.error &&
+      !memberId.error
     )
   }, [
     isAllFill,
@@ -89,6 +91,8 @@ const Register = () => {
     isPhoneValid,
     isEmailValid,
     isMemberIdValid,
+    email.error,
+    memberId.error,
   ])
 
   const handleBlur = async (e) => {
@@ -162,7 +166,6 @@ const Register = () => {
             })
             break
           }
-
           default: {
             alert("알 수 없는 문제 발생")
             break
