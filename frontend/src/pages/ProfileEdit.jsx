@@ -1,10 +1,15 @@
+import { useMemo } from "react"
 import { Link, useHistory } from "react-router-dom"
 import Button from "../components/Button"
 import Header from "../components/Header"
 import LabelInput from "../components/LabelInput"
 import { updateProfile, useAuthDispatch, useAuthState } from "../context"
 import useInputs from "../hooks/useInputs"
-import { emailValidator } from "../lib/validators"
+import {
+  emailValidator,
+  nameValidator,
+  phoneValidator,
+} from "../lib/validators"
 
 const ProfileEdit = () => {
   const authState = useAuthState()
@@ -14,12 +19,12 @@ const ProfileEdit = () => {
     name: {
       value: authState.user.name,
       errors: {},
-      validators: [],
+      validators: [nameValidator],
     },
     phone: {
       value: authState.user.phone,
       errors: {},
-      validators: [],
+      validators: [phoneValidator],
     },
     email: {
       value: authState.user.email,
@@ -28,6 +33,14 @@ const ProfileEdit = () => {
     },
   })
   const { name, phone, email } = state
+
+  const canSubmit = useMemo(() => {
+    return (
+      !Object.keys(name.errors).length &&
+      !Object.keys(phone.errors).length &&
+      !Object.keys(email.errors).length
+    )
+  }, [name, phone, email])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -71,7 +84,7 @@ const ProfileEdit = () => {
                 value={email.value}
               />
             </div>
-            <Button>확인</Button>
+            <Button disabled={!canSubmit}>확인</Button>
           </form>
           <Link
             to="/profile/change-password"

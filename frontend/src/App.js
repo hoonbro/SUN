@@ -6,7 +6,7 @@ import NoMatchRoute from "./components/NoMatchRoute"
 import {
   useAuthDispatch,
   useCalendarDispatch,
-  silentRefresh,
+  // silentRefresh,
   setCurrentCalendar,
 } from "./context"
 import BottomNav from "./components/BottomNav"
@@ -22,7 +22,7 @@ function App() {
       const user = JSON.parse(localStorage.getItem("currentUser"))
       if (user) {
         // TODO: authState를 payload로 전달하지 않고 다른 방법으로 token을 전달하기
-        await silentRefresh(authDispatch, user.token?.refreshToken)
+        // await silentRefresh(authDispatch, user.token?.refreshToken)
         setCurrentCalendar(calendarDispatch, user.user.defaultCalendar)
       }
       setLoading(false)
