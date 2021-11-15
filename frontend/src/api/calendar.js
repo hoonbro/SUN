@@ -5,8 +5,11 @@ const createCalendar = async (calendarName) => {
   return res.data
 }
 
-const addShareCalendar = async (calendarCode) => {
-  const res = await client.post(`calendar/share`, { calendarCode })
+const addShareCalendar = async ({ notificationId, calendarCode }) => {
+  const res = await client.post(`calendar/share`, {
+    notificationId,
+    calendarCode,
+  })
   return res.data
 }
 
@@ -40,6 +43,14 @@ const getMissionList = async (params) => {
   return res.data
 }
 
+const inviteUser = async ({ calendarCode, inviteeEmail }) => {
+  const res = await client.post(`/members/invite`, {
+    calendarCode,
+    inviteeEmail,
+  })
+  return res.data
+}
+
 const calendarAPI = {
   createCalendar,
   addShareCalendar,
@@ -49,6 +60,7 @@ const calendarAPI = {
   deleteMyCalendar,
   deleteShareCalendar,
   getMissionList,
+  inviteUser,
 }
 
 export default calendarAPI

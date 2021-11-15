@@ -3,6 +3,8 @@ import { IoEllipsisVertical } from "react-icons/io5"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
 import useSWR from "swr"
+import calendarAPI from "../api/calendar"
+import notificationAPI from "../api/notification"
 import Header from "../components/Header"
 import featcher from "../lib/featcher"
 
@@ -11,15 +13,19 @@ const NotiCard = ({
   type = "",
   calendarCode,
   sender,
+  sendDate,
+  sendTime,
+  id,
+  onDelete = (f) => f,
 }) => {
   const [buttonLabel, setButtonLabel] = useState("")
   const [message, setMessage] = useState("")
-  const [isCalendarEvent, setIsCalendarEvent] = useState(true)
+  const [isInviteEvent, setIsInviteEvent] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const deleteBtnEl = useRef(null)
 
   const role = useMemo(
-    () => (sender.auth === "ROLE_STUDENT" ? "학생" : "선생님"),
+    () => (sender?.auth === "ROLE_STUDENT" ? "학생" : "선생님"),
     [sender]
   )
 
@@ -30,6 +36,20 @@ const NotiCard = ({
     // 따라서, deleteBtn이 렌더링되기 전에 focus() 시키려다보니 에러가 발생한다.
   }, [])
 
+  const handleAcceptInvitation = useCallback(async () => {
+    try {
+      await calendarAPI.addShareCalendar({ notificationId: id, calendarCode })
+      alert("캘린더에 참여하였습니다")
+    } catch (error) {
+      console.error(error)
+      switch (error.response?.status) {
+        case 409: {
+          await onDelete(id)
+        }
+      }
+    }
+  }, [calendarCode, id, onDelete])
+
   useEffect(() => {
     if (menuOpen === true) {
       deleteBtnEl.current.focus()
@@ -39,25 +59,24 @@ const NotiCard = ({
   useEffect(() => {
     switch (type) {
       case "invite": {
+        setButtonLabel("초대 수락")
         setMessage("캘린더에 초대했어요.")
+        setIsInviteEvent(true)
         break
       }
       case "mission_create": {
         setButtonLabel("과제 보러가기")
         setMessage("과제를 만들었어요.")
-        setIsCalendarEvent(false)
         break
       }
       case "mission_update": {
         setButtonLabel("과제 보러가기")
         setMessage("과제를 변경했어요.")
-        setIsCalendarEvent(false)
         break
       }
       case "mission_delete": {
         setButtonLabel("과제 보러가기")
         setMessage("과제를 지웠어요")
-        setIsCalendarEvent(false)
         break
       }
       case "calendar_in": {
@@ -82,7 +101,7 @@ const NotiCard = ({
         </div>
         <div className="flex-1 grid gap-1">
           <div>
-            <span className="font-bold">{sender.name} </span>
+            <span className="font-bold">{sender?.name} </span>
             <span>
               {role}이 {message}
             </span>
@@ -99,6 +118,7 @@ const NotiCard = ({
                 className="text-sm font-medium text-red-500 py-1 px-2 w-full"
                 onBlur={() => setMenuOpen(false)}
                 ref={deleteBtnEl}
+                onClick={() => onDelete(id)}
               >
                 삭제
               </button>
@@ -107,7 +127,7 @@ const NotiCard = ({
         </div>
       </div>
       <div className="flex items-center justify-between">
-        {!isCalendarEvent && buttonLabel && (
+        {!isInviteEvent && buttonLabel && (
           <Link
             className={`py-1 px-2 font-medium text-sm rounded border 
             ${type === "mission" && "border-orange-200 bg-orange-50"}
@@ -118,7 +138,15 @@ const NotiCard = ({
             {buttonLabel}
           </Link>
         )}
-        <span className="text-sm text-gray-500 ml-auto">3시간 전</span>
+        {isInviteEvent && (
+          <button
+            className={`py-1 px-2 font-medium text-sm rounded border`}
+            onClick={handleAcceptInvitation}
+          >
+            {buttonLabel}
+          </button>
+        )}
+        <span className="text-sm text-gray-500 ml-auto">{sendDate}</span>
       </div>
     </div>
   )
@@ -130,6 +158,14 @@ const NotiCenter = () => {
   console.log(notiData)
   console.log(error)
 
+  const handleDelete = useCallback(async (notificationId) => {
+    try {
+      await notificationAPI.deleteNotification(notificationId)
+    } catch (error) {
+      console.error(error)
+    }
+  }, [])
+
   return (
     <div className="min-h-full bg-gray-50 flex flex-col">
       <Header pageTitle="알림" handleGoBack={() => history.goBack()} />
@@ -140,14 +176,8 @@ const NotiCenter = () => {
           {notiData !== undefined && !error && (
             <div className="grid gap-4">
               {notiData.map((noti) => (
-                <NotiCard key={noti.id} {...noti} />
+                <NotiCard key={noti.id} {...noti} onDelete={handleDelete} />
               ))}
-              {/* <NotiCard type="invite" />
-              <NotiCard type="mission_create" />
-              <NotiCard type="mission_update" />
-              <NotiCard type="mission_delete" />
-              <NotiCard type="calendar_in" />
-              <NotiCard type="calendar_out" /> */}
             </div>
           )}
         </div>

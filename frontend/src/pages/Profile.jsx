@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { Link, useParams, useHistory } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
 import { logout, useAuthDispatch, useAuthState } from "../context"
+import gravatar from "gravatar"
 import Header from "../components/Header"
 import client from "../api/client"
 import memberAPI from "../api/member"
@@ -42,8 +43,12 @@ const Profile = () => {
   }
 
   const profileImage = useMemo(() => {
-    return `https://d101s.s3.ap-northeast-2.amazonaws.com/${profileUser?.profileImage}`
-  }, [profileUser])
+    return loading
+      ? ""
+      : profileUser.profileImage
+      ? `https://d101s.s3.ap-northeast-2.amazonaws.com/${profileUser.profileImage}`
+      : gravatar.url(profileUser.email, { d: "retro" })
+  }, [loading, profileUser])
 
   const handleWithdrawal = useCallback(async () => {
     const ok = window.confirm("정말 회원탈퇴를 결정하신건가요?")
@@ -85,9 +90,7 @@ const Profile = () => {
               </button>
               {!!profileUser && (
                 <img
-                  src={
-                    profileImage || "https://picsum.photos/seed/picsum/200/200"
-                  }
+                  src={loading ? null : profileImage}
                   className="object-cover h-full w-full"
                   alt=""
                 />

@@ -18,10 +18,13 @@ const CalendarAddForm = () => {
       e.preventDefault()
       if (!code) {
         alert("코드를 입력하세요")
+        return
       }
       try {
         setLoading(true)
-        const calendarRes = await calendarAPI.addShareCalendar(code)
+        const calendarRes = await calendarAPI.addShareCalendar({
+          calendarCode: code,
+        })
         console.log(calendarRes)
         // 캘린더 새로 받아오기 실행
         mutate("/calendar/every/calendars")
@@ -44,7 +47,7 @@ const CalendarAddForm = () => {
       }
       setLoading(false)
     },
-    [code]
+    [code, mutate]
   )
 
   const canSubmit = useMemo(() => {
@@ -61,6 +64,7 @@ const CalendarAddForm = () => {
             name="code"
             id="calendar_code"
             value={code}
+            placeholder="캘린더 코드를 입력하세요"
             onChange={handleChange}
           />
         </div>
