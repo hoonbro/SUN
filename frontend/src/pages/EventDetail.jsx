@@ -84,16 +84,13 @@ const EventDetail = () => {
       sizePerPage
     )
     setCurrentPage((prev) => prev + 1)
-    // console.log(chatHistoryData)
-    // console.log(chatHistoryData.content)
     chatHistoryData.content = chatHistoryData.content.map((item) => {
-      if (item.fileName) {
-        return {
-          ...item,
-          fileUri: `https://d101s.s3.ap-northeast-2.amazonaws.com/${calendarCode}/${item.room_id}/${item.fileUuid}`,
-        }
-      }
-      return item
+      const chatItem = { ...item }
+      if (item.pic_uri)
+        chatItem.picUri = `https://d101s.s3.ap-northeast-2.amazonaws.com/${item.pic_uri}`
+      if (item.fileName)
+        chatItem.fileUri = `https://d101s.s3.ap-northeast-2.amazonaws.com/${calendarCode}/${item.room_id}/${item.fileUuid}`
+      return chatItem
     })
     // console.log(chatHistoryData.content)
     setLastPage(chatHistoryData.totalPages)
