@@ -51,15 +51,70 @@ public class MissionServiceImpl implements MissionService {
     @Autowired
     S3service s3service;
 
+//    @Override
+//    public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException, ParseException {
+//        CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(missionRqDto.getCalendarCode());
+////        if(calendarEntity.getId() != missionRqDto.getId()) {
+////            return null;
+////        }
+//        MissionEntity missionEntity = new MissionEntity();
+//        missionEntity.setTitle(missionRqDto.getTitle());
+//        missionEntity.setStartDate(stringToDate(missionRqDto.getStart().split("T")[0]));
+//        missionEntity.setStartTime(missionRqDto.getStart().split("T")[1]);
+//        missionEntity.setEndDate(stringToDate(missionRqDto.getEnd().split("T")[0]));
+//        missionEntity.setEndTime(missionRqDto.getEnd().split("T")[1]);
+//        missionEntity.setCalendarCode(missionRqDto.getCalendarCode());
+//        missionEntity.setId(missionRqDto.getId());
+//        List<String> list = missionRqDto.getTag();
+//        StringBuilder sb = new StringBuilder();
+//        int size = (list !=null) ? list.size():0;
+//        for(int i=0; i<size; i++) {
+//            String temp = list.get(i);
+//            sb.append("&@&").append(temp); // 있는 그대로 넣기
+//        }
+//        missionEntity.setTag(sb.toString());
+//        missionEntity = missionRepository.save(missionEntity);
+//        ChatRoom inner_chatroom = createChatRoom(missionEntity.getMissionId().toString(), missionEntity);
+//        chatRoomRepository.save(inner_chatroom);
+//
+//        notificationService.sendNotifyChange(missionRqDto.getId(),missionEntity.getCalendarCode(),"mission_create",missionEntity.getMissionId());
+//
+//        String[] tagArr = missionEntity.getTag().split("&@&");
+//        list = new ArrayList<>();
+//        size = tagArr.length;
+//        for(int i=1; i<size; i++) {
+//            list.add(tagArr[i]);
+//            System.out.println(tagArr[i]);
+//        }
+//
+//        if(teacherFile != null) {
+//            s3service.teacherFileUploads(teacherFile,missionEntity.getMissionId(),missionEntity.getId());
+//        }
+//        MissionRpDto missionRpDto = new MissionRpDto();
+//
+//        missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
+//                .tag(list).title(missionEntity.getTitle())
+//                .calendarCode(missionEntity.getCalendarCode())
+//                .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
+//                .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
+//                .id(missionEntity.getId())
+////                .teacherFileList(missionEntity.getTeacherFileList()) 따로 조회
+////                .missionFileList(missionEntity.getMissionFileList()) 따로 조회
+//                .build();
+//
+//
+//
+//
+//        return missionRpDto;
+//    }
+
+
     @Override
-    public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException, ParseException {
+    public MissionRpDto insertMission(MissionRqDto missionRqDto) throws IOException, ParseException {
         CalendarEntity calendarEntity = calendarRepository.findByCalendarCode(missionRqDto.getCalendarCode());
 //        if(calendarEntity.getId() != missionRqDto.getId()) {
 //            return null;
 //        }
-
-
-
         MissionEntity missionEntity = new MissionEntity();
         missionEntity.setTitle(missionRqDto.getTitle());
         missionEntity.setStartDate(stringToDate(missionRqDto.getStart().split("T")[0]));
@@ -77,6 +132,7 @@ public class MissionServiceImpl implements MissionService {
         }
         missionEntity.setTag(sb.toString());
         missionEntity = missionRepository.save(missionEntity);
+
         ChatRoom inner_chatroom = createChatRoom(missionEntity.getMissionId().toString(), missionEntity);
         chatRoomRepository.save(inner_chatroom);
 
@@ -87,12 +143,17 @@ public class MissionServiceImpl implements MissionService {
         size = tagArr.length;
         for(int i=1; i<size; i++) {
             list.add(tagArr[i]);
-            System.out.println(tagArr[i]);
+        }
+        List<String> teacherFileList = missionRqDto.getTeacherFileList();
+
+
+        int file_size = (teacherFileList !=null) ? teacherFileList.size():0;
+        for(int i=0; i<file_size; i++) { // teacherFile 테이블의 mission id null ->  값 변경
+            TeacherFileEntity tEntity = teacherFileRepository.findByFileUuid(missionRqDto.getTeacherFileList().get(i));
+            tEntity.setMissionId(missionEntity.getMissionId());
+            teacherFileRepository.save(tEntity);
         }
 
-        if(teacherFile != null) {
-            s3service.teacherFileUploads(teacherFile,missionEntity.getMissionId(),missionEntity.getId());
-        }
         MissionRpDto missionRpDto = new MissionRpDto();
 
         missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
@@ -101,15 +162,13 @@ public class MissionServiceImpl implements MissionService {
                 .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
                 .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
                 .id(missionEntity.getId())
-//                .teacherFileList(missionEntity.getTeacherFileList()) 따로 조회
-//                .missionFileList(missionEntity.getMissionFileList()) 따로 조회
+//                .teacherFileList(missionEntity.getTeacherFileList()) //따로 조회
+//                .missionFileList(missionEntity.getMissionFileList()) //따로 조회
                 .build();
-
-
-
-
         return missionRpDto;
     }
+
+
 
     @Override
     public MissionRpDto selectMission(Long missionId) {
@@ -137,33 +196,88 @@ public class MissionServiceImpl implements MissionService {
         return missionRpDto;
     }
 
+//    @Override
+//    public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException, ParseException {
+//        MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
+//        if(missionEntity == null) { //미션이 없을 때
+//            return null;
+//        }
+//
+//        MissionRpDto missionRpDto = new MissionRpDto();
+////        if(missionEntity.getId() != missionRqDto.getId()) { // 권한 없을 때
+////            return missionRpDto;
+////        }
+//
+//        List<TeacherFileEntity> list2 = teacherFileRepository.findByMissionId(missionId);
+//        int file_size = (list2 != null) ? list2.size():0;
+//
+//        for(int i=0; i<file_size; i++) { // 업데이트전 db 파일 삭제
+//            Long fileId = list2.get(i).getFileId();
+//            teacherFileRepository.deleteById(fileId);
+//            s3service.deleteTeacherFile(list2.get(i).fileUuid,list2.get(i).getId());
+//        }
+//
+//        if(teacherFile != null) {
+//            s3service.teacherFileUploads(teacherFile,missionId,missionRqDto.getId());
+//        }
+//
+//
+//
+//
+//        List<String> list = missionRqDto.getTag();
+//        if(list == null) {
+//            list = new ArrayList<>();
+//        }
+//        int size = (list != null) ? list.size():0;
+//        StringBuilder sb = new StringBuilder();
+//
+//        for(int i=0; i<size; i++) {
+//
+//            sb.append("&@&").append(list.get(i));
+//        }
+//
+//        missionEntity = new MissionEntity(missionId,missionRqDto.getTitle(),stringToDate(missionRqDto.getStart().split("T")[0]),
+//                missionRqDto.getStart().split("T")[1],
+//                stringToDate(missionRqDto.getEnd().split("T")[0]),missionRqDto.getEnd().split("T")[1],
+//                sb.toString(),missionRqDto.getCalendarCode(),missionRqDto.getId());
+//
+//
+//        missionEntity = missionRepository.save(missionEntity);
+//        notificationService.sendNotifyChange(missionRqDto.getId(),missionEntity.getCalendarCode(),"mission_update",missionEntity.getMissionId());
+//
+//        missionRpDto = missionRpDto.builder().missionId(missionEntity.getMissionId())
+//                .title(missionEntity.getTitle())
+//                .start(dateToString(missionEntity.getStartDate())+"T"+missionEntity.getStartTime())
+//                .end(dateToString(missionEntity.getEndDate())+"T"+missionEntity.getEndTime())
+//                .tag(list).
+//                id(missionEntity.getId()).
+//                calendarCode(missionEntity.getCalendarCode()).
+////                missionFileList(missionEntity.getMissionFileList()).
+////                teacherFileList(missionEntity.getTeacherFileList()).
+//        build();
+//
+//        return missionRpDto;
+//    }
+
     @Override
-    public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException, ParseException {
+    public MissionRpDto updateMission(Long missionId,MissionRqDto missionRqDto) throws IOException, ParseException {
         MissionEntity missionEntity = missionRepository.findByMissionId(missionId);
         if(missionEntity == null) { //미션이 없을 때
             return null;
         }
 
         MissionRpDto missionRpDto = new MissionRpDto();
-//        if(missionEntity.getId() != missionRqDto.getId()) { // 권한 없을 때
-//            return missionRpDto;
-//        }
 
-        List<TeacherFileEntity> list2 = teacherFileRepository.findByMissionId(missionId);
-        int file_size = (list2 != null) ? list2.size():0;
+        List<String> teacherFileList = missionRqDto.getTeacherFileList();
+        int file_size = (teacherFileList !=null) ? teacherFileList.size():0;
+        for(int i=0; i<file_size; i++) { // teacherFile 테이블의 mission id null ->  값 변경
+            TeacherFileEntity tEntity = teacherFileRepository.findByFileUuid(missionRqDto.getTeacherFileList().get(i));
 
-        for(int i=0; i<file_size; i++) { // 업데이트전 db 파일 삭제
-            Long fileId = list2.get(i).getFileId();
-            teacherFileRepository.deleteById(fileId);
-            s3service.deleteTeacherFile(list2.get(i).fileUuid,list2.get(i).getId());
+            if(tEntity != null) { // 새로 등록된 파일들 일 때 (기존 것은 변경x)
+                tEntity.setMissionId(missionEntity.getMissionId());
+                teacherFileRepository.save(tEntity);
+            }
         }
-
-        if(teacherFile != null) {
-            s3service.teacherFileUploads(teacherFile,missionId,missionRqDto.getId());
-        }
-
-
-
 
         List<String> list = missionRqDto.getTag();
         if(list == null) {
@@ -199,6 +313,8 @@ public class MissionServiceImpl implements MissionService {
 
         return missionRpDto;
     }
+
+
 
     @Override
     public int deleteMission(Long missionId,Long id) {
