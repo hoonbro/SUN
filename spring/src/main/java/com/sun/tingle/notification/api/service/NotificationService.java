@@ -1,5 +1,6 @@
 package com.sun.tingle.notification.api.service;
 
+import com.sun.tingle.calendar.db.entity.CalendarEntity;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
 import com.sun.tingle.member.api.dto.TokenInfo;
@@ -63,11 +64,13 @@ public class NotificationService {
         if(inviteConflict != null)
             throw new Exception();
 
+        String calendarName = calendarService.selectCalendar(calendarCode).getCalendarName();
         //디비 저장
         Date now = new Date();
         NotificationEntity notificationEntity = NotificationEntity.builder()
                 .type(type)
                 .calendarCode(calendarCode)
+                .calendarName(calendarName)
                 .senderId(sender.getId())
                 .sender(memberService.getMemberInfo(sender.getId()))
                 .receiverId(inviteeId)
@@ -92,10 +95,11 @@ public class NotificationService {
     public void sendNotifyChange(Long id,String calendarCode,String type, Long missionId) {
         Date now = new Date();
         MissionEntity m = missionRepository.findByMissionId(missionId);
-
+        String calendarName = calendarService.selectCalendar(calendarCode).getCalendarName();
         NotificationEntity notificationEntity = NotificationEntity.builder()
                 .type(type)
                 .calendarCode(calendarCode)
+                .calendarName(calendarName)
                 .senderId(id)
                 .sender(memberService.getMemberInfo(id))
                 .sendDate(now)
