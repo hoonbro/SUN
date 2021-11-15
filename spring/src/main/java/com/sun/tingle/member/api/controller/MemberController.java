@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
@@ -125,7 +126,14 @@ public class MemberController {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
 
-        MemberEntity memberEntity = memberService.getMemberByEmail(inviteReqDto.getInviteeEmail());
+
+        MemberEntity memberEntity = null;
+        try{
+            memberEntity = memberService.getMemberByEmail(inviteReqDto.getInviteeEmail());
+        }
+        catch (NoSuchElementException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
         try {
             notificationService.sendInvite(tokenInfo, inviteReqDto.getCalendarCode(), "invite", memberEntity.getId());
