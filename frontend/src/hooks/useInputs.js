@@ -34,6 +34,7 @@ const useInputs = (initialForm) => {
       const errors = {}
       const { validators } = state[name]
       validators.forEach((v) => {
+        console.log(v(value))
         const res = v(value)
         if (!res.valid) {
           errors[res.type] = res.message

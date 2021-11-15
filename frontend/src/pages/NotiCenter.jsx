@@ -90,7 +90,7 @@ const NotiCard = ({
     }
   }, [type])
   return (
-    <div className="p-2 rounded grid gap-4 hover:bg-gray-50">
+    <li className="p-2 rounded grid gap-4 hover:bg-gray-50">
       <div className="flex gap-2">
         <div className="img-wrapper w-12 h-12 rounded-full overflow-hidden">
           <img
@@ -148,15 +148,13 @@ const NotiCard = ({
         )}
         <span className="text-sm text-gray-500 ml-auto">{sendDate}</span>
       </div>
-    </div>
+    </li>
   )
 }
 
 const NotiCenter = () => {
   const { data: notiData, error } = useSWR("/notification", featcher)
   const history = useHistory()
-  console.log(notiData)
-  console.log(error)
 
   const handleDelete = useCallback(async (notificationId) => {
     try {
@@ -174,11 +172,11 @@ const NotiCenter = () => {
           <h3 className="px-2">새로운 알림</h3>
           {error && <p className="px-2">알림을 불러오다 미끄러졌어요</p>}
           {notiData !== undefined && !error && (
-            <div className="grid gap-4">
+            <ul className="grid gap-4">
               {notiData.map((noti) => (
                 <NotiCard key={noti.id} {...noti} onDelete={handleDelete} />
               ))}
-            </div>
+            </ul>
           )}
         </div>
       </div>
