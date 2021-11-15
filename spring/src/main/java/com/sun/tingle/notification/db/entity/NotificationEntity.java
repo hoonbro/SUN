@@ -27,6 +27,7 @@ public class NotificationEntity {
 
     private String calendarCode;
 
+    private String calendarName;
 //    private Long missionId;
 
     private Long senderId;
