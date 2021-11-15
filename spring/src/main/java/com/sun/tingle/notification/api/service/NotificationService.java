@@ -149,13 +149,17 @@ public class NotificationService {
         return notificationRepository.findById(id).orElseThrow(NoSuchElementException::new);
     }
 
+    public NotificationCheckEntity getNotificationCheck(Long notificationId,Long memberId){
+        return notificationCheckRepository.findByNotificationIdAndMemberId(notificationId, memberId);
+    }
+
     public List<NotificationEntity> getNotifications(Long id){
         List<NotificationEntity> list = notificationRepository.findALLByReceiverId(id).orElseThrow(NoSuchElementException::new);
 
         //내 캘린더 관련 알림
         List<CalendarRpDto> myCalendarList = calendarService.getMyCalendarList(id);
         for(CalendarRpDto calendarRpDto : myCalendarList){
-            List<NotificationEntity> calendarCodeList = notificationRepository.findAllByCalendarCode(calendarRpDto.getCalendarCode());
+            List<NotificationEntity> calendarCodeList = notificationRepository.findAllByCalendarCodeAndReceiverIdIsNull(calendarRpDto.getCalendarCode());
             list.addAll(calendarCodeList);
         }
         log.info("내 캘린더 알림 조회");
@@ -163,7 +167,7 @@ public class NotificationService {
         //공유 캘린더 관련 알림
         List<CalendarRpDto> shareCalendarList = calendarService.getShareCalendarList(id);
         for(CalendarRpDto calendarRpDto : shareCalendarList){
-            List<NotificationEntity> calendarCodeList = notificationRepository.findAllByCalendarCode(calendarRpDto.getCalendarCode());
+            List<NotificationEntity> calendarCodeList = notificationRepository.findAllByCalendarCodeAndReceiverIdIsNull(calendarRpDto.getCalendarCode());
             list.addAll(calendarCodeList);
         }
         log.info("공유 캘린더 알림 조회");
@@ -177,12 +181,21 @@ public class NotificationService {
                 return o1.getSendDate().compareTo(o2.getSendDate());
             }
         });
-        for(NotificationEntity n : list){
+
+        for(int i = 0; i < list.size(); i++){
+            NotificationEntity n = list.get(i);
+
             if(n.getType().equals("invite"))
                 continue;
+            NotificationCheckEntity notificationCheckEntity = notificationCheckRepository.findByNotificationIdAndMemberId(n.getId(), id);
+            if(notificationCheckEntity == null) {
+                list.remove(i);
+                continue;
+            }
             n.setIsCheck(notificationCheckRepository.findByNotificationIdAndMemberId(n.getId(), id).getIsCheck());
             n.setSender(memberService.getMemberInfo(n.getSenderId()));
         }
+
         log.info("사용자에 맞게 알림 체크 여부 판단");
 
         return list;
@@ -191,6 +204,12 @@ public class NotificationService {
     public void deleteNotification(Long notificationId){
         notificationRepository.delete(
                 notificationRepository.findById(notificationId).orElseThrow(NoSuchElementException::new)
+        );
+    }
+
+    public void deleteNotificationCheck(Long notificationCheckId){
+        notificationCheckRepository.delete(
+                notificationCheckRepository.findById(notificationCheckId).orElseThrow(NoSuchElementException::new)
         );
     }
 

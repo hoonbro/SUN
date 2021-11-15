@@ -3,7 +3,9 @@ package com.sun.tingle.notification.api.controller;
 import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.util.JwtUtil;
 import com.sun.tingle.notification.api.service.NotificationService;
+import com.sun.tingle.notification.db.entity.NotificationCheckEntity;
 import com.sun.tingle.notification.db.entity.NotificationEntity;
+import com.sun.tingle.notification.db.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -65,18 +67,14 @@ public class NotificationController {
         TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
 
         NotificationEntity notificationEntity = notificationService.getNotification(notificationId);
-        if(notificationEntity.getReceiverId() == tokenInfo.getId()) {
-            try {
-                notificationService.deleteNotification(notificationId);
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }catch(NoSuchElementException e){
-                log.error("해당 알림 없음");
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+
+        if(notificationEntity.getType().equals("invite")){
+            notificationService.deleteNotification(notificationEntity.getId());
         }else{
-            // 사용자 아이디와 알림의 사용자 아이디가 다를 경우
-            log.error("알림 삭제 권한 없음");
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            NotificationCheckEntity notificationCheckEntity = notificationService.getNotificationCheck(notificationEntity.getId(), tokenInfo.getId());
+            notificationService.deleteNotificationCheck(notificationCheckEntity.getId());
         }
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
