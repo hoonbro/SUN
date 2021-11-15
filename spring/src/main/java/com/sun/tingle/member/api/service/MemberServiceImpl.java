@@ -1,68 +1,79 @@
 package com.sun.tingle.member.api.service;
 
+import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.calendar.db.repo.CalendarRepository;
+import com.sun.tingle.calendar.service.CalendarService;
+import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.api.dto.request.MemberReqDto;
 import com.sun.tingle.member.api.dto.response.MemberResDto;
 import com.sun.tingle.member.db.entity.MemberEntity;
 import com.sun.tingle.member.db.repository.MemberRepository;
+import com.sun.tingle.member.db.repository.TokenRepository;
+import com.sun.tingle.member.util.JwtUtil;
+import com.sun.tingle.member.util.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class MemberServiceImpl implements MemberService {
     @Autowired
     MemberRepository memberRepository;
 
     @Autowired
+    TokenRepository tokenRepository;
+
+    @Autowired
+    CalendarRepository calendarRepository;
+
+    @Autowired
+    CalendarService calendarService;
+
+    @Lazy
+    @Autowired
     PasswordEncoder passwordEncoder;
- 
-    @Override
-    public MemberResDto registMember(MemberReqDto member) {
-        MemberEntity memberEntity = MemberEntity.builder()
-                .memberId(member.getMemberId())
-                .password(passwordEncoder.encode(member.getPassword()))
-                .name(member.getName())
-                .phone(member.getPhone())
-                .email(member.getEmail())
-                .auth("ROLE_USER")
-                .build();
 
+    @Autowired
+    S3service s3service;
+
+    @Lazy
+    @Autowired
+    JwtUtil jwtUtil;
+
+    @Autowired
+    RedisUtil redisUtil;
+
+    @Override
+    public MemberResDto getMemberInfo(Long id) {
+        MemberEntity memberEntity = memberRepository.findById(id).orElseThrow(NoSuchElementException::new);
+        return entity2Dto(memberEntity);
+    }
+
+    @Override
+    @Transactional
+    public MemberResDto updateMemberInfo(MemberReqDto memberReqDto) {
+        MemberEntity memberEntity = getMemberById(memberReqDto.getId()).orElseThrow(NoSuchElementException::new);
+        memberEntity.setName(memberReqDto.getName());
+        memberEntity.setEmail(memberReqDto.getEmail());
+        memberEntity.setPhone(memberReqDto.getPhone());
         memberEntity = memberRepository.save(memberEntity);
-
-        MemberResDto memberResDto = MemberResDto.builder()
-                .id(memberEntity.getId())
-                .memberId(memberEntity.getMemberId())
-                .name(memberEntity.getName())
-                .phone(memberEntity.getPhone())
-                .email(memberEntity.getEmail())
-                .auth(memberEntity.getAuth())
-                .build();
-
-        return memberResDto;
+        return entity2Dto(memberEntity);
     }
 
     @Override
-    public void duplicateId(String id) {
-        memberRepository.findByMemberId(id)
-                .ifPresent(m -> {
-                    throw new IllegalStateException("중복되는 아이디 입니다");
-                });
-
-
-    }
-
-    @Override
-    public void duplicateEmail(String email) {
-//        Optional<MemberEntity> memberOptional = memberRepository.findByEmail(email);
-
-//        MemberEntity memberEntity = memberRepository.findByEmail(email);
-        memberRepository.findByEmail(email)
-                .ifPresent(m -> {
-                    throw new IllegalStateException("중복되는 이메일 입니다");
-                });
+    public void deleteMemberInfo(Long id) {
+        memberRepository.delete(
+                memberRepository.findById(id).orElseThrow(() -> new NoSuchElementException())
+        );
     }
 
     @Override
@@ -81,7 +92,47 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void changePassword(MemberEntity memberEntity, String password) {
+    public MemberResDto entity2Dto(MemberEntity memberEntity) {
+        MemberResDto memberResDto = MemberResDto.builder()
+                .id(memberEntity.getId())
+                .memberId(memberEntity.getMemberId())
+                .name(memberEntity.getName())
+                .phone(memberEntity.getPhone())
+                .email(memberEntity.getEmail())
+                .auth(memberEntity.getAuth())
+                .profileImage(memberEntity.getProfileImage())
+                .defaultCalendar(memberEntity.getDefaultCalendar())
+                .build();
+        return memberResDto;
+    }
+
+    @Override
+    public String updateProfileImage(Long id, MultipartFile file) throws IOException {
+        MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
+
+        // 새로운 프로필 이미지 url
+//        String newUrl = s3service.ProfileUpload(file);
+      String newUrl = s3service.s3upload(file);
+
+        // s3에서 기존 프로필 이미지 삭제
+        if(memberEntity.getProfileImage()!=null)
+            s3service.deleteProfileFile(memberEntity.getProfileImage());
+
+        //DB에 저장
+        memberEntity.setProfileImage(newUrl);
+        memberRepository.save(memberEntity);
+
+        return newUrl;
+    }
+
+    @Override
+    public void logout(String refreshToken){
+        redisUtil.deleteData(refreshToken);
+    }
+
+    @Override
+    public void changePassword(Long id, String password){
+        MemberEntity memberEntity = getMemberById(id).orElseThrow(NoSuchElementException::new);
         memberEntity.setPassword(passwordEncoder.encode(password));
         memberRepository.save(memberEntity);
     }

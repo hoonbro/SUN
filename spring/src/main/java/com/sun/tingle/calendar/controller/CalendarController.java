@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/calendar")
+@CrossOrigin("*")
 public class CalendarController {
 
     @Autowired
@@ -30,7 +31,7 @@ public class CalendarController {
 
     @PostMapping
     public ResponseEntity<CalendarRpDto> insertCalendar(HttpServletRequest request, @RequestBody Map<String,String> map) {
-        String calendarCode = getRandomSentence();
+        String calendarCode = calendarService.getRandomSentence();
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         String calendarName = map.get("calendarName");
@@ -38,20 +39,27 @@ public class CalendarController {
         if(calendarRpDto == null) {
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.OK);
+        return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
     @DeleteMapping("{calendarCode}")
-    public ResponseEntity<Void> deleteCalendar(@PathVariable("calendarCode") String calendarCode){
+    public ResponseEntity<Void> deleteCalendar(HttpServletRequest request,@PathVariable("calendarCode") String calendarCode){
         HttpStatus httpStatus = HttpStatus.NO_CONTENT;
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         try{
-            calendarService.deleteCalendar(calendarCode);
+            int result = calendarService.deleteCalendar(calendarCode,id);
+            if(result ==1) { // 캘린더 등록한 사람이 아니라서 권한 없을 때
+                return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
+            }
+            else {  // 삭제 완료
+                return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
+            }
         }
         catch (Exception e){
             httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
             return new ResponseEntity<Void>(httpStatus);
         }
-        return new ResponseEntity<Void>(httpStatus);
     }
 
     @GetMapping("{calendarCode}")
@@ -66,10 +74,15 @@ public class CalendarController {
 
 
     @PutMapping("{calendarCode}")
-    public ResponseEntity<CalendarRpDto> updateCalendar(@PathVariable("calendarCode") String calendarCode,
+    public ResponseEntity<CalendarRpDto> updateCalendar(HttpServletRequest request,@PathVariable("calendarCode") String calendarCode,
                                                          @RequestBody Map<String,String> map) {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         String calendarName = map.get("calendarName");
-        CalendarRpDto calendarRpDto = calendarService.updateCalendar(calendarCode,calendarName);
+        CalendarRpDto calendarRpDto = calendarService.updateCalendar(calendarCode,calendarName,id);
+        if(calendarRpDto == null) {
+            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.UNAUTHORIZED);
+        }
         return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
@@ -82,7 +95,8 @@ public class CalendarController {
         Map<String,Object> map2 = calendarService.insertShareCalendar(calendarCode,id);
         int flag = (Integer)map2.get("flag");
         CalendarRpDto calendarRpDto = (CalendarRpDto)map2.get("calendarRpDto");
-        if(flag == -1) { // 애초에 등록 안된 달력일 때
+        if(flag == -1) { // 애초에 등록 안된 달력일
+            // 때
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.NO_CONTENT);
         }
         else if(flag == -2) { // 이미 공유 달력에 등록되어 있을 때
@@ -148,19 +162,6 @@ public class CalendarController {
 
 
 
-    public String getRandomSentence() {
-        String randomValue = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
-        int len = randomValue.length();
-        StringBuilder sb = new StringBuilder();
 
-        for(int i=0; i<10; i++) {
-            int idx = (int)(len * Math.random());
-
-            sb.append(randomValue.charAt(idx));
-        }
-
-
-        return sb.toString();
-    }
 
 }

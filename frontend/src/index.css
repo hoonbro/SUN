@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  h1 {
+    @apply text-3xl font-bold;
+  }
+  h2 {
+    @apply text-2xl font-bold;
+  }
+  h3 {
+    @apply text-xl font-bold;
+  }
+  h4 {
+    @apply text-lg font-bold;
+  }
+}
+
+@layer components {
+  .form-field {
+    @apply grid gap-2;
+  }
+  .form-field label {
+    @apply text-sm font-medium text-gray-700 place-self-start;
+  }
+  .form-field .input-wrapper {
+    @apply relative;
+  }
+  .form-field .input-wrapper.error {
+    @apply border-red-500;
+  }
+  .form-field .input-wrapper input {
+    @apply w-full border border-gray-300 rounded py-2 px-4 outline-none focus:ring;
+  }
+}

@@ -1,9 +1,13 @@
 package com.sun.tingle.member.api.service;
 
+import com.sun.tingle.member.api.dto.request.PasswordCodeDto;
+
 public interface EmailService {
 
-    public void sendId(String email, String memberId);
+    void sendId(String email, String memberId);
 
-    public String SendPasswordCode(String email, String name);
+    String SendPasswordCode(String email, String name);
+
+    boolean validatePasswordCode(PasswordCodeDto passwordCodeDto);
 }
  

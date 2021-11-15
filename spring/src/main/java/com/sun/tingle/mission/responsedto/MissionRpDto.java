@@ -1,11 +1,11 @@
 package com.sun.tingle.mission.responsedto;
 
+import com.sun.tingle.file.db.entity.MissionFileEntity;
+import com.sun.tingle.file.db.entity.TeacherFileEntity;
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -16,9 +16,14 @@ import java.util.List;
 public class MissionRpDto {
 
     private Long missionId;
-    private String missionName;
-    private String startDate;
-    private  String endDate;
+    private String title;
+    private String start;
+    private  String end;
     private  List<String> tag;
     private  String calendarCode;
+    private Long id;
+
+    private List<MissionFileEntity> missionFileList = new ArrayList<>();
+
+    private List<TeacherFileEntity> teacherFileList = new ArrayList<>();
 }
