@@ -176,9 +176,9 @@ public class NotificationService {
             @Override
             public int compare(NotificationEntity o1, NotificationEntity o2) {
                 if(o1.getSendDate().equals(o2.getSendDate())){
-                    return o1.getSendTime().compareTo(o2.getSendTime());
+                    return o2.getSendTime().compareTo(o1.getSendTime());
                 }
-                return o1.getSendDate().compareTo(o2.getSendDate());
+                return o2.getSendDate().compareTo(o1.getSendDate());
             }
         });
 
