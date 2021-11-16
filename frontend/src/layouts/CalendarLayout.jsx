@@ -4,10 +4,12 @@ import CalendarCreate from "../pages/CalendarCreate"
 import CalendarEdit from "../pages/CalendarEdit"
 import CalendarSetting from "../pages/CalendarSetting"
 import EventCreate from "../pages/EventCreate"
+import EventEdit from "../pages/EventEdit"
 import EventDetail from "../pages/EventDetail"
 
 const CalendarLayout = () => {
   const { path } = useRouteMatch()
+
   return (
     <Switch>
       <Route path={`${path}/setting`} exact>
@@ -24,6 +26,9 @@ const CalendarLayout = () => {
       </Route>
       <Route path={`${path}/:calendarCode/events/create`}>
         <EventCreate />
+      </Route>
+      <Route path={`${path}/:calendarCode/events/:eventId/edit`}>
+        <EventEdit />
       </Route>
       <Route path={`${path}/:calendarCode/events/:eventId`}>
         <EventDetail />

@@ -24,6 +24,12 @@ const NotiChatListItem = ({ ...chat }) => {
     }
   }, [chat.sentTime])
 
+  const profileImage = useMemo(() => {
+    return chat?.pic_uri
+      ? `https://d101s.s3.ap-northeast-2.amazonaws.com/${chat.pic_uri}`
+      : gravatar.url(chat?.email, { d: "retro" })
+  }, [chat])
+
   useEffect(() => {
     if (menuOpen === true) {
       deleteBtnEl.current.focus()
@@ -34,11 +40,19 @@ const NotiChatListItem = ({ ...chat }) => {
     <li>
       <Link
         className="p-2 rounded grid gap-1 hover:bg-gray-50"
-        to={`/calendars/${chat.chatRoom.mission.calendarCode}/events/${chat.chatRoom.mission.missionId}`}
+        // to={`/calendars/${chat.chatRoom.mission.calendarCode}/events/${chat.chatRoom.mission.missionId}`}
+        to={`/calendars`}
       >
         <div className="flex gap-2">
+          <div className="img-wrapper w-12 h-12 rounded-full overflow-hidden">
+            <img
+              src={profileImage}
+              alt="프로필 이미지"
+              className="w-full h-full object-cover"
+            />
+          </div>
           <div className="flex-1 grid gap-1">
-            <p className="font-bold">{chat.sender}</p>
+            <p className="font-bold">{chat.nickname}</p>
             <p className="text-sm font-medium">{chat.content}</p>
           </div>
           <div className="relative">

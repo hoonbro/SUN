@@ -1,7 +1,7 @@
 import { useHistory, useParams } from "react-router"
 import Header from "../components/Header"
 import EventForm from "../components/EventForm"
-import client from "../api/client"
+import calendarAPI from "../api/calendar"
 
 const EventCreate = () => {
   const history = useHistory()
@@ -13,14 +13,11 @@ const EventCreate = () => {
 
   const handleCreate = async (formData) => {
     try {
-      await client.post(`mission`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      const eventRes = await calendarAPI.createEvent(formData)
       const ok = window.confirm("과제가 생성되었어요! 지금 보러 갈까요?")
       if (ok) {
         alert("과제 상세 페이지로 이동")
+        history.push(`/calendars/${calendarCode}/events/${eventRes.missionId}`)
       } else {
         history.push(`/calendars/${calendarCode}`)
       }

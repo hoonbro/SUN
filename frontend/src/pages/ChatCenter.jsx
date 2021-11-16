@@ -19,12 +19,11 @@ const ChatCenter = () => {
       <div className="flex-1 h-full py-10">
         <div className="container max-w-xl bg-white p-4 grid gap-6 select-none xs:rounded-xl xs:shadow-lg">
           {error && <p className="px-2">알림을 불러오다 미끄러졌어요</p>}
-          {chatData !== undefined && !error && (
+          {chatData && !error && !!chatData.content.length && (
             <ul className="grid gap-4">
-              {chatData &&
-                chatData.content.map((chat) => (
-                  <NotiChatListItem key={chat.id} {...chat} />
-                ))}
+              {chatData.content.map((chat) => (
+                <NotiChatListItem key={chat.sentTime} {...chat} />
+              ))}
             </ul>
           )}
         </div>

@@ -9,6 +9,7 @@ const ChatListContainer = () => {
     chatStatus,
     getHistory,
     currentPage,
+    setCurrentPage,
     lastPage,
     sizePerPage,
   } = useContext(ChatContext)
@@ -35,7 +36,7 @@ const ChatListContainer = () => {
   const handleScroll = (e) => {
     if (e.target.scrollTop === 0 && currentPage <= lastPage) {
       setOldScrollHeight(e.target.scrollHeight)
-      getHistory(roomId)
+      getHistory(roomId, currentPage)
     }
   }
 
