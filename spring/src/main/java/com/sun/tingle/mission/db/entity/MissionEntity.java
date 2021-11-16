@@ -2,6 +2,7 @@ package com.sun.tingle.mission.db.entity;
 
 
 import com.sun.tingle.calendar.db.entity.ShareCalendarEntity;
+import com.sun.tingle.chat.entity.ChatRoom;
 import com.sun.tingle.file.db.entity.MissionFileEntity;
 import com.sun.tingle.file.db.entity.TeacherFileEntity;
 import com.sun.tingle.notification.db.entity.NotificationEntity;
@@ -50,6 +51,9 @@ public class MissionEntity {
 
     @OneToMany(mappedBy = "missionId", cascade = CascadeType.ALL)
     private List<TeacherFileEntity> teacherFileList = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "mission")
+    private List<ChatRoom> chatRoomList;
 
     public MissionEntity(Long missionId, String title, Date startDate,String startTime, Date endDate,String endTime, String toString, String calendarCode, Long id) {
         this.missionId = missionId;
