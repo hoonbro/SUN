@@ -13,6 +13,7 @@ import com.sun.tingle.file.db.entity.TeacherFileEntity;
 import com.sun.tingle.file.db.repo.MissionFileRepository;
 import com.sun.tingle.file.db.repo.TeacherFileRepository;
 import com.sun.tingle.file.responsedto.MissionFileRpDto;
+import com.sun.tingle.file.responsedto.TeacherFileRpDto;
 import com.sun.tingle.mission.db.repo.MissionRepository;
 import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,11 +111,33 @@ public class S3service {
             return missionFileRpDto;
     }
 
+
+    public TeacherFileRpDto teacherFileUpload(MultipartFile file, Long id) throws IOException{
+        String fileName = file.getOriginalFilename();
+        int len = fileName.lastIndexOf(".");
+        String fileNameE = fileName.substring(len,fileName.length());
+        String randomUuid= UUID.randomUUID().toString().replaceAll("-","");
+        randomUuid += fileNameE;
+        s3Client.putObject(new PutObjectRequest(bucket, randomUuid, file.getInputStream(), null)
+                .withCannedAcl(CannedAccessControlList.PublicRead));
+
+        String file_uuid = s3Client.getUrl(bucket,randomUuid).toString().replace(bucketUrl,"");
+
+        TeacherFileEntity teacherFileEntity = null;
+        teacherFileEntity = teacherFileEntity.builder().fileUuid(randomUuid).fileName(fileName).id(id).build();
+        teacherFileRepository.save(teacherFileEntity);
+        TeacherFileRpDto teacherFileRpDto = buildTeacherFile(teacherFileEntity);
+
+        return teacherFileRpDto;
+
+
+
+
+
+    }
+
                         //미션 등록 시 선생님이 파일 업로드할 때
     public void teacherFileUploads(MultipartFile[] file, Long missionId, Long id) throws IOException {
-//        List<TeacherFileRpDto> list = new ArrayList<>();
-        String[] url = new String[file.length];
-
         for(int i=0; i<file.length; i++) {
             String fileName = file[i].getOriginalFilename();
             String calendarCode = missionRepository.findByMissionId(missionId).getCalendarCode();
@@ -126,12 +149,7 @@ public class S3service {
                     build();
 
             teacherFileRepository.save(tEntity);
-//            TeacherFileRpDto teacherFileRpDto = new TeacherFileRpDto();
-//            teacherFileRpDto = teacherFileRpDto.builder().fileUuid(tEntity.getFileUuid()).
-//                    fileName(tEntity.getFileName()).build();
-//            list.add(teacherFileRpDto);
         }
-//        return list;
     }
 
     public int deleteMissionFile(String uuid,Long id) { // 채팅방에 자신이 올린 파일을 삭제할 때
@@ -151,7 +169,6 @@ public class S3service {
         }
     }
 
-
     public int deleteTeacherFile(String uuid,Long id) { // 선생이 자신이 올린 파일을 삭제할 때
         TeacherFileEntity m = teacherFileRepository.findByFileUuid(uuid);
         if(m == null) {
@@ -162,12 +179,27 @@ public class S3service {
         }
         else {
             teacherFileRepository.delete(m);
-            String calendarCode = missionRepository.findByMissionId(m.getMissionId()).getCalendarCode();
-//            String s3Uuid = uuid.replace("https://d101.s3.ap-northeast-2.amazonaws.com/","");
-            s3Client.deleteObject(new DeleteObjectRequest(bucket,calendarCode+"/"+ m.getMissionId()+"/"+uuid));
+//            String calendarCode = missionRepository.findByMissionId(m.getMissionId()).getCalendarCode();
+            s3Client.deleteObject(new DeleteObjectRequest(bucket,uuid));
             return 2; // 삭제 완료
         }
     }
+
+//    public int deleteTeacherFile(String uuid,Long id) { // 선생이 자신이 올린 파일을 삭제할 때
+//        TeacherFileEntity m = teacherFileRepository.findByFileUuid(uuid);
+//        if(m == null) {
+//            return 0; // 삭제할 사진이 없다.
+//        }
+//        else if(m.getId() != id) {
+//            return 1; //권한 없다
+//        }
+//        else {
+//            teacherFileRepository.delete(m);
+//            String calendarCode = missionRepository.findByMissionId(m.getMissionId()).getCalendarCode();
+//            s3Client.deleteObject(new DeleteObjectRequest(bucket,calendarCode+"/"+ m.getMissionId()+"/"+uuid));
+//            return 2; // 삭제 완료
+//        }
+//    }
 
 
     public void deleteProfileFile(String uuid) { // S3에 있는 프로필 정보 삭제
@@ -178,7 +210,14 @@ public class S3service {
 
 
 
+    public TeacherFileRpDto buildTeacherFile(TeacherFileEntity tEntity) {
+        TeacherFileRpDto tDto = new TeacherFileRpDto();
 
+        tDto = tDto.builder().fileName(tEntity.getFileName()).fileUuid(tEntity.getFileUuid()).
+                fileId(tEntity.getFileId()).build();
+
+        return tDto;
+    }
 
     public  MissionFileRpDto buildMissionFile(MissionFileEntity mEntity) {
         MissionFileRpDto mDto = new MissionFileRpDto();

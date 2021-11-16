@@ -10,9 +10,13 @@ import java.text.ParseException;
 import java.util.List;
 
 public interface MissionService {
-    public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException, ParseException;
+//    public MissionRpDto insertMission(MissionRqDto missionRqDto, MultipartFile[] teacherFile) throws IOException, ParseException;
+    public MissionRpDto insertMission(MissionRqDto missionRqDto) throws IOException, ParseException;
+
     public MissionRpDto selectMission(Long missionId);
-    public MissionRpDto updateMission(Long missionId, MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException, ParseException;
+//    public MissionRpDto updateMission(Long missionId, MissionRqDto missionRqDto,MultipartFile[] teacherFile) throws IOException, ParseException;
+    public MissionRpDto updateMission(Long missionId, MissionRqDto missionRqDto) throws IOException, ParseException;
+
     public int deleteMission(Long missionId,Long id);
     public List<MissionRpDto> selectMissionList(String calendarCode);
     public List<MissionRpDto> selectDateMissionList(String missionDate,String calendarCode) throws ParseException;
