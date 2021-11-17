@@ -50,7 +50,7 @@ public class ChatController {
     }
 
     @GetMapping("/chat/all")
-    public ResponseEntity<Page<ChatMessage>> getMemberChatAll(HttpServletRequest request, @PageableDefault(size = 10) @SortDefault(sort = "sentTime", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
+    public ResponseEntity<Page<ChatMessageResponseDto>> getMemberChatAll(HttpServletRequest request, @PageableDefault(size = 10) @SortDefault(sort = "sentTime", direction = Sort.Direction.DESC) Pageable pageable) throws Exception {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         return ResponseEntity.ok(chatService.getChatAll(id, pageable));

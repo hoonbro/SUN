@@ -161,7 +161,7 @@ public class ChatService {
     }
 
 
-    public Page<ChatMessage> getChatAll(Long id, Pageable pageable) {
+    public Page<ChatMessageResponseDto> getChatAll(Long id, Pageable pageable) {
         List<Long> missionList = missionService.getMemberMissionList(id);
 //        MemberEntity member = memberRepository.getById(id);
         List<ChatRoom> rooms = new ArrayList<>();
@@ -172,6 +172,6 @@ public class ChatService {
             }
         }
         Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomInAndSenderIsNot(rooms, id, pageable);
-        return chatMessages;
+        return chatMessages.map(m-> ChatMessageResponseDto.of(memberRepository, m, missionFileRepository));
     }
 }
