@@ -2,6 +2,7 @@ package com.sun.tingle.file.controller;
 
 
 import com.sun.tingle.file.responsedto.MissionFileRpDto;
+import com.sun.tingle.file.responsedto.TeacherFileRpDto;
 import com.sun.tingle.file.service.S3service;
 import com.sun.tingle.member.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +45,13 @@ public class FileController {
     }
 
 
-//    @PostMapping("/teacher")
-//    public ResponseEntity<List<TeacherFileRpDto>> teacherFileUpload(HttpServletRequest request,@RequestParam("teacherFile") MultipartFile[] file,@RequestParam("missionId") Long missionId) throws IOException {
-//        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
-//        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-//        List<TeacherFileRpDto> list = new ArrayList<>();
-//        list = s3service.teacherFileUploads(file,missionId,id);
-//        return new ResponseEntity<List<TeacherFileRpDto>>(list,HttpStatus.CREATED);
-//    }
+    @PostMapping("/teacher")
+    public ResponseEntity<TeacherFileRpDto> teacherFileUpload(HttpServletRequest request, @RequestParam("teacherFile") MultipartFile file) throws IOException {
+        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+        TeacherFileRpDto teacherFileRpDto = s3service.teacherFileUpload(file,id);
+        return new ResponseEntity<TeacherFileRpDto>(teacherFileRpDto,HttpStatus.CREATED);
+    }
 
 
 

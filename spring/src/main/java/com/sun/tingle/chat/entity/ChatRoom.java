@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Getter
 @Setter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Entity(name = "chat_room")
 public class ChatRoom {
     @Id

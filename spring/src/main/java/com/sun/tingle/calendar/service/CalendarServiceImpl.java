@@ -6,6 +6,8 @@ import com.sun.tingle.calendar.db.repo.CalendarRepository;
 import com.sun.tingle.calendar.db.repo.ShareCalendarRepository;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.file.service.S3service;
+import com.sun.tingle.member.db.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,9 @@ public class CalendarServiceImpl implements CalendarService{
 
     @Autowired
     ShareCalendarRepository shareCalendarRepository;
+
+    @Autowired
+    MemberRepository memberRepository;
 
     @Autowired
     S3service s3service;
@@ -67,6 +72,13 @@ public class CalendarServiceImpl implements CalendarService{
         if(calendarEntity.getId() != id) { // 등록한 사람아닐 때 권한 x
             return 1;
         }
+
+        String defaultCalendar = memberRepository.findById(id).get().getDefaultCalendar();
+
+        if(defaultCalendar.equals(calendarCode)) {
+            return 3;
+        }
+
         calendarRepository.deleteById(calendarCode);
         s3service.s3CalendarDelete(calendarCode);
         return 2;
@@ -79,6 +91,10 @@ public class CalendarServiceImpl implements CalendarService{
         CalendarRpDto calendarRpDto = selectCalendar(calendarCode);
         if(calendarRpDto == null) {
             map.put("flag",-1);
+            return map;
+        }
+        else if(calendarRpDto.getId() == id) { // 본인이 등록한 캘린더를 공유하려고 할때
+            map.put("flag",-3);
             return map;
         }
         ShareCalendarEntity shareCalendarEntity2 = new ShareCalendarEntity();
@@ -170,5 +186,13 @@ public class CalendarServiceImpl implements CalendarService{
 
 
         return sb.toString();
+    }
+
+    @Override
+    public List<Long> getMembersByCalendarCode(String calendarCode) {
+        List<Long> list = calendarRepository.findIdByCalendarCode(calendarCode);
+        List<Long> list2 = shareCalendarRepository.findIdByCalendarCode(calendarCode);
+        list.addAll(list2);
+        return list;
     }
 }

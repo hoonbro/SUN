@@ -11,6 +11,6 @@ public interface MissionRepository extends JpaRepository<MissionEntity,Long> {
     MissionEntity findByTitle(String title);
     MissionEntity findByMissionId(Long MissionId);
     List<MissionEntity> findByCalendarCode(String calendarCode);
-    List<MissionEntity> findByStartDateLessThanEqualAndEndDateGreaterThanEqual(Date date1,Date date2);
+    List<MissionEntity> findByCalendarCodeAndStartDateLessThanEqualAndEndDateGreaterThanEqual(String calendarCode,Date date1,Date date2);
 
 }

@@ -29,6 +29,9 @@ public class MissionFileEntity {
 
     @Column(name = "mission_id")
     public Long missionId;
+    
+    @Column(name = "type")
+    public String type;
 
     @Column(name = "id")
     public Long id;
