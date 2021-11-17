@@ -51,6 +51,20 @@ const inviteUser = async ({ calendarCode, inviteeEmail }) => {
   return res.data
 }
 
+const createEvent = async (formData) => {
+  const res = await client.post(`/mission`, formData)
+  return res.data
+}
+
+const editEvent = async ({ eventId, formData }) => {
+  const res = await client.put(`/mission/${eventId}`, formData)
+  return res.data
+}
+
+const deleteEvent = async (eventId) => {
+  await client.delete(`/mission/${eventId}`)
+}
+
 const calendarAPI = {
   createCalendar,
   addShareCalendar,
@@ -61,6 +75,9 @@ const calendarAPI = {
   deleteShareCalendar,
   getMissionList,
   inviteUser,
+  createEvent,
+  editEvent,
+  deleteEvent,
 }
 
 export default calendarAPI

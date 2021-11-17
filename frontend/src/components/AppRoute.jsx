@@ -5,6 +5,7 @@ import { useAuthState } from "../context"
 const AppRoute = ({ component: Component, path, ...rest }) => {
   const { requiresAuth, requiresNoAuth, ...routeRest } = rest
   const auth = useAuthState()
+  console.log(auth?.token)
 
   return (
     <Route

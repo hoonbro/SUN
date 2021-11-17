@@ -1,25 +1,27 @@
 import moment from "moment"
-import { v4 as uuidv4 } from "uuid"
-import { useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useParams } from "react-router-dom"
 import useInputs from "../hooks/useInputs"
 import { MdClose } from "react-icons/md"
+import fileAPI from "../api/file"
 
-const EventForm = ({ onSubmit = (f) => f }) => {
+const EventForm = ({ initData, onSubmit = (f) => f, onDelete }) => {
   const { calendarCode } = useParams()
   const [state, handleChange] = useInputs({
     title: {
-      value: "",
+      value: initData?.title || "",
       validators: [],
       errors: {},
     },
     start: {
-      value: moment().format("YYYY-MM-DDTHH:mm"),
+      value: moment(initData?.start).format("YYYY-MM-DDTHH:mm"),
       validators: [],
       errors: {},
     },
     end: {
-      value: moment(Date.now() + 3600000).format("YYYY-MM-DDTHH:mm"),
+      value: moment(initData?.end || Date.now() + 3600000).format(
+        "YYYY-MM-DDTHH:mm"
+      ),
       validators: [],
       errors: {},
     },
@@ -36,57 +38,102 @@ const EventForm = ({ onSubmit = (f) => f }) => {
     fileInputEl.current.click()
   }
 
-  const handleChangeFileInput = (e) => {
+  const handleChangeFileInput = useCallback(async (e) => {
     const { files } = e.target
     if (!files.length) return
-    const newFiles = {}
-    Array(...files).forEach((file) => {
-      newFiles[uuidv4()] = file
-    })
-    setFileList((oldFileList) => ({ ...oldFileList, ...newFiles }))
-  }
-
-  const handleDeleteFile = (id) => {
-    setFileList((oldFileList) => {
-      const files = { ...oldFileList }
-      delete files[id]
-      return { ...files }
-    })
-  }
-
-  const handleAddTag = (t) => {
-    if (tags.includes(t)) return
-    const newTag = t.replace(/,/g, "")
-    setTags((oldTags) => [...oldTags, newTag])
-  }
-
-  const handleDeleteTag = (t) => {
-    setTags((oldTags) => oldTags.filter((ot) => ot !== t))
-  }
-
-  const handleKeyDownTag = (e) => {
-    if (e.keyCode === 188 || e.keyCode === 13) {
-      e.preventDefault()
-      handleAddTag(tagInputEl.current.value)
-      tagInputEl.current.value = ""
-    }
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
     const formData = new FormData()
-    formData.append("title", title.value)
-    formData.append("start", start.value)
-    formData.append("end", end.value)
-    Object.values(fileList).forEach((file) => {
-      formData.append("teacherFile", file)
-    })
-    tags.forEach((tag) => {
-      formData.append("tag", tag)
-    })
-    formData.append("calendarCode", calendarCode)
-    onSubmit(formData)
-  }
+    formData.append("teacherFile", files[0])
+    try {
+      const { fileId, fileUuid, fileName } = await fileAPI.uploadFile(formData)
+      setFileList((prevList) => ({
+        ...prevList,
+        [fileUuid]: { fileId, fileName },
+      }))
+    } catch (error) {
+      console.log(error)
+    }
+  }, [])
+
+  const handleDeleteFile = useCallback(async (e, fileUuid) => {
+    e.preventDefault()
+    try {
+      await fileAPI.deleteFile(fileUuid)
+      setFileList((prevList) => {
+        const files = { ...prevList }
+        delete files[fileUuid]
+        return { ...files }
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }, [])
+
+  const handleAddTag = useCallback(
+    (t) => {
+      if (tags.includes(t)) return
+      const newTag = t.replace(/,/g, "")
+      setTags((oldTags) => [...oldTags, newTag])
+    },
+    [tags]
+  )
+
+  const handleDeleteTag = useCallback((t) => {
+    setTags((oldTags) => oldTags.filter((ot) => ot !== t))
+  }, [])
+
+  const handleKeyDownTag = useCallback(
+    (e) => {
+      if (e.keyCode === 188 || e.keyCode === 13) {
+        e.preventDefault()
+        handleAddTag(tagInputEl.current.value)
+        tagInputEl.current.value = ""
+      }
+    },
+    [handleAddTag]
+  )
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault()
+      const formData = {
+        title: title.value,
+        start: start.value,
+        end: end.value,
+        teacherFileList: Object.keys(fileList),
+        tag: [...tags],
+        calendarCode: calendarCode,
+      }
+      onSubmit(formData)
+    },
+    [title, start, end, fileList, tags, calendarCode, onSubmit]
+  )
+
+  const handleDeleteEvent = useCallback(
+    (e) => {
+      e.preventDefault()
+      const ok = window.confirm("과제를 삭제하실건가요?")
+      if (ok) {
+        onDelete()
+      }
+    },
+    [onDelete]
+  )
+
+  useEffect(() => {
+    if (initData?.teacherFileList && initData.teacherFileList.length) {
+      setFileList(
+        initData.teacherFileList.reduce((acc, f) => {
+          return {
+            ...acc,
+            [f.fileUuid]: { fileName: f.fileName, fileId: f.fileId },
+          }
+        }, {})
+      )
+    }
+    if (initData?.tag && initData.tag.length) {
+      setTags([...initData.tag])
+    }
+  }, [initData])
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
@@ -142,7 +189,6 @@ const EventForm = ({ onSubmit = (f) => f }) => {
           type="file"
           name="files"
           id="files"
-          multiple
           onChange={handleChangeFileInput}
           ref={fileInputEl}
         />
@@ -157,8 +203,11 @@ const EventForm = ({ onSubmit = (f) => f }) => {
               className="file-list-item flex items-center justify-between py-1"
               key={key}
             >
-              <span>{fileList[key].name}</span>
-              <button className="flex" onClick={() => handleDeleteFile(key)}>
+              <span className="break-all">{fileList[key].fileName}</span>
+              <button
+                className="flex"
+                onClick={(e) => handleDeleteFile(e, key)}
+              >
                 <MdClose size={18} color="red" />
               </button>
             </li>
@@ -192,9 +241,17 @@ const EventForm = ({ onSubmit = (f) => f }) => {
         </ul>
       </div>
       <div className="flex justify-end gap-2">
-        <button className="flex py-2 px-6 rounded-md border border-orange-400 bg-orange-400">
-          <span className="font-bold text-white">등록</span>
+        <button className="flex py-2 px-6 rounded-md border border-blue-500 bg-blue-500">
+          <span className="font-medium text-white">확인</span>
         </button>
+        {onDelete && (
+          <button
+            className="flex py-2 px-6 rounded-md border border-red-500 bg-white"
+            onClick={handleDeleteEvent}
+          >
+            <span className="font-medium text-red-500">삭제</span>
+          </button>
+        )}
       </div>
     </form>
   )

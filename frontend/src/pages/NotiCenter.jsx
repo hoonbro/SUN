@@ -2,19 +2,22 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { IoEllipsisVertical } from "react-icons/io5"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
+import gravatar from "gravatar"
 import useSWR from "swr"
 import calendarAPI from "../api/calendar"
 import notificationAPI from "../api/notification"
 import Header from "../components/Header"
 import featcher from "../lib/featcher"
+import InfoMessageWrapper from "../components/InfoMessageWrapper"
+import { useAuthState } from "../context"
 
 const NotiCard = ({
   missionName = "과제 제목",
   type = "",
   calendarCode,
+  calendarName,
   sender,
   sendDate,
-  sendTime,
   id,
   onDelete = (f) => f,
 }) => {
@@ -28,6 +31,12 @@ const NotiCard = ({
     () => (sender?.auth === "ROLE_STUDENT" ? "학생" : "선생님"),
     [sender]
   )
+
+  const profileImage = useMemo(() => {
+    return sender?.profileImage
+      ? `https://d101s.s3.ap-northeast-2.amazonaws.com/${sender.profileImage}`
+      : gravatar.url(sender?.email, { d: "retro" })
+  }, [sender])
 
   const handleMenuOpen = useCallback(() => {
     setMenuOpen(true)
@@ -60,7 +69,7 @@ const NotiCard = ({
     switch (type) {
       case "invite": {
         setButtonLabel("초대 수락")
-        setMessage("캘린더에 초대했어요.")
+        setMessage(`${calendarName}에 초대했어요.`)
         setIsInviteEvent(true)
         break
       }
@@ -80,33 +89,34 @@ const NotiCard = ({
         break
       }
       case "calendar_in": {
-        setMessage("캘린더에 들어왔어요")
+        setMessage(`${calendarName}에 들어왔어요`)
         break
       }
       case "calendar_out": {
-        setMessage("캘린더에서 나갔어요")
+        setMessage(`${calendarName}에서 나갔어요`)
         break
       }
     }
-  }, [type])
+  }, [type, calendarName])
+
   return (
-    <div className="p-2 rounded grid gap-4 hover:bg-gray-50">
+    <li className="p-2 rounded grid gap-4 hover:bg-gray-50">
       <div className="flex gap-2">
         <div className="img-wrapper w-12 h-12 rounded-full overflow-hidden">
           <img
-            src="https://i.ytimg.com/vi/y2YXl728YFg/maxresdefault.jpg"
+            src={profileImage}
             alt="프로필 이미지"
             className="w-full h-full object-cover"
           />
         </div>
         <div className="flex-1 grid gap-1">
-          <div>
+          <div className="flex gap-1">
             <span className="font-bold">{sender?.name} </span>
             <span>
               {role}이 {message}
             </span>
           </div>
-          <p className="text-sm font-medium">{missionName}</p>
+          {/* <p className="text-sm font-medium">{targetName}</p> */}
         </div>
         <div className="relative">
           <button className="flex" onClick={handleMenuOpen}>
@@ -148,15 +158,23 @@ const NotiCard = ({
         )}
         <span className="text-sm text-gray-500 ml-auto">{sendDate}</span>
       </div>
-    </div>
+    </li>
   )
 }
 
 const NotiCenter = () => {
+  const authState = useAuthState()
   const { data: notiData, error } = useSWR("/notification", featcher)
   const history = useHistory()
-  console.log(notiData)
-  console.log(error)
+
+  const filteredNotiData = useMemo(() => {
+    if (!notiData) {
+      return notiData
+    }
+    return notiData.filter((noti) => {
+      return authState.user.id !== noti.senderId
+    })
+  }, [notiData, authState])
 
   const handleDelete = useCallback(async (notificationId) => {
     try {
@@ -171,14 +189,16 @@ const NotiCenter = () => {
       <Header pageTitle="알림" handleGoBack={() => history.goBack()} />
       <div className="py-10 h-full flex-1">
         <div className="container max-w-xl bg-white p-4 grid gap-6 select-none xs:rounded-xl xs:shadow-lg">
-          <h3 className="px-2">새로운 알림</h3>
+          <h3 className="px-2">새 알림</h3>
           {error && <p className="px-2">알림을 불러오다 미끄러졌어요</p>}
-          {notiData !== undefined && !error && (
-            <div className="grid gap-4">
-              {notiData.map((noti) => (
+          {filteredNotiData && !error && !!filteredNotiData.length ? (
+            <ul className="grid gap-4">
+              {filteredNotiData.map((noti) => (
                 <NotiCard key={noti.id} {...noti} onDelete={handleDelete} />
               ))}
-            </div>
+            </ul>
+          ) : (
+            <InfoMessageWrapper>새로온 소식이 없어요</InfoMessageWrapper>
           )}
         </div>
       </div>
