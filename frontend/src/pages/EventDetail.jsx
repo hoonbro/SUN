@@ -105,7 +105,8 @@ const EventDetail = () => {
   const connect = useCallback(
     (roomId) => {
       client.current = new StompJS.Client({
-        webSocketFactory: () => new SockJS("http://13.209.9.223:8080/api/chat"),
+        webSocketFactory: () =>
+          new SockJS("https://k5d101.p.ssafy.io/api/chat"),
         connectHeaders: { Authorization: `${auth.token?.accessToken}` },
         debug: function (str) {
           console.log(str)
