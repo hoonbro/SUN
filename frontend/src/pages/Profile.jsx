@@ -58,7 +58,9 @@ const Profile = () => {
     }
     try {
       await memberAPI.withdraw()
-      await logout(authDispatch, authState.token.refreshToken)
+      // await logout(authDispatch, authState.token.refreshToken)
+      authDispatch({ type: "LOGOUT" })
+      localStorage.removeItem("currentUser")
       history.push("/login")
     } catch (error) {
       alert("회원 탈퇴 실패!")
