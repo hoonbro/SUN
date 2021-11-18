@@ -54,6 +54,10 @@ const ChatController = () => {
   const handleFileChange = (e) => {
     const files = e.target.files || e.dataTransfer.files
     if (!files.length) return
+    if (files[0].size > 3000000) {
+      alert("파일 용량 초과")
+      return
+    }
     sendFile(files[0])
     e.target.value = ""
   }

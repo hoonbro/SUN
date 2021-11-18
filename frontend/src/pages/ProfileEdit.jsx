@@ -1,5 +1,6 @@
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { Link, useHistory } from "react-router-dom"
+import client from "../api/client"
 import Button from "../components/Button"
 import Header from "../components/Header"
 import LabelInput from "../components/LabelInput"
@@ -42,18 +43,47 @@ const ProfileEdit = () => {
     )
   }, [name, phone, email])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    const res = await updateProfile(authDispatch, {
-      id: authState.user.id,
-      name: name.value,
-      phone: phone.value,
-      email: email.value,
-    })
-    if (res) {
-      history.replace(`/profile/${authState.user.id}`)
+  const emailCheck = useCallback(async (email) => {
+    try {
+      console.log(email)
+      await client.get(`/auth/duplicate-email/${email}`)
+      return true
+    } catch (error) {
+      return false
     }
-  }
+  }, [])
+
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault()
+      if (email.value !== authState.user.email) {
+        const ok = await emailCheck(email.value)
+        console.log(ok)
+        if (!ok) {
+          alert("이미 존재하는 이메일입니다")
+          return
+        }
+      }
+      const res = await updateProfile(authDispatch, {
+        id: authState.user.id,
+        name: name.value,
+        phone: phone.value,
+        email: email.value,
+      })
+      if (res) {
+        history.replace(`/profile/${authState.user.id}`)
+      }
+    },
+    [
+      authDispatch,
+      authState,
+      history,
+      name.value,
+      phone.value,
+      email.value,
+      emailCheck,
+    ]
+  )
 
   return (
     <div className="min-h-full bg-gray-50 flex flex-col">

@@ -37,6 +37,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
       setSentTime(timeMoment.format("LLL"))
     }
   })
+  console.log(chatItem)
 
   return (
     <div className="flex flex-col gap-1">
@@ -47,7 +48,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
           <img
             src={
               chatItem.picUri ||
-              gravatar.url("a@a.com", { d: "retro", size: "48px" })
+              gravatar.url(chatItem?.email, { d: "retro", size: "48px" })
             }
             alt="사진"
             className="rounded-full w-10 h-10"

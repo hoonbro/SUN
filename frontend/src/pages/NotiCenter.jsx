@@ -3,7 +3,7 @@ import { IoEllipsisVertical } from "react-icons/io5"
 import { useHistory } from "react-router"
 import { Link } from "react-router-dom"
 import gravatar from "gravatar"
-import useSWR from "swr"
+import useSWR, { useSWRConfig } from "swr"
 import calendarAPI from "../api/calendar"
 import notificationAPI from "../api/notification"
 import Header from "../components/Header"
@@ -12,10 +12,10 @@ import InfoMessageWrapper from "../components/InfoMessageWrapper"
 import { useAuthState } from "../context"
 
 const NotiCard = ({
-  missionName = "과제 제목",
   type = "",
   calendarCode,
   calendarName,
+  missionId,
   sender,
   sendDate,
   id,
@@ -49,6 +49,7 @@ const NotiCard = ({
     try {
       await calendarAPI.addShareCalendar({ notificationId: id, calendarCode })
       alert("캘린더에 참여하였습니다")
+      onDelete(id)
     } catch (error) {
       console.error(error)
       switch (error.response?.status) {
@@ -143,7 +144,7 @@ const NotiCard = ({
             ${type === "mission" && "border-orange-200 bg-orange-50"}
             ${type === "calendar" && "border-blue-200 bg-blue-50"}
             `}
-            to={`/calendars/${calendarCode}/events/26`}
+            to={`/calendars/${calendarCode}/events/${missionId}`}
           >
             {buttonLabel}
           </Link>
@@ -165,6 +166,7 @@ const NotiCard = ({
 const NotiCenter = () => {
   const authState = useAuthState()
   const { data: notiData, error } = useSWR("/notification", featcher)
+  const { mutate } = useSWRConfig()
   const history = useHistory()
 
   const filteredNotiData = useMemo(() => {
@@ -179,6 +181,7 @@ const NotiCenter = () => {
   const handleDelete = useCallback(async (notificationId) => {
     try {
       await notificationAPI.deleteNotification(notificationId)
+      mutate(`/notification`)
     } catch (error) {
       console.error(error)
     }

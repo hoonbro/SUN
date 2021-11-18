@@ -40,7 +40,14 @@ const EventForm = ({ initData, onSubmit = (f) => f, onDelete }) => {
 
   const handleChangeFileInput = useCallback(async (e) => {
     const { files } = e.target
+    console.log(files)
     if (!files.length) return
+    console.log(files[0])
+    console.log(files[0].size)
+    if (files[0].size > 3000000) {
+      alert("파일 용량 초과")
+      return
+    }
     const formData = new FormData()
     formData.append("teacherFile", files[0])
     try {
@@ -177,7 +184,7 @@ const EventForm = ({ initData, onSubmit = (f) => f, onDelete }) => {
         </div>
       </div>
       <div className="form-field">
-        <label htmlFor="files">수업자료</label>
+        <label htmlFor="files">수업자료 (3MB 이하)</label>
         <button
           className="py-2 bg-blue-500 text-white rounded"
           onClick={handleOpenFileInput}
