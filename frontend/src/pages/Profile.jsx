@@ -20,6 +20,10 @@ const Profile = () => {
     if (!files.length) {
       return
     }
+    if (files[0].size > 3000000) {
+      alert("파일 용량 초과")
+      return
+    }
     const formData = new FormData()
     formData.append("image", files[0])
     try {
