@@ -14,6 +14,7 @@ const CalendarInviteModal = ({
       try {
         console.log(calendarCode, inviteeEmail)
         await calendarAPI.inviteUser({ calendarCode, inviteeEmail })
+        alert("초대를 완료했습니다")
       } catch (error) {
         console.error(error)
         switch (error.response?.status) {

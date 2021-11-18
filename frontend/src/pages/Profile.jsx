@@ -20,6 +20,10 @@ const Profile = () => {
     if (!files.length) {
       return
     }
+    if (files[0].size > 3000000) {
+      alert("파일 용량 초과")
+      return
+    }
     const formData = new FormData()
     formData.append("image", files[0])
     try {
@@ -58,7 +62,9 @@ const Profile = () => {
     }
     try {
       await memberAPI.withdraw()
-      await logout(authDispatch, authState.token.refreshToken)
+      // await logout(authDispatch, authState.token.refreshToken)
+      authDispatch({ type: "LOGOUT" })
+      localStorage.removeItem("currentUser")
       history.push("/login")
     } catch (error) {
       alert("회원 탈퇴 실패!")
