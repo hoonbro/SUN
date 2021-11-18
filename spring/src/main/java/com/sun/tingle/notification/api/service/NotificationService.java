@@ -106,6 +106,7 @@ public class NotificationService {
                 .sendTime(now)
                 .isCheck(false)
                 .mission(m)
+                .missionId(missionId)
                 .build();
         notificationEntity = notificationRepository.save(notificationEntity);
 
@@ -185,8 +186,10 @@ public class NotificationService {
         for(int i = 0; i < list.size(); i++){
             NotificationEntity n = list.get(i);
 
-            if(n.getType().equals("invite"))
+            if(n.getType().equals("invite")) {
+                n.setSender(memberService.getMemberInfo(n.getSenderId()));
                 continue;
+            }
             NotificationCheckEntity notificationCheckEntity = notificationCheckRepository.findByNotificationIdAndMemberId(n.getId(), id);
             if(notificationCheckEntity == null) {
                 list.remove(i);
@@ -197,9 +200,30 @@ public class NotificationService {
         }
 
         log.info("사용자에 맞게 알림 체크 여부 판단");
+        list = setMissionIdList(list);
+        return list;
+    }
+
+    public List<NotificationEntity> setMissionIdList(List<NotificationEntity> list) {
+        int size = list.size();
+
+
+        for(int i=0; i<size; i++) {
+            Long id = list.get(i).getId();
+            NotificationEntity notificationEntity = notificationRepository.findById(id).get();
+
+
+            if(notificationEntity.getReceiverId() != null) {
+                continue;
+            }
+            notificationEntity.setMissionId(notificationEntity.getMission().getMissionId());
+            list.set(i,notificationEntity);
+        }
+
 
         return list;
     }
+
 
     public void deleteNotification(Long notificationId){
         notificationRepository.delete(
