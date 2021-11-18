@@ -138,7 +138,7 @@ const EventDetail = () => {
       const missionInfo = await ChatAPI.getMissionInfo(eventId)
       console.log(missionInfo)
       missionInfo.teacherFileList.forEach((fileItem) => {
-        fileItem.fileUri = `https://d101s.s3.ap-northeast-2.amazonaws.com/${calendarCode}/${fileItem.missionId}/${fileItem.fileUuid}`
+        fileItem.fileUri = `https://d101s.s3.ap-northeast-2.amazonaws.com/${fileItem.fileUuid}`
       })
       console.log(missionInfo)
       setTeacherFileList(missionInfo.teacherFileList)
