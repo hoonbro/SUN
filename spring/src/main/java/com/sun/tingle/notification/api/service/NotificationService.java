@@ -213,7 +213,8 @@ public class NotificationService {
             NotificationEntity notificationEntity = notificationRepository.findById(id).get();
 
 
-            if(notificationEntity.getReceiverId() != null) {
+            if(notificationEntity.getType().equals("invite") || notificationEntity.getType().equals("calendar_in") ||
+            notificationEntity.getType().equals("calendar_out")) {
                 continue;
             }
             notificationEntity.setMissionId(notificationEntity.getMission().getMissionId());
