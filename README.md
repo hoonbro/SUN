@@ -4,7 +4,7 @@
 
 
 
-### :man_technologist: 팀원 소개
+### :family_man_boy_boy: 팀원 소개
 
 - 5명
 
@@ -28,53 +28,31 @@
 
 ##### 1. 로그인
 
-![image-20211117154526176](README.assets/image-20211117154526176.png)
+![로그인](README.assets/로그인.gif)
 
 ##### 2. 회원가입
 
-![image-20211117154847636](README.assets/image-20211117154847636.png)
+![회원가입](README.assets/회원가입.gif)
 
 ##### 3. 아이디 / 비밀번호 찾기
 
-![image-20211117154948885](README.assets/image-20211117154948885.png)
-
-
-
-
-
-
+![비밀번호찾기](README.assets/비밀번호찾기.gif)
 
 ##### 4. 프로필
 
-![image-20211117155131548](README.assets/image-20211117155131548.png)
+![프로필](README.assets/프로필.gif)
 
-##### 5. 프로필 수정
-
-![image-20211117155159055](README.assets/image-20211117155159055.png)
-
-##### 6. 비밀번호 수정
+##### 5. 비밀번호 수정
 
 ![image-20211117155221389](README.assets/image-20211117155221389.png)
 
-##### 7. 캘린더
+##### 6. 캘린더
 
-![image-20211117155049898](README.assets/image-20211117155049898.png)
+![캘린더](README.assets/캘린더.gif)
 
-##### 8. 캘린더 목록
+##### 7. 과제별 채팅
 
-![image-20211117155947690](README.assets/image-20211117155947690.png)
-
-##### 9. 캘린더 관리
-
-![image-20211117160014618](README.assets/image-20211117160014618.png)
-
-##### 10. 캘린더 디테일 Modal (과제)
-
-![image-20211117155514396](README.assets/image-20211117155514396.png)
-
-##### 11. 과제별 채팅
-
-![image-20211117155831421](README.assets/image-20211117155831421.png)
+![채팅](README.assets/채팅.gif)
 
 ##### 12. 알림
 
