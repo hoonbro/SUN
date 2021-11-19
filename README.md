@@ -66,7 +66,7 @@
 
 ### :building_construction: 서비스 구조
 
-![image-20211117140342394](README.assets/image-20211117140342394.png)
+![image-20211119102044102](README.assets/image-20211119102044102.png)
 
 
 
