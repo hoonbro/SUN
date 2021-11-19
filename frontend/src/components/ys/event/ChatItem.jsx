@@ -51,7 +51,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
               gravatar.url(chatItem?.email, { d: "retro", size: "48px" })
             }
             alt="사진"
-            className="rounded-full w-10 h-10"
+            className="rounded-full w-10 h-10 object-cover"
           />
           <div className={" flex flex-col " + (isMe ? " items-end " : " ")}>
             <p className="font-medium text-sm text-gray-900">
@@ -73,7 +73,11 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
         {/* svg 파일 안보임 */}
         {chatItem.fileName && chatItem.fileType.includes("image") && (
           <a href={chatItem.fileUri}>
-            <img src={chatItem.fileUri} className="w-28 h-28" />
+            <img
+              src={chatItem.fileUri}
+              className="w-28 h-28 object-cover"
+              alt="이미지"
+            />
           </a>
         )}
         {chatItem.fileName && !chatItem.fileType.includes("image") && (
