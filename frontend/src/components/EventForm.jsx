@@ -46,6 +46,7 @@ const EventForm = ({ initData, onSubmit = (f) => f, onDelete }) => {
     console.log(files[0].size)
     if (files[0].size > 3000000) {
       alert("파일 용량 초과")
+      e.target.value = ""
       return
     }
     const formData = new FormData()
