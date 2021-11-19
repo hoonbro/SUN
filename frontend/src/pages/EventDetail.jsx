@@ -85,7 +85,8 @@ const EventDetail = () => {
       client.current.subscribe(`/room/${roomId}`, (res) => {
         let resData = JSON.parse(res.body)
         console.log(resData)
-
+        if (resData.pic_uri)
+          resData.picUri = `https://d101s.s3.ap-northeast-2.amazonaws.com/${resData.pic_uri}`
         if (resData.fileName) {
           resData = {
             ...resData,

@@ -1,0 +1,19 @@
+# 산출물
+
+## 버전
+
+- Back
+    - openjdk : 11.0.12
+
+- Front
+    - react : 17.0.2
+    - node.js(npm) : 14.17.2
+    
+    ### 1) 환경 변수
+    
+    - DOMAIN_NAME = https://k5d101.p.ssafy.io/
+    
+    ### 2) Mysql
+    
+    - username = root
+    - password = ssafy
