@@ -88,6 +88,7 @@
 - Redis
 - JPA
 - JWT
+- SSE(Server Sent Events)
 - WebSocket
 - Kafka
 - S3
