@@ -37,7 +37,7 @@ const CalendarInviteModal = ({
   )
 
   return (
-    <Modal onClose={onCloseModal}>
+    <Modal onClose={onCloseModal} maxHeight={false}>
       <header className={`flex py-4 justify-center relative`}>
         <h2>캘린더 초대하기</h2>
         <button className="absolute top-4 right-4">

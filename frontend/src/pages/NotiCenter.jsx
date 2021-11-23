@@ -197,13 +197,14 @@ const NotiCenter = () => {
         <div className="container max-w-xl bg-white p-4 grid gap-6 select-none xs:rounded-xl xs:shadow-lg">
           <h3 className="px-2">새 알림</h3>
           {error && <p className="px-2">알림을 불러오다 미끄러졌어요</p>}
-          {filteredNotiData && !error && !!filteredNotiData.length ? (
+          {notiData && !error && !!filteredNotiData.length && (
             <ul className="grid gap-4">
               {filteredNotiData.map((noti) => (
                 <NotiCard key={noti.id} {...noti} onDelete={handleDelete} />
               ))}
             </ul>
-          ) : (
+          )}
+          {notiData && !error && !filteredNotiData.length && (
             <InfoMessageWrapper>새로온 소식이 없어요</InfoMessageWrapper>
           )}
         </div>

@@ -1,7 +1,12 @@
 // import { useEffect } from "react"
 import Portal from "../Portal"
 
-const Modal = ({ onClose = (f) => f, maskClosable = true, children }) => {
+const Modal = ({
+  onClose = (f) => f,
+  maskClosable = true,
+  children,
+  maxHeight = true,
+}) => {
   const onMaskClick = (e) => {
     if (e.currentTarget !== e.target) return
     onClose(e)
@@ -25,9 +30,11 @@ const Modal = ({ onClose = (f) => f, maskClosable = true, children }) => {
         onClick={maskClosable ? onMaskClick : null}
       >
         <div
-          className="w-full bg-white rounded-md flex flex-col h-full max-w-3xl"
+          className={`w-full ${
+            maxHeight && "h-full"
+          } bg-white rounded-md flex flex-col max-w-3xl`}
           tabIndex="0"
-          style={{ height: "90vh" }}
+          style={{ height: maxHeight ? `90vh` : `` }}
         >
           {children}
         </div>

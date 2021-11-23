@@ -15,6 +15,7 @@ import { setCurrentCalendar, useCalendarDispatch } from "../context"
 import calendarAPI from "../api/calendar"
 import useSWR from "swr"
 import featcher from "../lib/featcher"
+import notificationAPI from "../api/notification"
 
 const localizer = momentLocalizer(moment)
 
@@ -100,6 +101,10 @@ const MyCalendar = () => {
   const calendarDispatch = useCalendarDispatch()
   const { calendarCode } = useParams()
 
+  const { data: calendarListData } = useSWR(
+    "/calendar/every/calendars",
+    featcher
+  )
   const { data: calendarData } = useSWR(
     calendarCode ? `/calendar/${calendarCode}` : null,
     featcher,
@@ -139,11 +144,52 @@ const MyCalendar = () => {
     history.push(`/calendars/${e.calendarCode}/events/${e.missionId}`)
   }
 
+  // const handleEventSource = useCallback(() => {
+  //   const calendarCodeList = []
+  //   const id = JSON.parse(localStorage.getItem("currentUser"))?.user?.id
+  //   if (id) {
+  //     const eventSource = new EventSource(`/api/notification/subscribe/${id}`)
+  //     eventSource.onopen = (e) => {
+  //       console.log(e)
+  //     }
+  //     eventSource.onerror = (e) => {
+  //       console.error(e)
+  //       eventSource.close()
+  //     }
+  //     eventSource.onmessage = (e) => {
+  //       console.log(e.data)
+  //     }
+  //   }
+  //   if (calendarListData) {
+  //     calendarListData.myCalendar.forEach((c) =>
+  //       calendarCodeList.push(c.calendarCode)
+  //     )
+  //     calendarListData.shareCalendar.forEach((c) =>
+  //       calendarCodeList.push(c.calendarCode)
+  //     )
+  //   }
+  //   // calendarCodeList.forEach((calendarCode) => {
+  //   //   const eventSource = new EventSource(
+  //   //     `/api/notification/subscribe/calendar/${calendarCode}`
+  //   //   )
+  //   //   eventSource.onopen = (e) => {
+  //   //     console.log(e)
+  //   //   }
+  //   //   eventSource.onerror = (e) => {
+  //   //     console.error(e)
+  //   //   }
+  //   //   eventSource.onmessage = (e) => {
+  //   //     console.log(e.data)
+  //   //   }
+  //   // })
+  // }, [calendarListData])
+
   useEffect(() => {
     setModalOpen(false)
     setAsideOpen(false)
     setCurrentCalendar(calendarDispatch, calendarCode)
-    console.log(document.querySelectorAll(".rbc-btn-group button"))
+    // handleEventSource()
+
     const [today, back, next] = document.querySelectorAll(
       ".rbc-btn-group button"
     )
@@ -152,7 +198,7 @@ const MyCalendar = () => {
       back.innerText = "<"
       next.innerText = ">"
     }
-  }, [calendarDispatch, calendarCode])
+  }, [calendarDispatch, calendarCode, calendarListData])
 
   return (
     <div className="relative flex flex-col h-full pb-4">

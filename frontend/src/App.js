@@ -6,8 +6,8 @@ import NoMatchRoute from "./components/NoMatchRoute"
 import {
   useAuthDispatch,
   useCalendarDispatch,
-  // silentRefresh,
   setCurrentCalendar,
+  useAuthState,
 } from "./context"
 import BottomNav from "./components/BottomNav"
 import routes from "./routes"
@@ -15,6 +15,7 @@ import routes from "./routes"
 function App() {
   const authDispatch = useAuthDispatch()
   const calendarDispatch = useCalendarDispatch()
+  const authState = useAuthState()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -51,6 +52,24 @@ function App() {
       false
     )
   }, [])
+
+  // useEffect(() => {
+  //   if (authState?.user?.id) {
+  //     const sse = new EventSource(
+  //       `/api/notification/subscribe/${authState.user.id}`
+  //     )
+  //     sse.onopen = () => {
+  //       alert("sse 연결")
+  //     }
+  //     sse.onmessage = (e) => {
+  //       alert(e)
+  //     }
+  //     sse.onerror = () => sse.close()
+  //     return () => {
+  //       sse.close()
+  //     }
+  //   }
+  // }, [authState])
 
   return (
     <main className="h-full max-h-full pb-16">
