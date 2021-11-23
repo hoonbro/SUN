@@ -9,7 +9,7 @@ import notificationAPI from "../api/notification"
 import Header from "../components/Header"
 import featcher from "../lib/featcher"
 import InfoMessageWrapper from "../components/InfoMessageWrapper"
-import { useAuthState } from "../context"
+import { clearNoti, useAuthState, useNotiDispatch } from "../context"
 
 const NotiCard = ({
   type = "",
@@ -112,12 +112,10 @@ const NotiCard = ({
         </div>
         <div className="flex-1 grid gap-1">
           <div className="flex gap-1">
-            <span className="font-bold">{sender?.name} </span>
             <span>
-              {role}이 {message}
+              <b>{sender?.name}</b> {role}이 {message}
             </span>
           </div>
-          {/* <p className="text-sm font-medium">{targetName}</p> */}
         </div>
         <div className="relative">
           <button className="flex" onClick={handleMenuOpen}>
@@ -168,6 +166,7 @@ const NotiCenter = () => {
   const { data: notiData, error } = useSWR("/notification", featcher)
   const { mutate } = useSWRConfig()
   const history = useHistory()
+  const notiDispatch = useNotiDispatch()
 
   const filteredNotiData = useMemo(() => {
     if (!notiData) {
@@ -189,6 +188,10 @@ const NotiCenter = () => {
     },
     [mutate]
   )
+
+  useEffect(() => {
+    clearNoti(notiDispatch)
+  }, [notiDispatch, notiData])
 
   return (
     <div className="min-h-full bg-gray-50 flex flex-col">

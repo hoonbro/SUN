@@ -11,17 +11,23 @@ import {
   useAuthDispatch,
   useAuthState,
   useCalendarState,
+  useNotiState,
 } from "../context"
+import { useMemo } from "react"
 
 const BottomNav = () => {
   const history = useHistory()
   const authState = useAuthState()
   const calendarState = useCalendarState()
-  const dispatch = useAuthDispatch()
+  const authDispatch = useAuthDispatch()
+  const notiState = useNotiState()
+
   const handleLogout = async () => {
-    await logout(dispatch, authState.token.refreshToken)
+    await logout(authDispatch, authState.token.refreshToken)
     history.push("/login")
   }
+
+  const isNew = useMemo(() => notiState.isNew, [notiState])
 
   return (
     <>
@@ -50,7 +56,12 @@ const BottomNav = () => {
               `
             }
           >
-            <IoNotifications size="24px" />
+            <div className="flex relative">
+              <IoNotifications size="24px" />
+              {isNew && (
+                <div className="w-2 h-2 absolute top-1 right-1 bg-red-500 rounded-full"></div>
+              )}
+            </div>
             <span className="text-xs">알림</span>
           </NavLink>
           <NavLink

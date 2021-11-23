@@ -2,14 +2,14 @@ import { useHistory, useParams } from "react-router"
 import Header from "../components/Header"
 import EventForm from "../components/EventForm"
 import calendarAPI from "../api/calendar"
-import useSWRImmutable from "swr/immutable"
 import featcher from "../lib/featcher"
 import { useCallback } from "react"
+import useSWR, { mutate } from "swr"
 
 const EventEdit = () => {
   const history = useHistory()
   const { calendarCode, eventId } = useParams()
-  const { data: eventData } = useSWRImmutable(`/mission/${eventId}`, featcher)
+  const { data: eventData } = useSWR(`/mission/${eventId}`, featcher)
 
   const handleGoBack = useCallback(() => {
     history.goBack()
@@ -19,9 +19,9 @@ const EventEdit = () => {
     async (formData) => {
       try {
         const eventRes = await calendarAPI.editEvent({ eventId, formData })
+        mutate(`/mission/${eventId}`)
         const ok = window.confirm("과제가 수정되었어요! 지금 보러 갈까요?")
         if (ok) {
-          alert("과제 상세 페이지로 이동")
           history.push(
             `/calendars/${calendarCode}/events/${eventRes.missionId}`
           )

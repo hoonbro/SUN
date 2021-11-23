@@ -7,6 +7,8 @@ import {
   addCalendar,
   editCalendar,
   setCurrentCalendar,
+  addNewNoti,
+  clearNoti,
 } from "./action"
 import {
   AuthProvider,
@@ -15,6 +17,9 @@ import {
   CalendarProvider,
   useCalendarDispatch,
   useCalendarState,
+  useNotiState,
+  useNotiDispatch,
+  NotiProvider,
 } from "./context"
 
 export {
@@ -32,4 +37,9 @@ export {
   CalendarProvider,
   useCalendarDispatch,
   useCalendarState,
+  useNotiState,
+  useNotiDispatch,
+  NotiProvider,
+  addNewNoti,
+  clearNoti,
 }

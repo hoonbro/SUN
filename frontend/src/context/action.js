@@ -149,3 +149,15 @@ export const setCurrentCalendar = (dispatch, currentCalendarCode) => {
     JSON.stringify({ ...currentUser, currentCalendarCode })
   )
 }
+
+export const addNewNoti = (dispatch) => {
+  dispatch({
+    type: "NEW",
+  })
+}
+
+export const clearNoti = (dispatch) => {
+  dispatch({
+    type: "CLEAR",
+  })
+}

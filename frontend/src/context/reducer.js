@@ -19,6 +19,27 @@ export const calendarInitialState = {
   currentCalendarCode: "",
 }
 
+export const notiInitialState = {
+  isNew: false,
+}
+
+export const NotiReducer = (initialState, action) => {
+  switch (action.type) {
+    case "NEW": {
+      return {
+        ...initialState,
+        isNew: true,
+      }
+    }
+    case "CLEAR": {
+      return {
+        ...initialState,
+        isNew: false,
+      }
+    }
+  }
+}
+
 export const CalendarReducer = (initialState, action) => {
   switch (action.type) {
     case "SET_CALENDAR": {

@@ -80,7 +80,7 @@ const ChatController = () => {
   return (
     <div className="p-2 flex gap-2">
       <div className="flex flex-col justify-center gap-2">
-        <div className="bg-gray-100 rounded-full w-10 h-10 flex justify-center items-center">
+        <button className="bg-gray-100 rounded-full w-10 h-10 flex justify-center items-center hover:bg-gray-200">
           <input
             type="file"
             ref={fileEl}
@@ -92,8 +92,8 @@ const ChatController = () => {
             onClick={() => handleFileBtnClick()}
             className="text-lg text-gray-500 "
           />
-        </div>
-        <div className="bg-gray-100 rounded-full w-10 h-10 flex justify-center items-center">
+        </button>
+        <button className="bg-gray-100 rounded-full w-10 h-10 flex justify-center items-center hover:bg-gray-200">
           <input
             type="file"
             ref={imgEl}
@@ -106,7 +106,7 @@ const ChatController = () => {
             onClick={() => handleImgBtnClick()}
             className="text-lg text-gray-500 "
           />
-        </div>
+        </button>
       </div>
       <div className="bg-gray-100 rounded-lg flex items-center gap-2 p-2 flex-grow">
         <textarea

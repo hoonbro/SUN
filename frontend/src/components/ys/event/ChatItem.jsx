@@ -65,7 +65,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
       <span
         className={
           (isMe ? "mr-12 ml-24" : "ml-12 mr-24") +
-          " border-2 rounded-xl py-1 px-2 " +
+          " border-2 rounded-xl p-2 text-sm break-all whitespace-pre-line" +
           contentBorderColor +
           contentLeftRight
         }

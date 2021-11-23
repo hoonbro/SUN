@@ -4,6 +4,8 @@ import {
   authInitialState,
   CalendarReducer,
   calendarInitialState,
+  NotiReducer,
+  notiInitialState,
 } from "./reducer"
 
 // Auth
@@ -12,6 +14,37 @@ const AuthDispatchContext = createContext(null)
 // Calendar
 const CalendarStateContext = createContext(null)
 const CalendarDispatchContext = createContext(null)
+// Noti
+const NotiStateContext = createContext(null)
+const NotiDispatchContext = createContext(null)
+
+export const useNotiState = () => {
+  const context = useContext(NotiStateContext)
+  if (context === undefined) {
+    throw new Error("useNotiState는 NotiProvider 안에서만 사용 가능합니다")
+  }
+  return context
+}
+
+export const useNotiDispatch = () => {
+  const context = useContext(NotiDispatchContext)
+  if (context === undefined) {
+    throw new Error("useNotiDispatch는 NotiProvider 안에서만 사용 가능합니다")
+  }
+  return context
+}
+
+export const NotiProvider = ({ children }) => {
+  const [noti, dispatch] = useReducer(NotiReducer, notiInitialState)
+
+  return (
+    <NotiStateContext.Provider value={noti}>
+      <NotiDispatchContext.Provider value={dispatch}>
+        {children}
+      </NotiDispatchContext.Provider>
+    </NotiStateContext.Provider>
+  )
+}
 
 export const useAuthState = () => {
   const context = useContext(AuthStateContext)

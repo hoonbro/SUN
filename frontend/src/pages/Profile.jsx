@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { Link, useParams, useHistory } from "react-router-dom"
 import { MdAddPhotoAlternate } from "react-icons/md"
-import { logout, useAuthDispatch, useAuthState } from "../context"
+import { useAuthDispatch, useAuthState } from "../context"
 import gravatar from "gravatar"
 import Header from "../components/Header"
 import client from "../api/client"
@@ -70,7 +70,7 @@ const Profile = () => {
     } catch (error) {
       alert("회원 탈퇴 실패!")
     }
-  }, [authDispatch, authState, history])
+  }, [authDispatch, history])
 
   useEffect(() => {
     async function fetchProfileUser() {

@@ -12,8 +12,8 @@ const CalendarInviteModal = ({
   const handleSubmit = useCallback(
     async (inviteeEmail) => {
       try {
-        console.log(calendarCode, inviteeEmail)
         await calendarAPI.inviteUser({ calendarCode, inviteeEmail })
+        onCloseModal()
         alert("초대를 완료했습니다")
       } catch (error) {
         console.error(error)
@@ -33,7 +33,7 @@ const CalendarInviteModal = ({
         }
       }
     },
-    [calendarCode]
+    [calendarCode, onCloseModal]
   )
 
   return (

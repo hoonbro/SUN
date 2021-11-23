@@ -11,11 +11,16 @@ import EventListItem from "../components/EventListItem"
 import "../static/calendar.css"
 import "react-big-calendar/lib/addons/dragAndDrop/styles.scss"
 import CalendarAside from "../components/calendar/CalendarAside"
-import { setCurrentCalendar, useCalendarDispatch } from "../context"
+import {
+  addNewNoti,
+  setCurrentCalendar,
+  useAuthState,
+  useCalendarDispatch,
+  useNotiDispatch,
+} from "../context"
 import calendarAPI from "../api/calendar"
 import useSWR from "swr"
 import featcher from "../lib/featcher"
-import notificationAPI from "../api/notification"
 
 const localizer = momentLocalizer(moment)
 
@@ -98,7 +103,9 @@ const EventsModal = ({
 
 const MyCalendar = () => {
   const history = useHistory()
+  const authState = useAuthState()
   const calendarDispatch = useCalendarDispatch()
+  const notiDispatch = useNotiDispatch()
   const { calendarCode } = useParams()
 
   const { data: calendarListData } = useSWR(
@@ -144,51 +151,50 @@ const MyCalendar = () => {
     history.push(`/calendars/${e.calendarCode}/events/${e.missionId}`)
   }
 
-  // const handleEventSource = useCallback(() => {
-  //   const calendarCodeList = []
-  //   const id = JSON.parse(localStorage.getItem("currentUser"))?.user?.id
-  //   if (id) {
-  //     const eventSource = new EventSource(`/api/notification/subscribe/${id}`)
-  //     eventSource.onopen = (e) => {
-  //       console.log(e)
-  //     }
-  //     eventSource.onerror = (e) => {
-  //       console.error(e)
-  //       eventSource.close()
-  //     }
-  //     eventSource.onmessage = (e) => {
-  //       console.log(e.data)
-  //     }
-  //   }
-  //   if (calendarListData) {
-  //     calendarListData.myCalendar.forEach((c) =>
-  //       calendarCodeList.push(c.calendarCode)
-  //     )
-  //     calendarListData.shareCalendar.forEach((c) =>
-  //       calendarCodeList.push(c.calendarCode)
-  //     )
-  //   }
-  //   // calendarCodeList.forEach((calendarCode) => {
-  //   //   const eventSource = new EventSource(
-  //   //     `/api/notification/subscribe/calendar/${calendarCode}`
-  //   //   )
-  //   //   eventSource.onopen = (e) => {
-  //   //     console.log(e)
-  //   //   }
-  //   //   eventSource.onerror = (e) => {
-  //   //     console.error(e)
-  //   //   }
-  //   //   eventSource.onmessage = (e) => {
-  //   //     console.log(e.data)
-  //   //   }
-  //   // })
-  // }, [calendarListData])
+  const handleEventSource = useCallback(() => {
+    const calendarCodeList = []
+    if (calendarListData) {
+      calendarListData.myCalendar.forEach((c) =>
+        calendarCodeList.push(c.calendarCode)
+      )
+      calendarListData.shareCalendar.forEach((c) =>
+        calendarCodeList.push(c.calendarCode)
+      )
+    }
+    calendarCodeList.forEach((calendarCode) => {
+      const eventSource = new EventSource(
+        `http://k5d101.p.ssafy.io:8080/api/notification/subscribe/calendar/${calendarCode}`
+      )
+      eventSource.onopen = (e) => {
+        console.log(e)
+      }
+      eventSource.onerror = (e) => {
+        console.error(e)
+      }
+      eventSource.onmessage = (e) => {
+        console.log(e.data)
+      }
+      eventSource.addEventListener(calendarCode, (e) => {
+        try {
+          const data = JSON.parse(e?.data)
+          console.log(data)
+          const { id } = authState.user
+          if (!data || data.senderId === id) {
+            return
+          }
+          addNewNoti(notiDispatch)
+        } catch (error) {
+          return
+        }
+      })
+    })
+  }, [calendarListData, notiDispatch, authState.user])
 
   useEffect(() => {
     setModalOpen(false)
     setAsideOpen(false)
     setCurrentCalendar(calendarDispatch, calendarCode)
-    // handleEventSource()
+    handleEventSource()
 
     const [today, back, next] = document.querySelectorAll(
       ".rbc-btn-group button"
