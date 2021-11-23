@@ -109,3 +109,6 @@
 - Notion
 - Gather Town
 
+### :speech_balloon: 기록들 
+> [프로젝트 활동 기록(Notion)](https://www.notion.so/binitiger/SSAFY-fd747d28c47f448c874e01526b4349b2)
+
