@@ -73,7 +73,7 @@ const Login = () => {
               className="font-bold text-sm text-gray-700 text-center"
               to="/register"
             >
-              팅글 회원가입
+              회원가입
             </Link>
             <Link
               className="font-bold text-sm text-gray-700 text-center"

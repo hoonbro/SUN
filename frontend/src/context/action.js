@@ -64,13 +64,13 @@ export const loginUser = async (dispatch, payload) => {
 
 export const logout = async (dispatch, refreshToken) => {
   try {
+    localStorage.removeItem("currentUser")
+    dispatch({ type: "LOGOUT" })
     await client.delete("/members/logout", {
       headers: {
         refreshToken,
       },
     })
-    dispatch({ type: "LOGOUT" })
-    localStorage.removeItem("currentUser")
   } catch (error) {
     console.log(error)
   }

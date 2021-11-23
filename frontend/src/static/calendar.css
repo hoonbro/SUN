@@ -53,6 +53,7 @@ button.rbc-input::-moz-focus-inner {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 0.875rem;
 }
 
 .rbc-rtl {
@@ -200,13 +201,18 @@ button.rbc-input::-moz-focus-inner {
   box-sizing: border-box;
   box-shadow: none;
   margin: 0;
-  padding: 2px 5px;
-  background-color: #3174ad;
+  padding: 4px 8px;
+  background-color: #3b82f6;
   border-radius: 5px;
   color: #fff;
   cursor: pointer;
   width: 100%;
   text-align: left;
+}
+.rbc-event:hover,
+.rbc-day-slot .rbc-background-event:hover {
+  transition: all 0.2s ease-in;
+  background-color: #1d4ed8;
 }
 .rbc-slot-selecting .rbc-event,
 .rbc-slot-selecting .rbc-day-slot .rbc-background-event,
