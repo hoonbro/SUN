@@ -44,4 +44,6 @@ const getMissionInfo = async (missionId) => {
   }
 }
 
-export default { getChatRoomInfo, getHistory, sendFile, getMissionInfo }
+const chatAPI = { getChatRoomInfo, getHistory, sendFile, getMissionInfo }
+
+export default chatAPI

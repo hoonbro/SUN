@@ -178,14 +178,17 @@ const NotiCenter = () => {
     })
   }, [notiData, authState])
 
-  const handleDelete = useCallback(async (notificationId) => {
-    try {
-      await notificationAPI.deleteNotification(notificationId)
-      mutate(`/notification`)
-    } catch (error) {
-      console.error(error)
-    }
-  }, [])
+  const handleDelete = useCallback(
+    async (notificationId) => {
+      try {
+        await notificationAPI.deleteNotification(notificationId)
+        mutate(`/notification`)
+      } catch (error) {
+        console.error(error)
+      }
+    },
+    [mutate]
+  )
 
   return (
     <div className="min-h-full bg-gray-50 flex flex-col">

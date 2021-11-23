@@ -29,16 +29,20 @@ const EventMaterial = () => {
           <span className="text-gray-900 font-medium">강의자료</span>
         </p>
         {!isShow && (
-          <RiArrowDropDownLine
-            className="text-3xl"
-            onClick={() => setIsShow(true)}
-          />
+          <button className="flex">
+            <RiArrowDropDownLine
+              className="text-3xl"
+              onClick={() => setIsShow(true)}
+            />
+          </button>
         )}
         {isShow && (
-          <RiArrowDropUpLine
-            className="text-3xl"
-            onClick={() => setIsShow(false)}
-          />
+          <button className="flex">
+            <RiArrowDropUpLine
+              className="text-3xl"
+              onClick={() => setIsShow(false)}
+            />
+          </button>
         )}
       </div>
       {isShow && (

@@ -9,7 +9,6 @@ const ChatListContainer = () => {
     chatStatus,
     getHistory,
     currentPage,
-    setCurrentPage,
     lastPage,
     sizePerPage,
   } = useContext(ChatContext)

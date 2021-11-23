@@ -29,6 +29,29 @@ function App() {
     }
     asyncEffect()
   }, [authDispatch, calendarDispatch])
+
+  useEffect(() => {
+    window.addEventListener(
+      "dragover",
+      (event) => {
+        event.preventDefault()
+        event.dataTransfer.effectAllowed = "none"
+        event.dataTransfer.dropEffect = "none"
+      },
+      false
+    )
+
+    window.addEventListener(
+      "drop",
+      (event) => {
+        event.preventDefault()
+        event.dataTransfer.effectAllowed = "none"
+        event.dataTransfer.dropEffect = "none"
+      },
+      false
+    )
+  }, [])
+
   return (
     <main className="h-full max-h-full pb-16">
       {!loading && (

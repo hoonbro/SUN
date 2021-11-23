@@ -5,7 +5,7 @@ import React, {
   useReducer,
   useCallback,
 } from "react"
-import { useParams, useRouteMatch } from "react-router"
+import { useParams } from "react-router"
 import { IoSettingsOutline } from "react-icons/io5"
 import ChatController from "../components/ys/event/ChatController"
 import ChatListContainer from "../components/ys/event/ChatListContainer"

@@ -36,7 +36,7 @@ const ChatItem = ({ chatItem, exChatItem = null }) => {
     } else {
       setSentTime(timeMoment.format("LLL"))
     }
-  })
+  }, [timeMoment])
   console.log(chatItem)
 
   return (

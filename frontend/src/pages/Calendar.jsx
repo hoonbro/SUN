@@ -143,10 +143,19 @@ const MyCalendar = () => {
     setModalOpen(false)
     setAsideOpen(false)
     setCurrentCalendar(calendarDispatch, calendarCode)
+    console.log(document.querySelectorAll(".rbc-btn-group button"))
+    const [today, back, next] = document.querySelectorAll(
+      ".rbc-btn-group button"
+    )
+    if (today && back && next) {
+      today.innerText = "오늘"
+      back.innerText = "<"
+      next.innerText = ">"
+    }
   }, [calendarDispatch, calendarCode])
 
   return (
-    <div className="relative flex flex-col h-full pb-10">
+    <div className="relative flex flex-col h-full pb-4">
       <header className="p-4">
         <button
           className="flex items-center gap-1"
@@ -171,7 +180,7 @@ const MyCalendar = () => {
         />
       )}
       <Link
-        className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white"
+        className="flex w-14 h-14 bg-orange-400 shadow-md items-center justify-center rounded-full absolute bottom-4 right-4 text-white z-10"
         to={`/calendars/${calendarCode}/events/create`}
       >
         <MdAdd size={28} />
