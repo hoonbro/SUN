@@ -40,23 +40,27 @@ public class MissionController {
 
 
     @PostMapping
-    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam(value = "teacherFile",required = false) MultipartFile[] teacherFile, @RequestParam(value = "tag",required = false) List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
-
+    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestBody MissionRqDto missionRqDto) throws IOException, ParseException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-
-        MissionRqDto missionRqDto = new MissionRqDto();
-        missionRqDto = missionRqDto.builder().id(id).tag(tag).calendarCode(calendarCode).
-                start(start).end(end).title(title).build();
-
-        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto,teacherFile);
-
-
-//        if(missionRpDto == null) {
-//            return new ResponseEntity<MissionRpDto>(missionRpDto, HttpStatus.UNAUTHORIZED);
-//        }
+        missionRqDto.setId(id);
+        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto);
         return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
     }
+
+//    @PostMapping
+//    public ResponseEntity<MissionRpDto> insertMission(HttpServletRequest request, @RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam(value = "teacherFile",required = false) MultipartFile[] teacherFile, @RequestParam(value = "tag",required = false) List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
+//
+//        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+//        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+//
+//        MissionRqDto missionRqDto = new MissionRqDto();
+//        missionRqDto = missionRqDto.builder().id(id).tag(tag).calendarCode(calendarCode).
+//                start(start).end(end).title(title).build();
+//
+//        MissionRpDto missionRpDto = missionService.insertMission(missionRqDto,teacherFile);
+//        return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.CREATED);
+//    }
 
     @GetMapping("{missionId}")
     public ResponseEntity<MissionRpDto> selectMission(@PathVariable("missionId") Long missionId) {
@@ -69,23 +73,33 @@ public class MissionController {
 
 
     @PutMapping("{missionId}")
-    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam(value="teacherFile",required = false) MultipartFile[] teacherFile, @RequestParam(value="tag",required = false) List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
+    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestBody MissionRqDto missionRqDto) throws IOException, ParseException {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-        MissionRqDto missionRqDto = new MissionRqDto();
-        missionRqDto = missionRqDto.builder().id(id).tag(tag).calendarCode(calendarCode).
-                start(start).end(end).title(title).build();
+        missionRqDto.setId(id);
 
-        MissionRpDto missionRpDto = missionService.updateMission(missionId,missionRqDto,teacherFile);
+        MissionRpDto missionRpDto = missionService.updateMission(missionId,missionRqDto);
         if(missionRpDto == null) {
             return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.NO_CONTENT);
         }
-//        else if(missionRpDto.getTitle() == null) { // 처리 권한 없을 때
-//            return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.UNAUTHORIZED);
-//        }
         return new ResponseEntity<>(missionRpDto, HttpStatus.CREATED);
-
     }
+
+
+//    @PutMapping("{missionId}")
+//    public ResponseEntity<MissionRpDto> updateMission(HttpServletRequest request,@PathVariable("missionId") Long missionId,@RequestParam("title") String title, @RequestParam("start") String start, @RequestParam("end") String end, @RequestParam(value="teacherFile",required = false) MultipartFile[] teacherFile, @RequestParam(value="tag",required = false) List<String> tag, @RequestParam("calendarCode") String calendarCode) throws IOException, ParseException {
+//        String token =request.getHeader(HttpHeaders.AUTHORIZATION);
+//        Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
+//        MissionRqDto missionRqDto = new MissionRqDto();
+//        missionRqDto = missionRqDto.builder().id(id).tag(tag).calendarCode(calendarCode).
+//                start(start).end(end).title(title).build();
+//
+//        MissionRpDto missionRpDto = missionService.updateMission(missionId,missionRqDto,teacherFile);
+//        if(missionRpDto == null) {
+//            return new ResponseEntity<MissionRpDto>(missionRpDto,HttpStatus.NO_CONTENT);
+//        }
+//        return new ResponseEntity<>(missionRpDto, HttpStatus.CREATED);
+//    }
 
     @DeleteMapping("{missionId}")
     public ResponseEntity<Void> deleteMission(HttpServletRequest request,@PathVariable("missionId") Long missionId) {

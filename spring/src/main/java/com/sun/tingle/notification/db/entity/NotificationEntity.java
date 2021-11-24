@@ -27,6 +27,7 @@ public class NotificationEntity {
 
     private String calendarCode;
 
+    private String calendarName;
 //    private Long missionId;
 
     private Long senderId;
@@ -43,10 +44,13 @@ public class NotificationEntity {
     Date sendTime;
 
     @JsonBackReference
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mission_id", referencedColumnName = "mission_id")
     private MissionEntity mission;
 
     @Transient
     private MemberResDto sender;
+
+    @Transient
+    private Long missionId;
 }

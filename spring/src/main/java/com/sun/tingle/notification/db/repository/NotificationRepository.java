@@ -11,5 +11,5 @@ import java.util.Optional;
 public interface NotificationRepository extends JpaRepository<NotificationEntity, Long> {
     Optional<List<NotificationEntity>> findALLByReceiverId(Long receiverId);
     NotificationEntity findByCalendarCodeAndReceiverId(String calendarCode, Long receiverId);
-    List<NotificationEntity> findAllByCalendarCode(String calendarCode);
+    List<NotificationEntity> findAllByCalendarCodeAndReceiverIdIsNull(String calendarCode);
 }

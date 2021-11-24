@@ -15,6 +15,7 @@ public class MissionRqDto {
     String title;
     String start;
     String end;
+    List<String> teacherFileList;
     List<String> tag;
     String calendarCode;
     Long id;
