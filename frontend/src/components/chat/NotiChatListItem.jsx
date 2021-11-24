@@ -38,7 +38,9 @@ const NotiChatListItem = ({ ...chat }) => {
           </div>
           <div className="flex-1 grid gap-1">
             <p className="font-bold">{chat.nickname}</p>
-            <p className="text-sm font-medium">{chat.content}</p>
+            <p className="text-sm font-medium break-all whitespace-pre-line">
+              {chat.content}
+            </p>
           </div>
         </div>
         <div className="flex items-center justify-between">

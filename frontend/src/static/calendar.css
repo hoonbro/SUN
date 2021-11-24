@@ -54,6 +54,8 @@ button.rbc-input::-moz-focus-inner {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.04rem;
 }
 
 .rbc-rtl {
@@ -124,10 +126,10 @@ button.rbc-input::-moz-focus-inner {
 }
 
 .rbc-toolbar {
-  @apply flex flex-wrap items-center justify-center mb-4 px-4;
+  @apply flex flex-wrap flex-row-reverse items-center justify-between mb-4;
 }
 .rbc-toolbar .rbc-toolbar-label {
-  @apply flex-1 text-right text-lg font-bold;
+  @apply text-lg font-bold;
 }
 .rbc-toolbar button {
   @apply text-gray-700 text-sm py-1 px-2 border border-gray-200 rounded whitespace-nowrap;
@@ -201,19 +203,17 @@ button.rbc-input::-moz-focus-inner {
   box-sizing: border-box;
   box-shadow: none;
   margin: 0;
-  padding: 4px 8px;
-  background-color: #3b82f6;
-  border-radius: 5px;
-  color: #fff;
+  border-radius: 4px;
   cursor: pointer;
   width: 100%;
   text-align: left;
+  @apply px-2 py-1 transition-all;
 }
-.rbc-event:hover,
+/* .rbc-event:hover,
 .rbc-day-slot .rbc-background-event:hover {
   transition: all 0.2s ease-in;
   background-color: #1d4ed8;
-}
+} */
 .rbc-slot-selecting .rbc-event,
 .rbc-slot-selecting .rbc-day-slot .rbc-background-event,
 .rbc-day-slot .rbc-slot-selecting .rbc-background-event {

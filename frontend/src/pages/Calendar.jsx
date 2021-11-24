@@ -101,11 +101,13 @@ const EventsModal = ({
   )
 }
 
+const colorSet = ["#60A5FA", "#818CF8", "#A78BFA", "#FB923C", "#22C55E"]
+
 const MyCalendar = () => {
   const history = useHistory()
-  const authState = useAuthState()
+  // const authState = useAuthState()
   const calendarDispatch = useCalendarDispatch()
-  const notiDispatch = useNotiDispatch()
+  // const notiDispatch = useNotiDispatch()
   const { calendarCode } = useParams()
 
   const { data: calendarListData } = useSWR(
@@ -132,6 +134,16 @@ const MyCalendar = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [asideOpen, setAsideOpen] = useState(false)
 
+  const setStyle = useCallback((event) => {
+    const style = {
+      backgroundColor: colorSet[event.missionId ? event.missionId % 5 : 0],
+      color: "#fff",
+    }
+    return {
+      style: style,
+    }
+  }, [])
+
   const handleSelectSlot = useCallback((slotInfo) => {
     setSelectedDate(slotInfo.slots[0])
     setModalOpen(true)
@@ -151,51 +163,53 @@ const MyCalendar = () => {
     history.push(`/calendars/${e.calendarCode}/events/${e.missionId}`)
   }
 
-  const handleEventSource = useCallback(() => {
-    const calendarCodeList = []
-    if (calendarListData) {
-      calendarListData.myCalendar.forEach((c) =>
-        calendarCodeList.push(c.calendarCode)
-      )
-      calendarListData.shareCalendar.forEach((c) =>
-        calendarCodeList.push(c.calendarCode)
-      )
-    }
-    calendarCodeList.forEach((calendarCode) => {
-      const eventSource = new EventSource(
-        `http://k5d101.p.ssafy.io:8080/api/notification/subscribe/calendar/${calendarCode}`
-      )
-      eventSource.onopen = (e) => {
-        console.log(e)
-      }
-      eventSource.onerror = (e) => {
-        console.error(e)
-      }
-      eventSource.onmessage = (e) => {
-        console.log(e.data)
-      }
-      eventSource.addEventListener(calendarCode, (e) => {
-        try {
-          const data = JSON.parse(e?.data)
-          console.log(data)
-          const { id } = authState.user
-          if (!data || data.senderId === id) {
-            return
-          }
-          addNewNoti(notiDispatch)
-        } catch (error) {
-          return
-        }
-      })
-    })
-  }, [calendarListData, notiDispatch, authState.user])
+  // const handleEventSource = useCallback(() => {
+  //   const calendarCodeList = []
+  //   if (calendarListData) {
+  //     calendarListData.myCalendar.forEach((c) =>
+  //       calendarCodeList.push(c.calendarCode)
+  //     )
+  //     calendarListData.shareCalendar.forEach((c) =>
+  //       calendarCodeList.push(c.calendarCode)
+  //     )
+  //   }
+  //   calendarCodeList.forEach((calendarCode) => {
+  //     const eventSource = new EventSource(
+  //       `http://k5d101.p.ssafy.io:8080/api/notification/subscribe/calendar/${calendarCode}`
+  //     )
+  //     eventSource.onopen = (e) => {
+  //       console.log(e)
+  //     }
+  //     eventSource.onerror = (e) => {
+  //       console.error(e)
+  //     }
+  //     eventSource.onmessage = (e) => {
+  //       console.log(e.data)
+  //     }
+  //     eventSource.addEventListener(calendarCode, (e) => {
+  //       try {
+  //         const data = JSON.parse(e?.data)
+  //         console.log(data)
+  //         const { id } = authState.user
+  //         if (!data || data.senderId === id) {
+  //           return
+  //         }
+  //         addNewNoti(notiDispatch)
+  //       } catch (error) {
+  //         return
+  //       }
+  //     })
+  //   })
+  // }, [calendarListData, notiDispatch, authState.user])
 
   useEffect(() => {
     setModalOpen(false)
     setAsideOpen(false)
     setCurrentCalendar(calendarDispatch, calendarCode)
-    handleEventSource()
+    // handleEventSource()
+  }, [calendarDispatch, calendarCode, calendarListData])
 
+  useEffect(() => {
     const [today, back, next] = document.querySelectorAll(
       ".rbc-btn-group button"
     )
@@ -204,7 +218,7 @@ const MyCalendar = () => {
       back.innerText = "<"
       next.innerText = ">"
     }
-  }, [calendarDispatch, calendarCode, calendarListData])
+  }, [events])
 
   return (
     <div className="relative flex flex-col h-full pb-4">
@@ -229,6 +243,7 @@ const MyCalendar = () => {
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
           onShowMore={handleShowMore}
+          eventPropGetter={setStyle}
         />
       )}
       <Link

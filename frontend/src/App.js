@@ -56,35 +56,35 @@ function App() {
     )
   }, [])
 
-  useEffect(() => {
-    if (authState?.user?.id) {
-      const sse = new EventSource(
-        `http://k5d101.p.ssafy.io:8080/api/notification/subscribe/${authState.user.id}`
-      )
-      sse.onopen = () => {
-        console.log("sse연결")
-      }
-      sse.onmessage = (e) => {
-        alert(e)
-      }
-      sse.onerror = () => sse.close()
-      sse.addEventListener(authState.user.id, (e) => {
-        try {
-          const data = JSON.parse(e?.data)
-          if (!data) {
-            return
-          }
-          addNewNoti(notiDispatch)
-        } catch (error) {
-          return
-        }
-      })
+  // useEffect(() => {
+  //   if (authState?.user?.id) {
+  //     const sse = new EventSource(
+  //       `http://k5d101.p.ssafy.io:8080/api/notification/subscribe/${authState.user.id}`
+  //     )
+  //     sse.onopen = () => {
+  //       console.log("sse연결")
+  //     }
+  //     sse.onmessage = (e) => {
+  //       alert(e)
+  //     }
+  //     sse.onerror = () => sse.close()
+  //     sse.addEventListener(authState.user.id, (e) => {
+  //       try {
+  //         const data = JSON.parse(e?.data)
+  //         if (!data) {
+  //           return
+  //         }
+  //         addNewNoti(notiDispatch)
+  //       } catch (error) {
+  //         return
+  //       }
+  //     })
 
-      return () => {
-        sse.close()
-      }
-    }
-  }, [authState, notiDispatch])
+  //     return () => {
+  //       sse.close()
+  //     }
+  //   }
+  // }, [authState, notiDispatch])
 
   return (
     <main className="h-full max-h-full pb-16">
