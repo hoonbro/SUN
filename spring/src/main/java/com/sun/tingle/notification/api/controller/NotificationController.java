@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -27,12 +28,16 @@ public class NotificationController {
     private final JwtUtil jwtUtil;
 
     @GetMapping(value = "/subscribe/{id}")
-    public SseEmitter subscribe(@PathVariable Long id) {
+    public SseEmitter subscribe(@PathVariable Long id, HttpServletResponse response) {
+        response.addHeader("X-Accel-Buffering", "no");
         return notificationService.subscribe(String.valueOf(id));
     }
 
     @GetMapping(value= "/subscribe/calendar/{calendarCode}")
-    public SseEmitter subscribe2(@PathVariable("calendarCode") String calendarCode){ return notificationService.subscribe(calendarCode); }
+    public SseEmitter subscribe2(@PathVariable("calendarCode") String calendarCode, HttpServletResponse response){
+        response.addHeader("X-Accel-Buffering", "no");
+        return notificationService.subscribe(calendarCode);
+    }
 
     @GetMapping
     public ResponseEntity<?> getNotifications(HttpServletRequest request) {
