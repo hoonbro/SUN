@@ -2,6 +2,7 @@ package com.sun.tingle.member.api.service;
 
 import com.sun.tingle.member.api.dto.request.PasswordCodeDto;
 import com.sun.tingle.member.util.RedisUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -15,15 +16,11 @@ import java.util.Date;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final JavaMailSender javaMailSender;
 
-    @Autowired
-    MemberService memberService;
-
-    @Autowired
-    RedisUtil redisUtil;
+    private final  RedisUtil redisUtil;
 
     private final long CODE_EXPIRE = 600000; // 10분
  

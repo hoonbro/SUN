@@ -2,9 +2,14 @@ package com.sun.tingle.calendar.controller;
 
 
 import com.sun.tingle.calendar.db.entity.CalendarEntity;
+import com.sun.tingle.calendar.requestdto.NotifyChangeRqDto;
+import com.sun.tingle.calendar.requestdto.ShareCalendarRqDto;
 import com.sun.tingle.calendar.responsedto.CalendarRpDto;
 import com.sun.tingle.calendar.service.CalendarService;
+import com.sun.tingle.member.api.dto.TokenInfo;
 import com.sun.tingle.member.util.JwtUtil;
+import com.sun.tingle.notification.api.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
@@ -19,15 +24,15 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/calendar")
+@RequiredArgsConstructor
 @CrossOrigin("*")
+
 public class CalendarController {
+    private final CalendarService calendarService;
 
-    @Autowired
-    CalendarService calendarService;
+    private final JwtUtil jwtUtil;
 
-    @Lazy
-    @Autowired
-    JwtUtil jwtUtil;
+    private final NotificationService notificationService;
 
     @PostMapping
     public ResponseEntity<CalendarRpDto> insertCalendar(HttpServletRequest request, @RequestBody Map<String,String> map) {
@@ -51,6 +56,9 @@ public class CalendarController {
             int result = calendarService.deleteCalendar(calendarCode,id);
             if(result ==1) { // 캘린더 등록한 사람이 아니라서 권한 없을 때
                 return new ResponseEntity<Void>(HttpStatus.UNAUTHORIZED);
+            }
+            else if(result == 3) {
+                return new ResponseEntity<Void>(HttpStatus.BAD_REQUEST);
             }
             else {  // 삭제 완료
                 return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
@@ -88,21 +96,29 @@ public class CalendarController {
 
 
     @PostMapping("/share")
-    public ResponseEntity<CalendarRpDto> insertShareCalendar(HttpServletRequest request,@RequestBody Map<String,String> map) {
-        String calendarCode = map.get("calendarCode");
+    public ResponseEntity<CalendarRpDto> insertShareCalendar(HttpServletRequest request, @RequestBody ShareCalendarRqDto shareCalendarRqDto) {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
-        Map<String,Object> map2 = calendarService.insertShareCalendar(calendarCode,id);
+
+        // 알림 삭제
+        if(shareCalendarRqDto.getNotificationId() != null)
+            notificationService.deleteNotification(shareCalendarRqDto.getNotificationId());
+
+        Map<String,Object> map2 = calendarService.insertShareCalendar(shareCalendarRqDto.getCalendarCode(),id);
         int flag = (Integer)map2.get("flag");
         CalendarRpDto calendarRpDto = (CalendarRpDto)map2.get("calendarRpDto");
         if(flag == -1) { // 애초에 등록 안된 달력일
             // 때
-            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.NO_CONTENT);
+            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.NOT_FOUND);
         }
         else if(flag == -2) { // 이미 공유 달력에 등록되어 있을 때
             return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CONFLICT);
         }
-            //공유 성공했을 때
+        else if(flag == -3) { // 본인이 만든 캘린더일때는 공유 되면 안됨
+            return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.BAD_REQUEST);
+        }
+        //공유 성공했을 때
+        notificationService.sendNotifyChange(id, shareCalendarRqDto.getCalendarCode(), "calendar_in", null);
         return new ResponseEntity<CalendarRpDto>(calendarRpDto,HttpStatus.CREATED);
     }
 
@@ -111,6 +127,7 @@ public class CalendarController {
         String token =request.getHeader(HttpHeaders.AUTHORIZATION);
         Long id = jwtUtil.getIdFromJwt(token.substring("Bearer ".length()));
         try {
+            notificationService.sendNotifyChange(id, calendarCode, "calendar_out", null);
             calendarService.deleteShareCalendar(calendarCode,id);
             return new ResponseEntity<Void>(HttpStatus.NO_CONTENT); //삭제가 됐을 떄
         }
@@ -159,9 +176,12 @@ public class CalendarController {
         return new ResponseEntity<List<CalendarRpDto>>(list,HttpStatus.OK);
     }
 
+    @PostMapping("/notifyChange")
+    public ResponseEntity<Void> testings(HttpServletRequest request,@RequestBody NotifyChangeRqDto notifyChangeRqDto) {
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        TokenInfo tokenInfo = jwtUtil.getClaimsFromJwt(token.substring("Bearer ".length()));
+        notificationService.sendNotifyChange(tokenInfo.getId(),notifyChangeRqDto.getCalendarCode(),notifyChangeRqDto.getType(), notifyChangeRqDto.getMissionId());
 
-
-
-
-
+        return new ResponseEntity<Void>(HttpStatus.OK);
+    }
 }

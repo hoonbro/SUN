@@ -31,7 +31,6 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             throws ServletException, IOException {
         // request에 Header(jwtToken)를 획득한다.
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-
         if (token == null || !token.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;

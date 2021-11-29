@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Entity(name = "chat_message")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 public class ChatMessage {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -31,10 +31,10 @@ public class ChatMessage {
     private LocalDateTime sentTime;
 
     @Column(name = "file_id")
-    private String file_id;
+    private Long file_id;
 
     @Builder
-    public ChatMessage(String content, Long sender, ChatRoom chatRoom, LocalDateTime sentTime, String file_id) {
+    public ChatMessage(String content, Long sender, ChatRoom chatRoom, LocalDateTime sentTime, Long file_id) {
         this.content = content;
         this.sender = sender;
         this.chatRoom = chatRoom;
